@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Octopus Agile - Extended with UK Energy Mix</title>
+  <title>Octopus Agile - New Chart & Fun Features</title>
 
   <!-- OPTIONAL: Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -14,9 +14,9 @@
   />
 
   <style>
-    /* =============================
+    /* =========================================
        BASE / DARK THEME
-       ============================= */
+       ========================================= */
     * {
       margin: 0;
       padding: 0;
@@ -27,53 +27,33 @@
       background-color: #1E0D35; /* Dark purple */
       color: #FFFFFF;
       font-family: 'Roboto', sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+      padding: 10px;
     }
 
-    .container {
-      width: 95%;
-      max-width: 1000px;
-      background-color: #2B1240;
-      border-radius: 8px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      animation: fadeIn 0.8s ease-in-out;
-    }
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(-4px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    /* Each section is top-level, no big container behind them. */
+    section {
+      background-color: #2B1240; 
+      border-radius: 6px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      margin-bottom: 16px;
+      padding: 16px;
     }
 
-    /* =============================
+    /* =========================================
        HEADER
-       ============================= */
+       ========================================= */
     .header {
       text-align: center;
+      background-color: #3A1D50; /* Slightly lighter for variety */
     }
     .header h1 {
-      font-size: 1.8rem;
+      font-size: 1.6rem;
       color: #FF00E5;
-      margin-bottom: 8px;
-    }
-    .header p {
-      font-size: 0.9rem;
-      color: #CCCCCC;
+      margin-bottom: 5px;
     }
 
     .region-selector {
-      margin-top: 10px;
+      margin-top: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -84,96 +64,78 @@
       color: #FF00E5;
     }
     .region-selector select {
-      padding: 5px 10px;
+      padding: 4px 8px;
       border-radius: 4px;
       border: 1px solid #999;
-      background-color: #3A1D50;
+      background-color: #4A2E60;
       color: #FFFFFF;
     }
-    .region-selector select:focus {
-      outline: 1px solid #FF00E5;
-    }
 
-    /* =============================
+    /* =========================================
        CURRENT PRICE
-       ============================= */
+       ========================================= */
     .current-price {
-      background-color: #3A1D50;
-      border-radius: 6px;
-      padding: 16px;
       text-align: center;
     }
-    .current-price .price-display {
-      font-size: 1.6rem;
+    .price-display {
+      font-size: 1.4rem;
       font-weight: 700;
       margin-bottom: 5px;
     }
-    .current-price .timestamp {
-      font-size: 0.9rem;
+    .timestamp {
+      font-size: 0.85rem;
       color: #BBBBBB;
     }
 
-    /* =============================
+    /* =========================================
        METRICS
-       ============================= */
-    .metrics {
-      background-color: #3A1D50;
-      border-radius: 6px;
-      padding: 16px;
-    }
+       ========================================= */
     .metrics-title {
-      font-size: 1.2rem;
-      font-weight: 700;
       text-align: center;
-      margin-bottom: 10px;
+      font-size: 1.2rem;
       color: #FF00E5;
+      margin-bottom: 8px;
+      font-weight: 700;
     }
     .metrics-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 12px;
+      margin-top: 8px;
     }
     .metric-item {
-      background-color: #4A2E60;
-      border-radius: 6px;
+      background-color: #3A1D50;
+      border-radius: 4px;
       padding: 10px;
       text-align: center;
     }
     .metric-item h2 {
       font-size: 1rem;
       color: #FF00E5;
-      margin-bottom: 6px;
-    }
-    .metric-item p {
-      font-size: 1rem;
+      margin-bottom: 5px;
     }
 
-    /* =============================
+    /* =========================================
        PRICE TABLE
-       ============================= */
-    .price-table {
-      background-color: #3A1D50;
-      border-radius: 6px;
-      padding: 16px;
-    }
+       ========================================= */
     .price-table-title {
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin-bottom: 10px;
       text-align: center;
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+      font-weight: 700;
       color: #FF00E5;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
+      margin-top: 6px;
     }
     thead {
-      background-color: #4A2E60;
+      background-color: #3A1D50;
     }
     thead th {
       padding: 8px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 700;
       color: #FFFFFF;
     }
@@ -181,296 +143,238 @@
       border-bottom: 1px solid #4A2E60;
     }
     tbody tr:hover {
-      background-color: #5B3E70;
+      background-color: #4A2E60;
     }
     td {
       padding: 8px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       text-align: center;
       color: #FFFFFF;
     }
-    /* color-coded intervals: <15 => green, <25 => orange, else => red */
-    .price-good {
+
+    /* color-coded intervals:
+       gold if <10p,
+       green if <20p,
+       orange if <26p,
+       red otherwise
+    */
+    .price-gold {
+      background-color: rgba(255, 215, 0, 0.3);
+    }
+    .price-green {
       background-color: rgba(0, 255, 0, 0.2);
     }
-    .price-ok {
+    .price-orange {
       background-color: rgba(255, 165, 0, 0.2);
     }
-    .price-bad {
+    .price-red {
       background-color: rgba(255, 0, 0, 0.2);
     }
 
-    /* =============================
+    /* highlight the current interval row */
+    .current-interval {
+      outline: 2px solid #FF00E5; 
+      background-color: rgba(255, 0, 229, 0.1) !important;
+    }
+
+    /* =========================================
        TOMORROW PREVIEW
-       ============================= */
-    .tomorrow {
-      background-color: #3A1D50;
-      border-radius: 6px;
-      padding: 16px;
-      text-align: center;
-    }
+       ========================================= */
     .tomorrow-title {
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin-bottom: 10px;
-      color: #FF00E5;
-    }
-
-    /* =============================
-       DEBUG
-       ============================= */
-    .debug {
-      background-color: rgba(255, 0, 0, 0.1);
-      color: #ff8080;
-      font-size: 0.8rem;
-      padding: 10px;
-      border-radius: 6px;
-      display: none;
-      word-wrap: break-word;
-    }
-
-    /* =============================
-       CHART WITH GRID LINES
-       ============================= */
-    .chart-section {
-      background-color: #3A1D50;
-      border-radius: 6px;
-      padding: 16px;
-      position: relative;
-    }
-    .chart-title {
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin-bottom: 10px;
       text-align: center;
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+      color: #FF00E5;
+      font-weight: 700;
+    }
+
+    /* =========================================
+       CHART (WITH GRID LINES)
+       ========================================= */
+    .chart-title {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+      font-weight: 700;
       color: #FF00E5;
     }
     .chart-container {
-      position: relative;
       width: 100%;
-      height: 300px; 
-      background-color: #4A2E60;
-      border-radius: 6px;
-      overflow: hidden; /* in case we draw near edges */
-    }
-
-    /* =============================
-       ENERGY MIX SECTION
-       ============================= */
-    .energy-mix {
-      background-color: #3A1D50;
-      border-radius: 6px;
-      padding: 16px;
-    }
-    .energy-mix-title {
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin-bottom: 10px;
-      text-align: center;
-      color: #FF00E5;
-    }
-    .mix-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    .mix-item {
-      background-color: #4A2E60;
-      border-radius: 6px;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .mix-item h3 {
-      font-size: 1rem;
-      color: #FF00E5;
-      margin: 0;
-    }
-    .mix-bar-container {
+      height: 300px;
       background-color: #3A1D50;
       border-radius: 4px;
-      height: 10px;
-      width: 100%;
       position: relative;
       overflow: hidden;
     }
-    .mix-bar {
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      background-color: #FF00E5; /* Pink bar */
-    }
-    .mix-perc {
+
+    /* =========================================
+       DEBUG
+       ========================================= */
+    #debugToggle {
+      display: block;
+      margin: 0 auto 10px auto;
+      padding: 6px 10px;
+      background-color: #FF00E5;
+      border: none;
+      border-radius: 4px;
+      color: #FFF;
+      cursor: pointer;
       font-size: 0.9rem;
-      color: #FFFFFF;
+    }
+    #debugPanel {
+      display: none;
+      background-color: rgba(255,0,0,0.2);
+      padding: 10px;
+      border-radius: 4px;
+      max-height: 300px;
+      overflow: auto;
+      word-wrap: break-word;
+      font-size: 0.8rem;
     }
 
-    /* Responsive for small screens */
+    /* =========================================
+       RESPONSIVE TWEAKS
+       ========================================= */
     @media (max-width: 768px) {
       .metrics-grid {
         grid-template-columns: 1fr;
       }
-      .mix-grid {
-        grid-template-columns: 1fr;
-      }
-      table thead, table tbody {
-        font-size: 0.8rem;
-      }
-    }
-    @media (max-width: 480px) {
-      .header h1 {
-        font-size: 1.4rem;
-      }
-      .price-display {
-        font-size: 1.4rem;
-      }
-      .metrics-title, .price-table-title, .tomorrow-title, .chart-title, .energy-mix-title {
-        font-size: 1.0rem;
+      table th, table td {
+        font-size: 0.75rem;
       }
     }
   </style>
 </head>
-
 <body>
-  <div class="container">
-    <!-- HEADER -->
-    <div class="header">
-      <h1>Octopus Agile - Extended with UK Energy Mix</h1>
-      <p>See your region’s Agile prices, plus the current National Grid fuel mix.</p>
-      <div class="region-selector">
-        <label for="regionSelect">Region:</label>
-        <select id="regionSelect">
-          <option value="A">A (Eastern England)</option>
-          <option value="B">B (East Midlands)</option>
-          <option value="C">C (London)</option>
-          <option value="D">D (Merseyside/N. Wales)</option>
-          <option value="E">E (West Midlands)</option>
-          <option value="F">F (N. Eastern Eng.)</option>
-          <option value="G">G (North Western)</option>
-          <option value="H">H (Southern Eng.)</option>
-          <option value="J">J (South Eastern)</option>
-          <option value="K">K (Southern Scotland)</option>
-          <option value="L">L (Northern Scotland)</option>
-          <option value="M">M (South Wales)</option>
-          <option value="N">N (South Western)</option>
-          <option value="P">P (Yorkshire)</option>
-        </select>
+
+  <!-- HEADER -->
+  <section class="header">
+    <h1>Octopus Agile - Fun Features & Crisp Chart</h1>
+    <div class="region-selector">
+      <label for="regionSelect">Region:</label>
+      <select id="regionSelect">
+        <option value="A">A (Eastern England)</option>
+        <option value="B">B (East Midlands)</option>
+        <option value="C">C (London)</option>
+        <option value="D">D (Merseyside/N.Wales)</option>
+        <option value="E">E (West Midlands)</option>
+        <option value="F">F (N.E. England)</option>
+        <option value="G">G (North Western)</option>
+        <option value="H">H (Southern Eng.)</option>
+        <option value="J">J (South Eastern)</option>
+        <option value="K">K (Southern Scotland)</option>
+        <option value="L">L (Northern Scotland)</option>
+        <option value="M">M (South Wales)</option>
+        <option value="N">N (South Western)</option>
+        <option value="P">P (Yorkshire)</option>
+      </select>
+    </div>
+  </section>
+
+  <!-- CURRENT PRICE -->
+  <section class="current-price">
+    <div id="priceDisplay" class="price-display">Loading price...</div>
+    <div id="timestampDisplay" class="timestamp"></div>
+  </section>
+
+  <!-- METRICS -->
+  <section class="metrics">
+    <div class="metrics-title">Today’s Summary</div>
+    <div class="metrics-grid">
+      <div class="metric-item">
+        <h2>Min Price</h2>
+        <p id="minPrice">-</p>
+      </div>
+      <div class="metric-item">
+        <h2>Max Price</h2>
+        <p id="maxPrice">-</p>
+      </div>
+      <div class="metric-item">
+        <h2>Average</h2>
+        <p id="avgPrice">-</p>
       </div>
     </div>
+  </section>
 
-    <!-- CURRENT PRICE -->
-    <div class="current-price">
-      <div id="priceDisplay" class="price-display">Loading price...</div>
-      <div id="timestampDisplay" class="timestamp"></div>
+  <!-- CHART -->
+  <section>
+    <div class="chart-title">Today’s Price Chart</div>
+    <div id="chartContainer" class="chart-container">
+      <!-- We'll draw with JS -->
     </div>
+  </section>
 
-    <!-- METRICS -->
-    <div class="metrics">
-      <div class="metrics-title">Today’s Summary</div>
-      <div class="metrics-grid">
-        <div class="metric-item">
-          <h2>Min Price</h2>
-          <p id="minPrice">-</p>
-        </div>
-        <div class="metric-item">
-          <h2>Max Price</h2>
-          <p id="maxPrice">-</p>
-        </div>
-        <div class="metric-item">
-          <h2>Average</h2>
-          <p id="avgPrice">-</p>
-        </div>
-      </div>
-    </div>
+  <!-- PRICE TABLE -->
+  <section class="price-table">
+    <div class="price-table-title">Half-Hourly Prices</div>
+    <table>
+      <thead>
+        <tr>
+          <th>From</th>
+          <th>To</th>
+          <th>Price (p/kWh)</th>
+        </tr>
+      </thead>
+      <tbody id="priceTableBody"><!-- Filled by JS --></tbody>
+    </table>
+  </section>
 
-    <!-- CHART -->
-    <div class="chart-section">
-      <div class="chart-title">Today’s Price Chart</div>
-      <div class="chart-container" id="chartContainer">
-        <!-- We’ll draw manually with JS -->
-      </div>
-    </div>
+  <!-- TOMORROW -->
+  <section>
+    <div class="tomorrow-title">Tomorrow’s Preview</div>
+    <div id="tomorrowInfo">Checking tomorrow’s data...</div>
+  </section>
 
-    <!-- PRICE TABLE -->
-    <div class="price-table">
-      <div class="price-table-title">Half-Hourly Prices (Today)</div>
-      <table>
-        <thead>
-          <tr>
-            <th>From</th>
-            <th>To</th>
-            <th>Price (p/kWh)</th>
-          </tr>
-        </thead>
-        <tbody id="priceTableBody"></tbody>
-      </table>
-    </div>
-
-    <!-- TOMORROW PREVIEW -->
-    <div class="tomorrow">
-      <div class="tomorrow-title">Tomorrow’s Preview</div>
-      <div id="tomorrowInfo">Checking tomorrow’s data...</div>
-    </div>
-
-    <!-- NATIONAL GRID ENERGY MIX -->
-    <div class="energy-mix">
-      <div class="energy-mix-title">Current UK Energy Mix</div>
-      <div id="energyMixContainer">
-        <!-- We'll display a grid of sources here -->
-      </div>
-    </div>
-
-    <!-- DEBUG -->
-    <div id="debugLog" class="debug"></div>
-  </div>
+  <!-- DEBUG BUTTON & PANEL -->
+  <button id="debugToggle">Toggle Debug</button>
+  <div id="debugPanel"></div>
 
   <script>
-    /**********************************************************************************************
-     *                               GLOBAL VARIABLES & DOM REFS
-     **********************************************************************************************/
+    /************************************************************************
+     *                          GLOBAL & DOM REFS
+     ************************************************************************/
     const API_BASE = 'https://api.octopus.energy/v1/products/AGILE-18-02-21';
-    // carbonintensity.org.uk for "fuel" breakdown
-    const GENERATION_MIX_API = 'https://api.carbonintensity.org.uk/generation';
+    let regionCode = 'A';
 
-    let regionCode = 'A'; // default
     let todayData = [];
     let tomorrowData = [];
+    let allFutureData = []; // combined "rest of today" + "tomorrow"
 
     // DOM
-    const regionSelectEl   = document.getElementById('regionSelect');
-    const priceEl          = document.getElementById('priceDisplay');
-    const timestampEl      = document.getElementById('timestampDisplay');
-    const minPriceEl       = document.getElementById('minPrice');
-    const maxPriceEl       = document.getElementById('maxPrice');
-    const avgPriceEl       = document.getElementById('avgPrice');
+    const regionSelectEl = document.getElementById('regionSelect');
+    const priceEl        = document.getElementById('priceDisplay');
+    const timestampEl    = document.getElementById('timestampDisplay');
+    const minPriceEl     = document.getElementById('minPrice');
+    const maxPriceEl     = document.getElementById('maxPrice');
+    const avgPriceEl     = document.getElementById('avgPrice');
     const priceTableBodyEl = document.getElementById('priceTableBody');
-    const tomorrowInfoEl   = document.getElementById('tomorrowInfo');
-    const debugLogEl       = document.getElementById('debugLog');
-    const chartContainerEl = document.getElementById('chartContainer');
-    const energyMixContainerEl = document.getElementById('energyMixContainer');
+    const tomorrowInfoEl = document.getElementById('tomorrowInfo');
+    const chartContainerEl= document.getElementById('chartContainer');
+    const debugToggleEl  = document.getElementById('debugToggle');
+    const debugPanelEl   = document.getElementById('debugPanel');
 
-    /**********************************************************************************************
-     *                                      LISTENERS
-     **********************************************************************************************/
+    /************************************************************************
+     *                          EVENT LISTENERS
+     ************************************************************************/
     regionSelectEl.addEventListener('change', () => {
       regionCode = regionSelectEl.value;
       fetchAndRenderAll();
     });
 
-    /**********************************************************************************************
-     *                         FETCH OCTOPUS AGILE DATA
-     **********************************************************************************************/
+    debugToggleEl.addEventListener('click', () => {
+      debugPanelEl.style.display = debugPanelEl.style.display === 'block' ? 'none' : 'block';
+    });
+
+    /************************************************************************
+     *                          FETCH AGILE DATA
+     ************************************************************************/
     async function fetchAgileData() {
       const url = `${API_BASE}/electricity-tariffs/E-1R-AGILE-18-02-21-${regionCode}/standard-unit-rates/`;
-      try {
-        const resp = await fetch(url);
-        if (!resp.ok) throw new Error(`HTTP error: ${resp.status}`);
-        return resp.json();
-      } catch (err) {
-        throw err;
+      const resp = await fetch(url);
+      if (!resp.ok) {
+        throw new Error(`HTTP Error: ${resp.status}`);
       }
+      return resp.json();
     }
 
     function splitTodayAndTomorrow(results) {
@@ -484,8 +388,8 @@
       tomorrowDate.setDate(now.getDate() + 1);
       const tomorrowStr = formatDateYYYYMMDD(tomorrowDate);
 
-      results.sort((a,b) => new Date(a.valid_from) - new Date(b.valid_from));
-      results.forEach(item => {
+      results.sort((a, b) => new Date(a.valid_from) - new Date(b.valid_from));
+      for (const item of results) {
         const d = new Date(item.valid_from);
         const dStr = formatDateYYYYMMDD(d);
         if (dStr === todayStr) {
@@ -493,24 +397,34 @@
         } else if (dStr === tomorrowStr) {
           tomorrowData.push(item);
         }
-      });
+      }
+    }
+
+    // We'll combine "rest of today" + "all tomorrow" to display in the table
+    function buildAllFutureData() {
+      const now = new Date();
+      const futureToday = todayData.filter(d => new Date(d.valid_to) > now);
+      // tomorrow is already for the entire next day
+      allFutureData = [...futureToday, ...tomorrowData];
+      // Sort by start time
+      allFutureData.sort((a,b) => new Date(a.valid_from) - new Date(b.valid_from));
     }
 
     function formatDateYYYYMMDD(d) {
       const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
+      const m = String(d.getMonth()+1).padStart(2,'0');
+      const day = String(d.getDate()).padStart(2,'0');
       return `${y}-${m}-${day}`;
     }
 
-    /**********************************************************************************************
-     *                            RENDER CURRENT PRICE
-     **********************************************************************************************/
+    /************************************************************************
+     *                       RENDER CURRENT PRICE
+     ************************************************************************/
     function renderCurrentPrice() {
       const now = new Date();
       const currentPeriod = todayData.find(item => {
-        const start = new Date(item.valid_from);
-        const end   = new Date(item.valid_to);
+        const start= new Date(item.valid_from);
+        const end  = new Date(item.valid_to);
         return start <= now && end > now;
       });
       if (!currentPeriod) {
@@ -522,67 +436,77 @@
       priceEl.innerText = `Current Price: ${pStr} p/kWh`;
 
       const startStr = new Date(currentPeriod.valid_from)
-        .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        .toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' });
       const endStr   = new Date(currentPeriod.valid_to)
-        .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      timestampEl.innerText = `Valid: ${startStr} - ${endStr}`;
+        .toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' });
+      timestampEl.innerText= `Valid: ${startStr} - ${endStr}`;
     }
 
-    /**********************************************************************************************
-     *                              RENDER METRICS
-     **********************************************************************************************/
+    /************************************************************************
+     *                       RENDER METRICS
+     ************************************************************************/
     function renderMetrics() {
       if (!todayData.length) {
-        minPriceEl.innerText = '-';
-        maxPriceEl.innerText = '-';
-        avgPriceEl.innerText = '-';
+        minPriceEl.innerText='-';
+        maxPriceEl.innerText='-';
+        avgPriceEl.innerText='-';
         return;
       }
-      let minP = Infinity, maxP = -Infinity, sum=0;
+      let minP=Infinity, maxP=-Infinity, sum=0;
       todayData.forEach(d => {
-        if (d.value_inc_vat < minP) minP = d.value_inc_vat;
-        if (d.value_inc_vat > maxP) maxP = d.value_inc_vat;
-        sum += d.value_inc_vat;
+        const p = d.value_inc_vat;
+        if (p<minP) minP=p;
+        if (p>maxP) maxP=p;
+        sum+=p;
       });
       const avgP = sum / todayData.length;
-      minPriceEl.innerText = `${minP.toFixed(2)} p/kWh`;
-      maxPriceEl.innerText = `${maxP.toFixed(2)} p/kWh`;
-      avgPriceEl.innerText = `${avgP.toFixed(2)} p/kWh`;
+      minPriceEl.innerText= `${minP.toFixed(2)} p/kWh`;
+      maxPriceEl.innerText= `${maxP.toFixed(2)} p/kWh`;
+      avgPriceEl.innerText= `${avgP.toFixed(2)} p/kWh`;
     }
 
-    /**********************************************************************************************
-     *                         PRICE TABLE (HALF-HOURLY)
-     **********************************************************************************************/
+    /************************************************************************
+     *                 RENDER TABLE (TODAY + TOMORROW)
+     ************************************************************************/
     function renderPriceTable() {
-      priceTableBodyEl.innerHTML = '';
-      const now = new Date();
-      const future = todayData.filter(d => new Date(d.valid_to) > now);
-      if (!future.length) {
+      priceTableBodyEl.innerHTML='';
+      if(!allFutureData.length) {
         const row = document.createElement('tr');
         const cell= document.createElement('td');
         cell.colSpan=3;
-        cell.innerText='No more intervals today.';
+        cell.innerText='No upcoming intervals.';
         row.appendChild(cell);
         priceTableBodyEl.appendChild(row);
         return;
       }
-      future.forEach(item => {
+
+      const now = new Date();
+      allFutureData.forEach(item => {
         const row = document.createElement('tr');
+
         const fromStr = new Date(item.valid_from)
-          .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          .toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
         const toStr   = new Date(item.valid_to)
-          .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          .toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
         const p = item.value_inc_vat;
 
         // color-coded row
-        if (p < 15) row.classList.add('price-good');
-        else if (p < 25) row.classList.add('price-ok');
-        else row.classList.add('price-bad');
+        if (p<10) row.classList.add('price-gold');
+        else if (p<20) row.classList.add('price-green');
+        else if (p<26) row.classList.add('price-orange');
+        else row.classList.add('price-red');
+
+        // highlight current interval if now is between valid_from & valid_to
+        const start= new Date(item.valid_from);
+        const end  = new Date(item.valid_to);
+        if (start<=now && end>now) {
+          row.classList.add('current-interval');
+        }
 
         const fromTd  = document.createElement('td');
-        fromTd.innerText = fromStr;
+        fromTd.innerText= fromStr;
         const toTd    = document.createElement('td');
-        toTd.innerText   = toStr;
+        toTd.innerText= toStr;
         const priceTd = document.createElement('td');
         priceTd.innerText= p.toFixed(2);
 
@@ -593,238 +517,205 @@
       });
     }
 
-    /**********************************************************************************************
-     *                             TOMORROW PREVIEW
-     **********************************************************************************************/
+    /************************************************************************
+     *                    TOMORROW PREVIEW
+     ************************************************************************/
     function renderTomorrow() {
-      if (!tomorrowData.length) {
-        tomorrowInfoEl.innerText = 'No data for tomorrow yet.';
+      if(!tomorrowData.length) {
+        tomorrowInfoEl.innerText='No data for tomorrow yet.';
         return;
       }
-      let minP = Infinity, maxP = -Infinity;
+      let minP=Infinity, maxP=-Infinity;
       tomorrowData.forEach(d => {
-        if (d.value_inc_vat < minP) minP = d.value_inc_vat;
-        if (d.value_inc_vat > maxP) maxP = d.value_inc_vat;
+        if(d.value_inc_vat<minP) minP=d.value_inc_vat;
+        if(d.value_inc_vat>maxP) maxP=d.value_inc_vat;
       });
       tomorrowInfoEl.innerText=
         `Min: ${minP.toFixed(2)} p/kWh, Max: ${maxP.toFixed(2)} p/kWh`;
     }
 
-    /**********************************************************************************************
-     *                    DRAW A LINE CHART WITH GRID LINES
-     **********************************************************************************************/
+    /************************************************************************
+     *                    CHART WITH GRID LINES
+     ************************************************************************/
     function renderChart() {
-      chartContainerEl.innerHTML = ''; // clear any old
+      chartContainerEl.innerHTML='';
 
-      if (!todayData.length) {
-        // If no data, just put a message
-        const msg = document.createElement('div');
-        msg.style.padding = '20px';
-        msg.innerText = 'No data to chart.';
-        chartContainerEl.appendChild(msg);
+      if(!todayData.length) {
+        chartContainerEl.innerText='No data to chart.';
         return;
       }
 
-      // Create a <canvas> inside the container
-      const canvas = document.createElement('canvas');
-      canvas.width  = chartContainerEl.clientWidth;
-      canvas.height = chartContainerEl.clientHeight;
-      chartContainerEl.appendChild(canvas);
+      // We'll create a canvas that scales with devicePixelRatio
+      const w = chartContainerEl.clientWidth;
+      const h = chartContainerEl.clientHeight;
+      const dpr = window.devicePixelRatio || 1;
 
+      const canvas = document.createElement('canvas');
+      canvas.style.width  = w+'px';
+      canvas.style.height = h+'px';
+      canvas.width  = w * dpr;
+      canvas.height = h * dpr;
+
+      chartContainerEl.appendChild(canvas);
       const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
 
       // Sort by time
-      todayData.sort((a,b) => new Date(a.valid_from) - new Date(b.valid_from));
+      todayData.sort((a,b)=> new Date(a.valid_from) - new Date(b.valid_from));
       const minTime = new Date(todayData[0].valid_from).getTime();
-      const maxTime = new Date(todayData[todayData.length - 1].valid_to).getTime();
+      const maxTime = new Date(todayData[todayData.length -1].valid_to).getTime();
 
-      let minPrice = Infinity, maxPrice = -Infinity;
+      let minPrice=Infinity, maxPrice=-Infinity;
       todayData.forEach(d => {
-        if (d.value_inc_vat < minPrice) minPrice = d.value_inc_vat;
-        if (d.value_inc_vat > maxPrice) maxPrice = d.value_inc_vat;
+        if(d.value_inc_vat<minPrice) minPrice=d.value_inc_vat;
+        if(d.value_inc_vat>maxPrice) maxPrice=d.value_inc_vat;
       });
 
-      // We'll pad the top by ~10% so the line isn't at the very top
-      const pricePadding = (maxPrice - minPrice)*0.1;
-      const chartMinP = (pricePadding ? minPrice - pricePadding : minPrice);
-      const chartMaxP = (pricePadding ? maxPrice + pricePadding : maxPrice);
+      // Add ~10% padding top/bottom
+      const padding = (maxPrice-minPrice)*0.1 || 1;
+      const chartMinP = minPrice - padding;
+      const chartMaxP = maxPrice + padding;
 
-      const w = canvas.width;
-      const h = canvas.height;
-
-      // We'll draw faint grid lines
-      ctx.clearRect(0,0,w,h);
-
-      ctx.fillStyle = '#4A2E60'; 
+      // fill background
+      ctx.fillStyle = '#4A2E60';
       ctx.fillRect(0,0,w,h);
 
-      ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-      ctx.lineWidth   = 1;
+      ctx.lineWidth=1;
+      ctx.strokeStyle='rgba(255,255,255,0.2)';
+      ctx.fillStyle='#fff';
+      ctx.font='12px Roboto';
 
-      // Let's draw horizontal grid lines every (approx) 5 p/kWh
-      const step = 5; // or compute a dynamic step
-      const start = Math.floor(chartMinP/step)*step;
-      const end   = Math.ceil(chartMaxP/step)*step;
-      for(let val=start; val<=end; val+=step) {
-        const yNorm = (val - chartMinP)/(chartMaxP-chartMinP || 1);
-        const yPos  = h - (yNorm*h);
+      // horizontal grid lines at increments of 5
+      const step=5;
+      const base = Math.floor(chartMinP/step)*step;
+      const limit= Math.ceil(chartMaxP/step)*step;
+      for(let val=base; val<=limit; val+=step){
+        const yNorm=(val-chartMinP)/(chartMaxP-chartMinP);
+        const yPos = h-(yNorm*h);
         ctx.beginPath();
-        ctx.moveTo(0, yPos);
-        ctx.lineTo(w, yPos);
+        ctx.moveTo(0,yPos);
+        ctx.lineTo(w,yPos);
         ctx.stroke();
 
-        // label on left
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = '12px Roboto';
-        ctx.fillText(val+'p', 5, yPos-3);
+        // label
+        ctx.fillText(val+'p', 5, yPos-2);
       }
 
-      // We'll also draw vertical lines for each half-hour from minTime to maxTime
-      // The difference in 30-min increments
-      const halfHour=1800000; 
-      ctx.textAlign = 'center';
-      for(let t=minTime; t<=maxTime; t+= halfHour) {
-        const xNorm = (t - minTime)/(maxTime - minTime || 1);
-        const xPos  = xNorm * w;
-        ctx.beginPath();
-        ctx.moveTo(xPos,0);
-        ctx.lineTo(xPos,h);
-        ctx.stroke();
+      // vertical lines each hour
+      // skip half-hours for simpler labeling: "9pm" etc.
+      const oneHour = 3600000;
+      let tCur= minTime - (minTime%(oneHour)); // round down
+      while(tCur<= maxTime){
+        const date= new Date(tCur);
+        const hours= date.getHours();
+        const mins = date.getMinutes();
+        // only draw if mins==0 (top of hour)
+        if(mins===0){
+          const xNorm= (tCur-minTime)/(maxTime-minTime);
+          const xPos= xNorm*w;
+          ctx.beginPath();
+          ctx.moveTo(xPos,0);
+          ctx.lineTo(xPos,h);
+          ctx.stroke();
 
-        // time label
-        const timeStr = new Date(t)
-          .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillText(timeStr, xPos, h-5);
-      }
-
-      // Now we draw the line
-      ctx.strokeStyle = '#FF00E5';
-      ctx.lineWidth   = 2;
-      ctx.beginPath();
-      todayData.forEach((item, i) => {
-        const t = new Date(item.valid_from).getTime();
-        const xNorm = (t - minTime)/(maxTime - minTime || 1);
-        const x = xNorm*w;
-        const priceNorm = (item.value_inc_vat - chartMinP)/(chartMaxP-chartMinP || 1);
-        const y = h - priceNorm*h;
-        if(i===0) ctx.moveTo(x,y);
-        else ctx.lineTo(x,y);
-      });
-      ctx.stroke();
-    }
-
-    /**********************************************************************************************
-     *                       FETCH & DISPLAY UK ENERGY MIX
-     **********************************************************************************************/
-    async function fetchEnergyMix() {
-      try {
-        const resp = await fetch(GENERATION_MIX_API);
-        if (!resp.ok) throw new Error(`Energy Mix fetch error: ${resp.status}`);
-        const data = await resp.json();
-        return data;
-      } catch (err) {
-        throw err;
-      }
-    }
-
-    function renderEnergyMix(mixData) {
-      // mixData is expected in shape: data.generationmix = [ { fuel:'biomass', perc:...}, ... ]
-      if (!mixData || !mixData.data || !mixData.data.generationmix) {
-        energyMixContainerEl.innerHTML = 'No mix data.';
-        return;
-      }
-      const mixArr = mixData.data.generationmix;
-
-      // Sort by highest to lowest, just for clarity
-      mixArr.sort((a,b) => b.perc - a.perc);
-
-      // Render
-      energyMixContainerEl.innerHTML = '';
-      const grid = document.createElement('div');
-      grid.className = 'mix-grid';
-      energyMixContainerEl.appendChild(grid);
-
-      mixArr.forEach(item => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'mix-item';
-
-        const title = document.createElement('h3');
-        title.innerText = item.fuel;
-        wrapper.appendChild(title);
-
-        const barContainer = document.createElement('div');
-        barContainer.className = 'mix-bar-container';
-
-        const bar = document.createElement('div');
-        bar.className = 'mix-bar';
-        bar.style.width = item.perc + '%';
-
-        barContainer.appendChild(bar);
-        wrapper.appendChild(barContainer);
-
-        const percTxt = document.createElement('div');
-        percTxt.className = 'mix-perc';
-        percTxt.innerText= item.perc.toFixed(1) + '%';
-        wrapper.appendChild(percTxt);
-
-        grid.appendChild(wrapper);
-      });
-    }
-
-    /**********************************************************************************************
-     *                             DEBUG UTILS
-     **********************************************************************************************/
-    function showDebug(msg) {
-      debugLogEl.style.display = 'block';
-      debugLogEl.textContent = (typeof msg==='object') ? JSON.stringify(msg) : String(msg);
-      console.error(msg);
-    }
-    function hideDebug() {
-      debugLogEl.style.display = 'none';
-      debugLogEl.textContent = '';
-    }
-
-    /**********************************************************************************************
-     *                           MAIN WORKFLOW
-     **********************************************************************************************/
-    async function fetchAndRenderAll() {
-      showDebug(`Fetching Agile data for region: ${regionCode}, and National Grid mix...`);
-      try {
-        // 1) Fetch Octopus data
-        const agileData = await fetchAgileData();
-        hideDebug();
-        if (!agileData || !agileData.results) {
-          throw new Error('No Agile data returned.');
+          // label: e.g. "9pm"
+          const hour12 = (hours===0?12: (hours>12?hours-12:hours));
+          const ampm   = (hours>=12?'pm':'am');
+          const label  = hour12 + ampm;
+          ctx.fillText(label, xPos, h-5);
         }
-        splitTodayAndTomorrow(agileData.results);
+        tCur+= oneHour;
+      }
+
+      // Draw the line in segments, coloring each segment by price
+      ctx.lineWidth=2;
+      for(let i=0; i< todayData.length; i++){
+        // find x,y for interval i
+        const d = todayData[i];
+        const start = new Date(d.valid_from).getTime();
+        const nextT= (i<todayData.length-1)
+          ? new Date(todayData[i+1].valid_from).getTime()
+          : new Date(d.valid_to).getTime();
+        // We'll treat the segment as [start -> nextT] or [start-> d.valid_to].
+        const x1Norm= (start- minTime)/(maxTime- minTime);
+        const x1= x1Norm*w;
+        const p = d.value_inc_vat;
+        const pNorm= (p-chartMinP)/(chartMaxP-chartMinP);
+        const y1= h-(pNorm*h);
+
+        const endTime = i<todayData.length-1
+          ? nextT 
+          : new Date(d.valid_to).getTime();
+        const x2Norm= (endTime- minTime)/(maxTime- minTime);
+        const x2= x2Norm*w;
+
+        // If we want a line to the next price specifically,
+        // we can average or we can just do a horizontal line segment.
+        // We'll just do a horizontal line for each half-hour. 
+        // Then connect the next segment in the next iteration, or not.
+
+        const color = getPriceColor(p);
+        ctx.strokeStyle = color;
+
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y1); // horizontal line
+        ctx.stroke();
+      }
+    }
+
+    // returns color for the line based on price
+    function getPriceColor(p) {
+      // gold if <10, green if <20, orange if <26, else red
+      if(p<10) return 'gold';
+      if(p<20) return 'limegreen';
+      if(p<26) return 'orange';
+      return 'red';
+    }
+
+    /************************************************************************
+     *                     TOMORROW PREVIEW
+     ************************************************************************/
+    function renderDebugData(data) {
+      debugPanelEl.style.display='none';
+      debugPanelEl.textContent= JSON.stringify(data, null,2);
+    }
+
+    /************************************************************************
+     *                           MAIN
+     ************************************************************************/
+    async function fetchAndRenderAll() {
+      try {
+        const data= await fetchAgileData();
+        if(!data || !data.results){
+          throw new Error('No data returned from API');
+        }
+        // Show raw data in debug panel (hidden by default)
+        renderDebugData(data);
+
+        // split
+        splitTodayAndTomorrow(data.results);
+        buildAllFutureData();
+
+        // render
         renderCurrentPrice();
         renderMetrics();
         renderPriceTable();
         renderTomorrow();
         renderChart();
 
-        // 2) Fetch energy mix
-        try {
-          const mix = await fetchEnergyMix();
-          renderEnergyMix(mix);
-        } catch (mixErr) {
-          showDebug('Could not fetch energy mix data: ' + mixErr);
-        }
-
-      } catch (err) {
-        showDebug(err);
-        priceEl.innerText = 'Error loading price data.';
+      } catch(err){
+        debugPanelEl.textContent= String(err);
+        debugPanelEl.style.display='block';
+        console.error(err);
+        priceEl.innerText='Error fetching data.';
       }
     }
 
-    function startApp() {
-      fetchAndRenderAll();
-      setInterval(fetchAndRenderAll, 30 * 60 * 1000); // every 30 mins
-    }
+    // Initialize
+    fetchAndRenderAll();
+    setInterval(fetchAndRenderAll, 30*60*1000);
 
-    // On load
-    startApp();
   </script>
 </body>
 </html>
