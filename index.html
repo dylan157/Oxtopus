@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Octopus Agile Flex – UTC Date Requests</title>
+  <title>Octopus Agile Flex – UTC Queries (Fixed)</title>
 
   <!-- OPTIONAL: Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -260,7 +260,7 @@
 
   <!-- TITLE / REGION -->
   <section class="header">
-    <h1>Octopus Agile Flex – UTC Queries</h1>
+    <h1>Octopus Agile Flex – UTC Queries (Fixed)</h1>
     <div class="region-select">
       <label for="regionSelect">Region:</label>
       <select id="regionSelect">
@@ -425,29 +425,21 @@
     /************************************************************************
      * HELPER: Build a URL with period_from & period_to in UTC
      ************************************************************************/
-    // We'll define two methods to get "today" and "tomorrow" in local, then
-    // create midnight UTC boundaries. For example:
-    // if "today" is 2023-03-28 locally, we do period_from=2023-03-28T00:00Z to T23:59Z
-    // This ensures correct intervals for that local date, in UTC format with 'Z'.
     function getAgileUrlForDate(dateObj, region) {
-      // dateObj is some local date. We'll build the period_from.. period_to in UTC as:
-      // YYYY-MM-DDT00:00Z to YYYY-MM-DDT23:59Z
+      // For “today” or “tomorrow” in local time, 
+      // we build period_from=YYYY-MM-DDT00:00Z to T23:59Z in UTC
       const y = dateObj.getFullYear();
       const m = String(dateObj.getMonth()+1).padStart(2,'0');
       const d = String(dateObj.getDate()).padStart(2,'0');
-
       const period_from = `${y}-${m}-${d}T00:00Z`;
       const period_to   = `${y}-${m}-${d}T23:59Z`;
+
       return `https://api.octopus.energy/v1/products/${PRODUCT_CODE}` +
              `/electricity-tariffs/E-1R-${PRODUCT_CODE}-${region}/standard-unit-rates/` +
              `?period_from=${period_from}&period_to=${period_to}`;
     }
 
-    /************************************************************************
-     * DATE LOGIC: "Today" & "Tomorrow" in local
-     ************************************************************************/
     function getLocalTodayDate() {
-      // returns a Date with local year/month/day, time=0:00 local
       const now = new Date();
       return new Date(now.getFullYear(), now.getMonth(), now.getDate());
     }
@@ -457,7 +449,7 @@
     }
 
     /************************************************************************
-     * FETCH & SPLIT DATA
+     * FETCH & PROCESS DATA
      ************************************************************************/
     async function fetchAgileDataForDay(dateObj, region) {
       const url = getAgileUrlForDate(dateObj, region);
@@ -469,8 +461,6 @@
     }
 
     function processAgileResultsForDay(results) {
-      // no "today/tomorrow" split needed, this is just data for one day
-      // But we can just return results (already sorted).
       if(!results) return [];
       // Sort by valid_from ascending
       results.sort((a,b)=> new Date(a.valid_from)- new Date(b.valid_from));
@@ -478,7 +468,7 @@
     }
 
     /************************************************************************
-     * RENDER CURRENT PRICE (based on "todayData")
+     * RENDER CURRENT PRICE
      ************************************************************************/
     function renderCurrentPrice() {
       const now = new Date();
@@ -503,8 +493,7 @@
     }
 
     /************************************************************************
-     * RENDER METRICS & TABLE
-     *  (similar for today & tomorrow)
+     * RENDER METRICS
      ************************************************************************/
     function renderDayMetrics(dataArray, minEl, maxEl, avgEl) {
       if(!dataArray.length) {
@@ -513,14 +502,14 @@
         avgEl.innerText='-';
         return;
       }
-      let minP=Infinity, maxP=-Infinity, sum=0;
+      let minP= Infinity, maxP= -Infinity, sum=0;
       dataArray.forEach(d => {
-        const p=d.value_inc_vat;
+        const p= d.value_inc_vat;
         if(p<minP) minP=p;
         if(p>maxP) maxP=p;
-        sum+=p;
+        sum+= p;
       });
-      const avgP= sum/dataArray.length;
+      const avgP = sum/dataArray.length;
       minEl.innerText= `${minP.toFixed(2)} p`;
       maxEl.innerText= `${maxP.toFixed(2)} p`;
       avgEl.innerText= `${avgP.toFixed(2)} p`;
@@ -574,8 +563,6 @@
 
     /************************************************************************
      * BAR CHART
-     *  - color rule: p<22=green, <30=orange, else red
-     *  - only label every 2 hours on bottom axis
      ************************************************************************/
     function renderDayChart(dataArray, containerEl) {
       containerEl.innerHTML='';
@@ -623,7 +610,7 @@
       ctx.fillStyle='#4A2E60';
       ctx.fillRect(0,0,w,h);
 
-      // 1) Draw horizontal grid lines
+      // horizontal grid lines
       ctx.strokeStyle='rgba(255,255,255,0.2)';
       ctx.lineWidth=1;
       ctx.fillStyle='#fff';
@@ -644,7 +631,7 @@
         ctx.fillText(`${val}p`, 2, yPos-2);
       }
 
-      // 2) Bottom axis: every 2 hours
+      // bottom axis every 2 hours
       const twoHours= 2*3600000;
       let t= minTime - (minTime%twoHours);
       while(t<= maxTime) {
@@ -666,7 +653,7 @@
         t+= twoHours;
       }
 
-      // 3) Bars
+      // bars
       const n= dataArray.length;
       const gap=1;
       const barWidth= (innerWidth/n) - gap;
@@ -677,10 +664,12 @@
         const barHeight= pNorm* innerHeight;
         const x= marginLeft + i*(barWidth+gap);
         const y= innerHeight- barHeight;
+
         ctx.fillStyle= getBarColor(price);
         ctx.fillRect(x,y,barWidth,barHeight);
       });
     }
+
     function getBarColor(p) {
       if(p<22) return 'green';
       if(p<30) return 'orange';
@@ -747,7 +736,7 @@
     }
 
     /************************************************************************
-     * MAIN - FETCH & RENDER
+     * MAIN
      ************************************************************************/
     async function fetchAndRenderAll() {
       try {
@@ -780,20 +769,23 @@
           energyMixData=null;
         }
 
-        // RENDER
+        // 4) RENDER
         renderCurrentPrice();
 
-        renderTodayMetrics();
+        // Render “today” metrics, table, chart
+        renderDayMetrics(todayData, todayMinEl, todayMaxEl, todayAvgEl);
         renderDayTable(todayData, todayTableBodyEl);
         renderDayChart(todayData, todayChartEl);
 
-        renderTomorrowMetrics();
+        // Render “tomorrow” metrics, table, chart
+        renderDayMetrics(tomorrowData, tomorrowMinEl, tomorrowMaxEl, tomorrowAvgEl);
         renderDayTable(tomorrowData, tomorrowTableBodyEl);
         renderDayChart(tomorrowData, tomorrowChartEl);
 
+        // Render energy mix
         renderEnergyMix();
 
-        // DEBUG
+        // Debug
         renderDebugInfo();
 
       } catch(err) {
@@ -805,7 +797,7 @@
     }
 
     // INIT
-    regionSelectEl.value='C'; // Example default
+    regionSelectEl.value='C'; // Example default (London)
     fetchAndRenderAll();
     setInterval(fetchAndRenderAll, 30*60*1000);
   </script>
