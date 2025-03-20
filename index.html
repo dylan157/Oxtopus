@@ -1,19 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- 
-  ---------------------------------------------------------------------------------------------
-  |                                                                                           |
-  |     OCTOPUS AGILE PRICE DISPLAY - LARGE SINGLE-PAGE WITH REGION DROPDOWN & RESPONSIVE     |
-  |     CHART FIXES FOR MOBILE                                                                |
-  |                                                                                           |
-  ---------------------------------------------------------------------------------------------
--->
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Octopus Agile Price Display – Region & Responsive Chart</title>
+  <title>Octopus Agile Price Display – Interactive Chart & Auto Region</title>
 
-  <!-- OPTIONAL FONT: ROBOTO -->
+  <!-- OPTIONAL FONT -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link
@@ -22,11 +14,9 @@
   />
 
   <style>
-    /* 
-      ================
-      BASE / RESET
-      ================
-    */
+    /************************************************************************************************
+     *                                   BASE / RESET                                               *
+     ************************************************************************************************/
     * {
       margin: 0;
       padding: 0;
@@ -42,11 +32,9 @@
       color: #FFFFFF; /* White text for contrast */
     }
 
-    /* 
-      =========================
-      MAIN CONTAINER & FADE-IN
-      =========================
-    */
+    /************************************************************************************************
+     *                             MAIN CONTAINER & ANIMATION                                       *
+     ************************************************************************************************/
     .main-container {
       width: 95%;
       max-width: 900px;
@@ -71,11 +59,9 @@
       }
     }
 
-    /* 
-      ========================
-      HEADER SECTION
-      ========================
-    */
+    /************************************************************************************************
+     *                                   HEADER SECTION                                             *
+     ************************************************************************************************/
     .header-section {
       text-align: center;
     }
@@ -90,7 +76,6 @@
       color: #CCCCCC;
     }
 
-    /* Region Selector */
     .region-selector {
       margin-top: 10px;
       display: flex;
@@ -112,12 +97,21 @@
     .region-selector select:focus {
       outline: 1px solid #FF00E5;
     }
+    .auto-detect-btn {
+      padding: 5px 10px;
+      border-radius: 4px;
+      border: 1px solid #999;
+      background-color: #FF00E5;
+      color: #FFFFFF;
+      cursor: pointer;
+    }
+    .auto-detect-btn:hover {
+      opacity: 0.9;
+    }
 
-    /* 
-      ========================
-      CURRENT PRICE SECTION
-      ========================
-    */
+    /************************************************************************************************
+     *                                   CURRENT PRICE SECTION                                      *
+     ************************************************************************************************/
     .current-price-section {
       background-color: #3A1D50;
       border-radius: 6px;
@@ -134,11 +128,9 @@
       color: #BBBBBB;
     }
 
-    /* 
-      ========================
-      METRICS SECTION
-      ========================
-    */
+    /************************************************************************************************
+     *                                       METRICS SECTION                                        *
+     ************************************************************************************************/
     .metrics-section {
       background-color: #3A1D50;
       border-radius: 6px;
@@ -173,11 +165,9 @@
       color: #FFFFFF;
     }
 
-    /* 
-      ========================
-      PRICE TABLE SECTION
-      ========================
-    */
+    /************************************************************************************************
+     *                                  PRICE TABLE SECTION                                         *
+     ************************************************************************************************/
     .price-table-section {
       background-color: #3A1D50;
       border-radius: 6px;
@@ -217,15 +207,27 @@
       color: #FFFFFF;
     }
 
-    /* 
-      ========================
-      CHART SECTION
-      ========================
-    */
+    /* Color-coded backgrounds for "price goodness" */
+    /* Adjust thresholds as desired. Example: <15 = green, <25 = orange, else red. */
+    .price-good {
+      background-color: rgba(0, 255, 0, 0.2); /* light green overlay */
+    }
+    .price-ok {
+      background-color: rgba(255, 165, 0, 0.2); /* light orange overlay */
+    }
+    .price-bad {
+      background-color: rgba(255, 0, 0, 0.2); /* light red overlay */
+    }
+
+    /************************************************************************************************
+     *                                      CHART SECTION                                           *
+     *  We'll add an interactive tooltip that appears near hovered data points.                    *
+     ************************************************************************************************/
     .chart-section {
       background-color: #3A1D50;
       border-radius: 6px;
       padding: 15px;
+      position: relative;
     }
     .chart-section-title {
       font-size: 1.2rem;
@@ -237,24 +239,32 @@
     .chart-container {
       position: relative;
       width: 100%;
-      /* By default, let's fix height to ~300px on all screens. 
-         The canvas will be scaled to container width. */
-      height: 300px; 
+      height: 300px;
     }
     .chart-container canvas {
-      /* Make the canvas fill the container’s width, maintain a set height */
       width: 100%;
       height: 100%;
       background-color: #4A2E60;
       border-radius: 6px;
       display: block;
     }
+    /* Tooltip for chart interactivity */
+    .chart-tooltip {
+      position: absolute;
+      background-color: #222222;
+      color: #FFFFFF;
+      padding: 6px 8px;
+      font-size: 0.8rem;
+      border-radius: 4px;
+      pointer-events: none; /* so it doesn't block mouse events */
+      opacity: 0;
+      transition: opacity 0.1s ease-in-out;
+      white-space: nowrap;
+    }
 
-    /* 
-      ========================
-      TOMORROW PREVIEW SECTION
-      ========================
-    */
+    /************************************************************************************************
+     *                                 TOMORROW PREVIEW SECTION                                     *
+     ************************************************************************************************/
     .tomorrow-section {
       background-color: #3A1D50;
       border-radius: 6px;
@@ -272,11 +282,9 @@
       color: #FFFFFF;
     }
 
-    /* 
-      ========================
-      DEBUG SECTION
-      ========================
-    */
+    /************************************************************************************************
+     *                                 DEBUG SECTION                                                *
+     ************************************************************************************************/
     .debug-section {
       background-color: rgba(255, 0, 0, 0.1);
       color: #ff8080;
@@ -288,11 +296,9 @@
       word-wrap: break-word;
     }
 
-    /* 
-      ========================
-      RESPONSIVENESS 
-      ========================
-    */
+    /************************************************************************************************
+     *                                  RESPONSIVE ADJUSTMENTS                                      *
+     ************************************************************************************************/
     @media (max-width: 768px) {
       .metrics-grid {
         grid-template-columns: 1fr;
@@ -317,34 +323,22 @@
     }
   </style>
 </head>
-
 <body>
-  <!-- 
-    =======================
-    MAIN CONTAINER
-    =======================
-  -->
   <div class="main-container">
-    <!-- 
-      =======================
-      HEADER SECTION
-      =======================
-    -->
+    <!-- HEADER -->
     <div class="header-section">
-      <h1>Octopus Agile Price - Regions & Chart</h1>
-      <p>Now with a region selector and responsive chart for mobile!</p>
+      <h1>Octopus Agile Price - Interactive & Auto Region</h1>
+      <p>Shows an interactive chart, color-coded intervals, and can detect your region.</p>
       <div class="region-selector">
         <label for="regionSelect">Select Region:</label>
         <select id="regionSelect">
-          <!-- Some known region codes for Agile (there is no 'I' or 'O' for example). 
-               Full list includes: A, B, C, D, E, F, G, H, J, K, L, M, N, P
-               We'll list them all here. -->
+          <!-- Some standard region codes -->
           <option value="A">A (Eastern England)</option>
           <option value="B">B (East Midlands)</option>
           <option value="C">C (London)</option>
-          <option value="D">D (Merseyside and North Wales)</option>
+          <option value="D">D (Merseyside & N. Wales)</option>
           <option value="E">E (West Midlands)</option>
-          <option value="F">F (North Eastern England)</option>
+          <option value="F">F (N. Eastern England)</option>
           <option value="G">G (North Western)</option>
           <option value="H">H (Southern England)</option>
           <option value="J">J (South Eastern)</option>
@@ -354,24 +348,17 @@
           <option value="N">N (South Western)</option>
           <option value="P">P (Yorkshire)</option>
         </select>
+        <button class="auto-detect-btn" id="autoDetectBtn">Auto-Detect Region</button>
       </div>
     </div>
 
-    <!-- 
-      =======================
-      CURRENT PRICE SECTION
-      =======================
-    -->
+    <!-- CURRENT PRICE SECTION -->
     <div class="current-price-section">
       <div id="price" class="price-display">Loading current price...</div>
       <div id="timestamp" class="timestamp-display"></div>
     </div>
 
-    <!-- 
-      =======================
-      METRICS SECTION
-      =======================
-    -->
+    <!-- METRICS SECTION -->
     <div class="metrics-section">
       <div class="metrics-title">Today's Summary</div>
       <div class="metrics-grid">
@@ -390,11 +377,7 @@
       </div>
     </div>
 
-    <!-- 
-      =======================
-      PRICE TABLE SECTION
-      =======================
-    -->
+    <!-- PRICE TABLE SECTION -->
     <div class="price-table-section">
       <div class="price-table-title">Half-Hourly Price Data (Today)</div>
       <table>
@@ -405,61 +388,42 @@
             <th>Price (p/kWh)</th>
           </tr>
         </thead>
-        <tbody id="priceTableBody">
-          <!-- Populated by JS -->
-        </tbody>
+        <tbody id="priceTableBody"><!-- Populated by JS --></tbody>
       </table>
     </div>
 
-    <!-- 
-      =======================
-      CHART SECTION
-      =======================
-    -->
+    <!-- CHART SECTION -->
     <div class="chart-section">
       <div class="chart-section-title">Today's Price Chart</div>
       <div class="chart-container">
         <canvas id="priceChart"></canvas>
+        <!-- Tooltip element for hovering data points -->
+        <div id="chartTooltip" class="chart-tooltip"></div>
       </div>
     </div>
 
-    <!-- 
-      =======================
-      TOMORROW PREVIEW
-      =======================
-    -->
+    <!-- TOMORROW PREVIEW -->
     <div class="tomorrow-section">
       <div class="tomorrow-title">Tomorrow's Preview</div>
-      <div class="tomorrow-content" id="tomorrowContent">
-        Checking tomorrow's data...
-      </div>
+      <div class="tomorrow-content" id="tomorrowContent">Checking tomorrow's data...</div>
     </div>
 
-    <!-- 
-      =======================
-      DEBUG SECTION
-      =======================
-    -->
+    <!-- DEBUG SECTION -->
     <div id="debug" class="debug-section"></div>
-
-  </div> <!-- END .main-container -->
+  </div> <!-- END main-container -->
 
   <script>
     /************************************************************************************************
-     *             LARGE SINGLE-PAGE JAVASCRIPT                                                     *
-     *             Region Dropdown + Responsive Chart Fix                                           *
+     *                          GLOBAL VARIABLES & ELEMENT REFERENCES                               *
      ************************************************************************************************/
-
-    // ----------------------------------------------------------------------------------------------
-    // 0. GLOBAL VARIABLES & ELEMENT REFERENCES
-    // ----------------------------------------------------------------------------------------------
     const OCTOPUS_API_BASE = 'https://api.octopus.energy/v1/products/AGILE-18-02-21';
-    let currentRegion = 'A'; // Default region
+    let currentRegion = 'A'; // default if geolocation fails
     let todayData = [];
     let tomorrowData = [];
 
     // DOM elements
     const regionSelectEl    = document.getElementById('regionSelect');
+    const autoDetectBtnEl   = document.getElementById('autoDetectBtn');
     const priceEl           = document.getElementById('price');
     const timestampEl       = document.getElementById('timestamp');
     const priceTableBodyEl  = document.getElementById('priceTableBody');
@@ -469,21 +433,98 @@
     const tomorrowContentEl = document.getElementById('tomorrowContent');
     const debugEl           = document.getElementById('debug');
 
-    // Chart canvas
-    const priceChartCanvas = document.getElementById('priceChart');
-    const priceChartCtx    = priceChartCanvas.getContext('2d');
+    // Chart canvas & tooltip
+    const priceChartCanvas  = document.getElementById('priceChart');
+    const priceChartCtx     = priceChartCanvas.getContext('2d');
+    const chartTooltipEl    = document.getElementById('chartTooltip');
 
-    // ----------------------------------------------------------------------------------------------
-    // 1. EVENT LISTENER FOR REGION SELECT
-    // ----------------------------------------------------------------------------------------------
+    // We'll keep track of the chart points for interactivity
+    let chartPoints = [];
+
+    /************************************************************************************************
+     *                                EVENT LISTENERS                                               *
+     ************************************************************************************************/
     regionSelectEl.addEventListener('change', () => {
       currentRegion = regionSelectEl.value;
-      main(); // Re-run the main process with new region
+      main(); // re-fetch & re-render
     });
 
-    // ----------------------------------------------------------------------------------------------
-    // 2. FETCH DATA
-    // ----------------------------------------------------------------------------------------------
+    autoDetectBtnEl.addEventListener('click', () => {
+      // Attempt geolocation
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            const { latitude, longitude } = position.coords;
+            const guessedRegion = guessRegionByLocation(latitude, longitude);
+            currentRegion = guessedRegion;
+            regionSelectEl.value = guessedRegion; // sync dropdown
+            main();
+          },
+          error => {
+            showDebug('Geolocation failed or was denied. Using default region A.');
+            currentRegion = 'A';
+            regionSelectEl.value = 'A';
+            main();
+          }
+        );
+      } else {
+        showDebug('Geolocation not supported by this browser. Using default region A.');
+        currentRegion = 'A';
+        regionSelectEl.value = 'A';
+        main();
+      }
+    });
+
+    // Chart interactivity: handle mouse move/touch move
+    priceChartCanvas.addEventListener('mousemove', onCanvasHover);
+    priceChartCanvas.addEventListener('touchmove', onCanvasHover);
+
+    // Re-render chart on window resize
+    window.addEventListener('resize', () => {
+      renderChart();
+    });
+
+    /************************************************************************************************
+     *                          APPROXIMATE REGION GUESSING BY LAT/LON                              *
+     ************************************************************************************************/
+    function guessRegionByLocation(lat, lon) {
+      // This is a TOTALLY MADE-UP bounding box approach, not official.
+      // In reality, the UK distribution regions are not perfect squares.
+      // For demonstration, we'll define some extremely rough boundaries.
+      // If none match, default to 'A'.
+
+      // Example approach: first check if user is within the UK
+      // (rough bounding box: lat ~ 49..59, lon ~ -8..2)
+      const isInUK = lat >= 49 && lat <= 59 && lon >= -8 && lon <= 2;
+      if (!isInUK) {
+        return 'A'; // default
+      }
+      // We'll define some rough dividing lines for demonstration:
+      // e.g., North vs South, East vs West. This is not accurate!
+      if (lat > 55) {
+        // Let's guess region L or K for Northern Scotland
+        return (lon < -3) ? 'L' : 'K';
+      } else if (lat > 53) {
+        // Middle belt: maybe G or F or P?
+        if (lon < -2) return 'G';
+        if (lon < 0)  return 'F';
+        return 'P';
+      } else if (lat > 51) {
+        // Could be A, B, C, E
+        if (lon < -2) return 'B';
+        if (lon < -1) return 'A';
+        return 'C'; // or E
+      } else {
+        // Far south might be H, J, M, N
+        if (lon < -3) return 'M';
+        if (lon < -1) return 'N';
+        return 'H'; // fallback
+      }
+    }
+
+    /************************************************************************************************
+     *                              FETCH DATA FROM OCTOPUS                                         *
+     ************************************************************************************************/
     async function fetchAgileData(region) {
       const url = `${OCTOPUS_API_BASE}/electricity-tariffs/E-1R-AGILE-18-02-21-${region}/standard-unit-rates/`;
       try {
@@ -498,9 +539,9 @@
       }
     }
 
-    // ----------------------------------------------------------------------------------------------
-    // 3. ORGANIZE DATA BY TODAY / TOMORROW
-    // ----------------------------------------------------------------------------------------------
+    /************************************************************************************************
+     *                          PARSE DATA INTO TODAY & TOMORROW                                    *
+     ************************************************************************************************/
     function separateTodayAndTomorrowData(results) {
       todayData = [];
       tomorrowData = [];
@@ -512,13 +553,12 @@
       const tomorrowDateString = formatDateYYYYMMDD(tomorrowDate);
 
       results.sort((a, b) => new Date(a.valid_from) - new Date(b.valid_from));
-
       results.forEach(item => {
         const itemDate = new Date(item.valid_from);
-        const itemDateString = formatDateYYYYMMDD(itemDate);
-        if (itemDateString === todayDateString) {
+        const itemDateStr = formatDateYYYYMMDD(itemDate);
+        if (itemDateStr === todayDateString) {
           todayData.push(item);
-        } else if (itemDateString === tomorrowDateString) {
+        } else if (itemDateStr === tomorrowDateString) {
           tomorrowData.push(item);
         }
       });
@@ -531,9 +571,9 @@
       return `${year}-${month}-${day}`;
     }
 
-    // ----------------------------------------------------------------------------------------------
-    // 4. FIND CURRENT PERIOD
-    // ----------------------------------------------------------------------------------------------
+    /************************************************************************************************
+     *                                    FIND CURRENT PERIOD                                       *
+     ************************************************************************************************/
     function findCurrentPeriod(dataArray) {
       const now = new Date();
       return dataArray.find(period => {
@@ -543,9 +583,9 @@
       }) || null;
     }
 
-    // ----------------------------------------------------------------------------------------------
-    // 5. METRICS: MIN, MAX, AVERAGE
-    // ----------------------------------------------------------------------------------------------
+    /************************************************************************************************
+     *                            CALCULATE DAILY METRICS (MIN, MAX, AVG)                           *
+     ************************************************************************************************/
     function calculateDailyMetrics(dataArray) {
       if (!dataArray || dataArray.length === 0) {
         return { min: null, max: null, avg: null };
@@ -563,16 +603,18 @@
       return { min: minPrice, max: maxPrice, avg };
     }
 
-    // ----------------------------------------------------------------------------------------------
-    // 6. RENDER: CURRENT PRICE
-    // ----------------------------------------------------------------------------------------------
+    /************************************************************************************************
+     *                                    RENDER CURRENT PRICE                                      *
+     ************************************************************************************************/
     function renderCurrentPrice() {
       const currentPeriod = findCurrentPeriod(todayData);
       if (currentPeriod) {
         const priceStr = currentPeriod.value_inc_vat.toFixed(2);
         priceEl.innerText = `Current Price: ${priceStr} p/kWh`;
-        const fromTime = new Date(currentPeriod.valid_from).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        const toTime   = new Date(currentPeriod.valid_to).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const fromTime = new Date(currentPeriod.valid_from)
+          .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const toTime   = new Date(currentPeriod.valid_to)
+          .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         timestampEl.innerText = `Valid from: ${fromTime} to ${toTime}`;
       } else {
         priceEl.innerText = 'No current price data available.';
@@ -580,9 +622,9 @@
       }
     }
 
-    // ----------------------------------------------------------------------------------------------
-    // 7. RENDER: METRICS
-    // ----------------------------------------------------------------------------------------------
+    /************************************************************************************************
+     *                                    RENDER DAILY METRICS                                      *
+     ************************************************************************************************/
     function renderMetrics() {
       const { min, max, avg } = calculateDailyMetrics(todayData);
       if (min === null) {
@@ -596,9 +638,10 @@
       avgPriceValueEl.innerText = `${avg.toFixed(2)} p/kWh`;
     }
 
-    // ----------------------------------------------------------------------------------------------
-    // 8. RENDER: PRICE TABLE (for the rest of today)
-    // ----------------------------------------------------------------------------------------------
+    /************************************************************************************************
+     *                                   RENDER PRICE TABLE                                         *
+     *   Color rows by thresholds: <15 = green, <25 = orange, >=25 = red.                           *
+     ************************************************************************************************/
     function renderPriceTable() {
       priceTableBodyEl.innerHTML = '';
       const now = new Date();
@@ -608,26 +651,40 @@
       });
       if (futureIntervals.length === 0) {
         const noDataRow = document.createElement('tr');
-        const noDataCell = document.createElement('td');
+        const noDataCell= document.createElement('td');
         noDataCell.colSpan = 3;
         noDataCell.innerText = 'No more intervals for the rest of today.';
         noDataRow.appendChild(noDataCell);
         priceTableBodyEl.appendChild(noDataRow);
         return;
       }
+
       futureIntervals.forEach(interval => {
         const row = document.createElement('tr');
-        const fromCell = document.createElement('td');
-        const toCell   = document.createElement('td');
-        const priceCell= document.createElement('td');
 
-        const fromTime = new Date(interval.valid_from).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const fromCell  = document.createElement('td');
+        const toCell    = document.createElement('td');
+        const priceCell = document.createElement('td');
+
+        const fromTime  = new Date(interval.valid_from)
+          .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         fromCell.innerText = fromTime;
 
-        const toTime = new Date(interval.valid_to).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const toTime    = new Date(interval.valid_to)
+          .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         toCell.innerText = toTime;
 
-        priceCell.innerText = interval.value_inc_vat.toFixed(2);
+        const p = interval.value_inc_vat;
+        priceCell.innerText = p.toFixed(2);
+
+        // Color code row based on thresholds
+        if (p < 15) {
+          row.classList.add('price-good');
+        } else if (p < 25) {
+          row.classList.add('price-ok');
+        } else {
+          row.classList.add('price-bad');
+        }
 
         row.appendChild(fromCell);
         row.appendChild(toCell);
@@ -636,21 +693,23 @@
       });
     }
 
-    // ----------------------------------------------------------------------------------------------
-    // 9. RENDER: CHART (RESPONSIVE)
-    // ----------------------------------------------------------------------------------------------
+    /************************************************************************************************
+     *                                   RENDER CHART (RESPONSIVE)                                  *
+     *   We'll store the data points in a global array (chartPoints) for hover interactivity.        *
+     ************************************************************************************************/
     function renderChart() {
-      // We'll measure the canvas's current "client" size and set its internal drawing scale
       const canvasWidth  = priceChartCanvas.clientWidth;
       const canvasHeight = priceChartCanvas.clientHeight;
 
-      // Adjust the internal resolution to match the displayed size
-      // (so it won't be blurry on high DPI screens)
-      priceChartCanvas.width  = canvasWidth * window.devicePixelRatio;
+      // Adjust canvas resolution for device pixel ratio
+      priceChartCanvas.width  = canvasWidth  * window.devicePixelRatio;
       priceChartCanvas.height = canvasHeight * window.devicePixelRatio;
-      // Now, update the 2D context scale
       priceChartCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
 
+      // Clear the stored points
+      chartPoints = [];
+
+      // If no data, draw text
       if (!todayData || todayData.length === 0) {
         priceChartCtx.clearRect(0, 0, canvasWidth, canvasHeight);
         priceChartCtx.fillStyle = '#FFFFFF';
@@ -658,74 +717,126 @@
         return;
       }
 
-      // Sort by valid_from
+      // Sort and compute min/max
       todayData.sort((a, b) => new Date(a.valid_from) - new Date(b.valid_from));
       const minTime = new Date(todayData[0].valid_from).getTime();
       const maxTime = new Date(todayData[todayData.length - 1].valid_to).getTime();
 
-      const chartPoints = todayData.map(interval => {
-        const startTime = new Date(interval.valid_from).getTime();
-        // Normalized X from 0..1
-        const xNorm = (startTime - minTime) / (maxTime - minTime || 1);
-        // We'll store the price as y value
-        return { xNorm, y: interval.value_inc_vat };
-      });
-
-      let minPrice = Infinity, maxPrice = -Infinity;
-      chartPoints.forEach(pt => {
-        if (pt.y < minPrice) minPrice = pt.y;
-        if (pt.y > maxPrice) maxPrice = pt.y;
+      let minPrice = Infinity;
+      let maxPrice = -Infinity;
+      todayData.forEach(d => {
+        if (d.value_inc_vat < minPrice) minPrice = d.value_inc_vat;
+        if (d.value_inc_vat > maxPrice) maxPrice = d.value_inc_vat;
       });
       const priceRange = maxPrice - minPrice || 1;
 
-      // Clear
+      // 1) Clear canvas
       priceChartCtx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-      // Draw baseline
+      // 2) We'll create chartPoints that store the scaled x,y plus the actual data
+      chartPoints = todayData.map(d => {
+        const t = new Date(d.valid_from).getTime();
+        const xNorm = (t - minTime) / (maxTime - minTime || 1); // 0..1
+        const x = xNorm * canvasWidth;
+        const yNorm = (d.value_inc_vat - minPrice) / priceRange; // 0..1
+        // Flip Y
+        const y = canvasHeight - (yNorm * canvasHeight);
+        return {
+          x, y,
+          price: d.value_inc_vat,
+          timeFrom: d.valid_from
+        };
+      });
+
+      // 3) Draw baseline
       priceChartCtx.strokeStyle = '#CCCCCC';
-      priceChartCtx.lineWidth = 1;
+      priceChartCtx.lineWidth   = 1;
       priceChartCtx.beginPath();
       priceChartCtx.moveTo(0, canvasHeight - 1);
       priceChartCtx.lineTo(canvasWidth, canvasHeight - 1);
       priceChartCtx.stroke();
 
-      // Plot line
+      // 4) Draw the line
       priceChartCtx.strokeStyle = '#FF00E5';
-      priceChartCtx.lineWidth = 2;
+      priceChartCtx.lineWidth   = 2;
       priceChartCtx.beginPath();
-      chartPoints.forEach((pt, i) => {
-        const x = pt.xNorm * canvasWidth;
-        // Flip the Y scale
-        const yNorm = (pt.y - minPrice) / priceRange;
-        const y = canvasHeight - (yNorm * canvasHeight);
-        if (i === 0) {
-          priceChartCtx.moveTo(x, y);
+      chartPoints.forEach((pt, index) => {
+        if (index === 0) {
+          priceChartCtx.moveTo(pt.x, pt.y);
         } else {
-          priceChartCtx.lineTo(x, y);
+          priceChartCtx.lineTo(pt.x, pt.y);
         }
       });
       priceChartCtx.stroke();
 
-      // Circle markers
+      // 5) Circle markers
       priceChartCtx.fillStyle = '#FF00E5';
       chartPoints.forEach(pt => {
-        const x = pt.xNorm * canvasWidth;
-        const yNorm = (pt.y - minPrice) / priceRange;
-        const y = canvasHeight - (yNorm * canvasHeight);
         priceChartCtx.beginPath();
-        priceChartCtx.arc(x, y, 3, 0, 2*Math.PI);
+        priceChartCtx.arc(pt.x, pt.y, 3, 0, 2*Math.PI);
         priceChartCtx.fill();
       });
 
-      // Labels for min & max
+      // 6) Show min & max on the side
       priceChartCtx.fillStyle = '#FFFFFF';
       priceChartCtx.fillText(`${minPrice.toFixed(2)} p`, 10, canvasHeight - 10);
       priceChartCtx.fillText(`${maxPrice.toFixed(2)} p`, 10, 20);
     }
 
-    // ----------------------------------------------------------------------------------------------
-    // 10. RENDER: TOMORROW PREVIEW
-    // ----------------------------------------------------------------------------------------------
+    /************************************************************************************************
+     *                                CHART INTERACTIVITY (TOOLTIP)                                 *
+     ************************************************************************************************/
+    function onCanvasHover(e) {
+      // We need to figure out the mouse/touch position relative to the canvas
+      const rect = priceChartCanvas.getBoundingClientRect();
+
+      // Support both mouse and touch
+      let clientX, clientY;
+      if (e.touches && e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+
+      // Now find the closest data point
+      let closestPt = null;
+      let minDist   = 9999999;
+      chartPoints.forEach(pt => {
+        const dx = pt.x - x;
+        const dy = pt.y - y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < minDist) {
+          minDist = dist;
+          closestPt = pt;
+        }
+      });
+      // If it’s within 20px of a data point, show the tooltip
+      if (closestPt && minDist < 20) {
+        showTooltip(closestPt, x, y, rect);
+      } else {
+        hideTooltip();
+      }
+    }
+
+    function showTooltip(pt, mouseX, mouseY, boundingRect) {
+      chartTooltipEl.innerText = `${pt.price.toFixed(2)} p/kWh`;
+      chartTooltipEl.style.left = (boundingRect.left + mouseX + 10) + 'px';
+      chartTooltipEl.style.top  = (boundingRect.top + mouseY - 10) + 'px';
+      chartTooltipEl.style.opacity = 1;
+    }
+
+    function hideTooltip() {
+      chartTooltipEl.style.opacity = 0;
+    }
+
+    /************************************************************************************************
+     *                                  RENDER TOMORROW PREVIEW                                     *
+     ************************************************************************************************/
     function renderTomorrowPreview() {
       if (!tomorrowData || tomorrowData.length === 0) {
         tomorrowContentEl.innerText = 'No data available for tomorrow yet.';
@@ -736,15 +847,16 @@
         tomorrowContentEl.innerText = 'No data available for tomorrow yet.';
         return;
       }
-      tomorrowContentEl.innerText = `Min: ${min.toFixed(2)} p/kWh, Max: ${max.toFixed(2)} p/kWh (tomorrow)`;
+      tomorrowContentEl.innerText =
+        `Min: ${min.toFixed(2)} p/kWh, Max: ${max.toFixed(2)} p/kWh (tomorrow)`;
     }
 
-    // ----------------------------------------------------------------------------------------------
-    // 11. DEBUG MESSAGES
-    // ----------------------------------------------------------------------------------------------
+    /************************************************************************************************
+     *                                      DEBUG FUNCTIONS                                         *
+     ************************************************************************************************/
     function showDebug(msg) {
       debugEl.style.display = 'block';
-      if (typeof msg === 'object' && msg !== null) {
+      if (typeof msg === 'object') {
         debugEl.textContent = `Error: ${msg.message || JSON.stringify(msg)}`;
       } else {
         debugEl.textContent = String(msg);
@@ -756,9 +868,9 @@
       debugEl.textContent = '';
     }
 
-    // ----------------------------------------------------------------------------------------------
-    // 12. MAIN WORKFLOW
-    // ----------------------------------------------------------------------------------------------
+    /************************************************************************************************
+     *                                        MAIN FLOW                                             *
+     ************************************************************************************************/
     async function main() {
       showDebug(`Fetching data for region: ${currentRegion}...`);
       try {
@@ -769,7 +881,6 @@
         hideDebug();
 
         separateTodayAndTomorrowData(data.results);
-
         renderCurrentPrice();
         renderMetrics();
         renderPriceTable();
@@ -784,14 +895,8 @@
       }
     }
 
-    // Run main once, then every 30 minutes
     main();
     setInterval(main, 30 * 60 * 1000);
-
-    // Optionally, re-render chart on window resize (to keep it fully responsive)
-    window.addEventListener('resize', () => {
-      renderChart();
-    });
   </script>
 </body>
 </html>
