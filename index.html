@@ -1,29 +1,3 @@
-Below is an updated large single-page example that fixes two issues:
-
-1. Chart Overflow on Mobile:
-
-Removed the fixed 800×300 <canvas> dimensions.
-
-Added responsive styling so the chart scales to the container width.
-
-Dynamically resizes the drawing area to fit the <canvas> at render time.
-
-
-
-2. Region Dropdown:
-
-A <select> at the top lets you pick an Octopus region code (A, B, C, etc.).
-
-Whenever you change the region, it re-fetches and re-renders the data and chart.
-
-
-
-
-Everything else remains similar to the large “1000-line” style. You could reduce or modularize this for real-world usage, but here it is as a single big file.
-
-
----
-
 <!DOCTYPE html>
 <html lang="en">
 <!-- 
@@ -821,37 +795,3 @@ Everything else remains similar to the large “1000-line” style. You could re
   </script>
 </body>
 </html>
-
-What Changed?
-
-1. Responsive Chart
-
-We removed fixed canvas width/height attributes.
-
-The CSS .chart-container { width: 100%; height: 300px } ensures a consistent aspect ratio.
-
-At render time, we measure the canvas’s display size and set its internal width/height to match (factoring in devicePixelRatio for a sharper look).
-
-Also re-render the chart on window.resize events (optional but helpful).
-
-
-
-2. Region Dropdown
-
-A <select> is added in the header.
-
-On change, the code updates currentRegion and calls main() again to fetch new data.
-
-
-
-3. Still Large & Single-File
-
-All logic is inlined for demonstration.
-
-In real projects, you’d separate HTML, CSS, and JS into distinct files.
-
-
-
-
-With this, the chart should no longer overflow on mobile, and you’ll have a working dropdown to choose the region.
-
