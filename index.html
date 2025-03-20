@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Octopus Agile - Brand New Interactive Display</title>
+  <title>Octopus Agile - Interactive Display (No Auto-Detect)</title>
 
-  <!-- Optional Google Font -->
+  <!-- OPTIONAL: Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link
@@ -15,11 +15,11 @@
 
   <style>
     /* =============================
-       BASE STYLES / DARK THEME
+       BASE / DARK THEME
        ============================= */
     * {
-      margin: 0; 
-      padding: 0; 
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
     }
     body {
@@ -45,7 +45,6 @@
       gap: 20px;
       animation: fadeIn 0.8s ease-in-out;
     }
-
     @keyframes fadeIn {
       from {
         opacity: 0;
@@ -58,14 +57,14 @@
     }
 
     /* =============================
-       HEADER SECTION
+       HEADER
        ============================= */
     .header {
       text-align: center;
     }
     .header h1 {
       font-size: 1.8rem;
-      color: #FF00E5; /* Octopus pink/magenta */
+      color: #FF00E5;
       margin-bottom: 8px;
     }
     .header p {
@@ -91,16 +90,8 @@
       background-color: #3A1D50;
       color: #FFFFFF;
     }
-    .region-selector button {
-      padding: 5px 10px;
-      border-radius: 4px;
-      border: 1px solid #999;
-      background-color: #FF00E5;
-      color: #FFFFFF;
-      cursor: pointer;
-    }
-    .region-selector button:hover {
-      opacity: 0.9;
+    .region-selector select:focus {
+      outline: 1px solid #FF00E5;
     }
 
     /* =============================
@@ -123,7 +114,7 @@
     }
 
     /* =============================
-       METRICS SECTION
+       METRICS
        ============================= */
     .metrics {
       background-color: #3A1D50;
@@ -164,7 +155,7 @@
       background-color: #3A1D50;
       border-radius: 6px;
       padding: 16px;
-      position: relative; /* For tooltip positioning */
+      position: relative; /* for tooltip */
     }
     .chart-title {
       font-size: 1.2rem;
@@ -176,7 +167,7 @@
     .chart-container {
       position: relative;
       width: 100%;
-      height: 300px; /* fixed height, but auto width */
+      height: 300px; 
     }
     .chart-container canvas {
       width: 100%;
@@ -185,8 +176,7 @@
       border-radius: 6px;
       display: block;
     }
-
-    /* Tooltip for the chart on hover */
+    /* Tooltip for data point hover */
     .chart-tooltip {
       position: absolute;
       background-color: #222;
@@ -194,14 +184,14 @@
       padding: 6px 8px;
       font-size: 0.8rem;
       border-radius: 4px;
-      pointer-events: none; /* don't block mouse */
+      pointer-events: none;
       opacity: 0;
-      transition: opacity 0.1s ease-in-out;
+      transition: opacity 0.1s;
       white-space: nowrap;
     }
 
     /* =============================
-       PRICE TABLE SECTION
+       PRICE TABLE
        ============================= */
     .price-table {
       background-color: #3A1D50;
@@ -241,7 +231,7 @@
       text-align: center;
       color: #FFFFFF;
     }
-    /* Color-coded intervals: <15 => green, <25 => orange, otherwise => red. */
+    /* color-coded intervals: <15 => green, <25 => orange, else => red */
     .price-good {
       background-color: rgba(0, 255, 0, 0.2);
     }
@@ -305,16 +295,17 @@
     }
   </style>
 </head>
+
 <body>
   <div class="container">
-    <!-- =======================================
-         HEADER SECTION
-         ======================================= -->
+    <!-- =============================
+         HEADER
+         ============================= -->
     <div class="header">
-      <h1>Octopus Agile - New Interactive Display</h1>
-      <p>A fresh start: better region checks for Milton Keynes, no 35p cap, interactive chart.</p>
+      <h1>Octopus Agile - Interactive (No Auto-Detect)</h1>
+      <p>No region auto-detection; just pick your region code.</p>
       <div class="region-selector">
-        <label for="regionSelect">Choose Region:</label>
+        <label for="regionSelect">Region:</label>
         <select id="regionSelect">
           <option value="A">A (Eastern England)</option>
           <option value="B">B (East Midlands)</option>
@@ -331,21 +322,20 @@
           <option value="N">N (South Western)</option>
           <option value="P">P (Yorkshire)</option>
         </select>
-        <button id="autoDetectBtn">Auto-Detect (Geo)</button>
       </div>
     </div>
 
-    <!-- =======================================
+    <!-- =============================
          CURRENT PRICE
-         ======================================= -->
+         ============================= -->
     <div class="current-price">
       <div id="priceDisplay" class="price-display">Loading price...</div>
       <div id="timestampDisplay" class="timestamp"></div>
     </div>
 
-    <!-- =======================================
+    <!-- =============================
          METRICS
-         ======================================= -->
+         ============================= -->
     <div class="metrics">
       <div class="metrics-title">Today’s Summary</div>
       <div class="metrics-grid">
@@ -364,21 +354,20 @@
       </div>
     </div>
 
-    <!-- =======================================
+    <!-- =============================
          CHART
-         ======================================= -->
+         ============================= -->
     <div class="chart-section">
       <div class="chart-title">Today’s Price Chart</div>
       <div class="chart-container">
         <canvas id="chartCanvas"></canvas>
-        <!-- Tooltip for data hover -->
         <div id="chartTooltip" class="chart-tooltip"></div>
       </div>
     </div>
 
-    <!-- =======================================
+    <!-- =============================
          PRICE TABLE
-         ======================================= -->
+         ============================= -->
     <div class="price-table">
       <div class="price-table-title">Half-Hourly Prices (Today)</div>
       <table>
@@ -389,130 +378,68 @@
             <th>Price (p/kWh)</th>
           </tr>
         </thead>
-        <tbody id="priceTableBody"><!-- JS appends rows --></tbody>
+        <tbody id="priceTableBody"><!-- Filled by JS --></tbody>
       </table>
     </div>
 
-    <!-- =======================================
+    <!-- =============================
          TOMORROW PREVIEW
-         ======================================= -->
+         ============================= -->
     <div class="tomorrow">
       <div class="tomorrow-title">Tomorrow’s Preview</div>
       <div id="tomorrowInfo">Checking tomorrow’s data...</div>
     </div>
 
-    <!-- =======================================
-         DEBUG
-         ======================================= -->
+    <!-- =============================
+         DEBUG LOG
+         ============================= -->
     <div id="debugLog" class="debug"></div>
   </div>
 
   <script>
-    /*******************************************************************************
-     *                           GLOBAL VARIABLES                                  *
-     ******************************************************************************/
+    /************************************************************************
+     *                   GLOBAL VARIABLES & REFERENCES                       *
+     ************************************************************************/
     const API_BASE = 'https://api.octopus.energy/v1/products/AGILE-18-02-21';
-
-    let regionCode = 'A'; // Default region
+    let regionCode = 'A'; // default
     let todayData = [];
     let tomorrowData = [];
 
-    // DOM references
-    const regionSelectEl     = document.getElementById('regionSelect');
-    const autoDetectBtnEl    = document.getElementById('autoDetectBtn');
-    const priceEl            = document.getElementById('priceDisplay');
-    const timestampEl        = document.getElementById('timestampDisplay');
-    const minPriceEl         = document.getElementById('minPrice');
-    const maxPriceEl         = document.getElementById('maxPrice');
-    const avgPriceEl         = document.getElementById('avgPrice');
-    const priceTableBodyEl   = document.getElementById('priceTableBody');
-    const tomorrowInfoEl     = document.getElementById('tomorrowInfo');
-    const debugLogEl         = document.getElementById('debugLog');
+    // DOM elements
+    const regionSelectEl   = document.getElementById('regionSelect');
+    const priceEl          = document.getElementById('priceDisplay');
+    const timestampEl      = document.getElementById('timestampDisplay');
+    const minPriceEl       = document.getElementById('minPrice');
+    const maxPriceEl       = document.getElementById('maxPrice');
+    const avgPriceEl       = document.getElementById('avgPrice');
+    const priceTableBodyEl = document.getElementById('priceTableBody');
+    const tomorrowInfoEl   = document.getElementById('tomorrowInfo');
+    const debugLogEl       = document.getElementById('debugLog');
 
-    // Chart references
-    const chartCanvas        = document.getElementById('chartCanvas');
-    const chartCtx           = chartCanvas.getContext('2d');
-    const chartTooltipEl     = document.getElementById('chartTooltip');
-    let chartPoints = []; // We'll store scaled x/y for interactive tooltip
+    // Chart
+    const chartCanvas      = document.getElementById('chartCanvas');
+    const chartCtx         = chartCanvas.getContext('2d');
+    const chartTooltipEl   = document.getElementById('chartTooltip');
+    let chartPoints        = [];
 
-    /*******************************************************************************
-     *                           EVENT LISTENERS                                   *
-     ******************************************************************************/
+    /************************************************************************
+     *                          EVENT LISTENERS                              *
+     ************************************************************************/
     regionSelectEl.addEventListener('change', () => {
       regionCode = regionSelectEl.value;
       fetchAndRenderAll();
     });
 
-    autoDetectBtnEl.addEventListener('click', () => {
-      if (!navigator.geolocation) {
-        showDebug('Geolocation not supported by this browser. Using default region A.');
-        regionCode = 'A';
-        regionSelectEl.value = 'A';
-        fetchAndRenderAll();
-        return;
-      }
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          const { latitude, longitude } = position.coords;
-          regionCode = guessRegion(latitude, longitude);
-          regionSelectEl.value = regionCode;
-          fetchAndRenderAll();
-        },
-        error => {
-          showDebug('Geolocation failed or denied. Defaulting to region A.');
-          regionCode = 'A';
-          regionSelectEl.value = 'A';
-          fetchAndRenderAll();
-        }
-      );
-    });
-
-    // Chart hover
     chartCanvas.addEventListener('mousemove', onCanvasHover);
     chartCanvas.addEventListener('touchmove', onCanvasHover);
 
-    // Rerender chart on window resize (makes it more responsive)
-    window.addEventListener('resize', () => renderChart());
+    window.addEventListener('resize', () => {
+      renderChart();
+    });
 
-    /*******************************************************************************
-     *           APPROXIMATE REGION GUESSING FOR MILTON KEYNES, ETC.               *
-     *  (Purely bounding-box approach, not official distribution boundaries)       *
-     ******************************************************************************/
-    function guessRegion(lat, lon) {
-      // We'll define some bounding boxes so Milton Keynes (roughly lat=52.0, lon=-0.76) → region A
-      // Real distribution boundaries are more complex. This is purely approximate.
-      // If not found, fallback to A.
-
-      // First check if in the general UK bounding box (roughly lat 49..59, lon -8..2):
-      if (lat < 49 || lat > 59 || lon < -8 || lon > 2) {
-        return 'A';
-      }
-
-      // Specifically for Milton Keynes area:
-      // MK is around lat ~ 51.8..52.2, lon ~ -0.9..-0.5
-      if (lat >= 51.7 && lat <= 52.3 && lon >= -1.0 && lon <= -0.3) {
-        // We'll assume region A
-        return 'A';
-      }
-
-      // Very rough approach for "London" region (region C):
-      // Let's say lat ~ 51.2..51.7, lon ~ -0.5..0.2
-      if (lat >= 51.2 && lat <= 51.7 && lon >= -0.5 && lon <= 0.2) {
-        return 'C';
-      }
-
-      // Very rough approach for East Midlands (region B):
-      if (lat >= 52.5 && lat <= 53.5 && lon >= -1.5 && lon <= -0.3) {
-        return 'B';
-      }
-
-      // Otherwise default to A to keep it simple
-      return 'A';
-    }
-
-    /*******************************************************************************
-     *                             FETCH & PROCESS DATA                             *
-     ******************************************************************************/
+    /************************************************************************
+     *                           FETCH DATA                                  *
+     ************************************************************************/
     async function fetchAgileData() {
       const url = `${API_BASE}/electricity-tariffs/E-1R-AGILE-18-02-21-${regionCode}/standard-unit-rates/`;
       try {
@@ -520,16 +447,19 @@
         if (!resp.ok) {
           throw new Error(`HTTP Error: ${resp.status}`);
         }
-        const data = await resp.json();
-        return data;
+        return resp.json();
       } catch (err) {
         throw err;
       }
     }
 
+    /************************************************************************
+     *                     PARSE INTO TODAY & TOMORROW                       *
+     ************************************************************************/
     function splitTodayAndTomorrow(results) {
       todayData = [];
       tomorrowData = [];
+
       const now = new Date();
       const todayStr = formatDateYYYYMMDD(now);
 
@@ -537,9 +467,10 @@
       tomorrowDate.setDate(now.getDate() + 1);
       const tomorrowStr = formatDateYYYYMMDD(tomorrowDate);
 
-      // Sort
+      // Sort by valid_from
       results.sort((a, b) => new Date(a.valid_from) - new Date(b.valid_from));
-      for (const item of results) {
+
+      results.forEach(item => {
         const d = new Date(item.valid_from);
         const dStr = formatDateYYYYMMDD(d);
         if (dStr === todayStr) {
@@ -547,42 +478,44 @@
         } else if (dStr === tomorrowStr) {
           tomorrowData.push(item);
         }
-      }
+      });
     }
 
     function formatDateYYYYMMDD(d) {
-      const year  = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day   = String(d.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
     }
 
-    /*******************************************************************************
-     *                                  RENDER LOGIC                                *
-     ******************************************************************************/
-    // Current Price
+    /************************************************************************
+     *                     RENDER CURRENT PRICE                              *
+     ************************************************************************/
     function renderCurrentPrice() {
       const now = new Date();
-      // Find a period that covers the current time
       const currentPeriod = todayData.find(item => {
         const start = new Date(item.valid_from);
         const end   = new Date(item.valid_to);
-        return start <= now && end > now;
+        return (start <= now && end > now);
       });
       if (!currentPeriod) {
         priceEl.innerText = 'No current price data.';
         timestampEl.innerText = '';
         return;
       }
-      priceEl.innerText = `Current Price: ${currentPeriod.value_inc_vat.toFixed(2)} p/kWh`;
-      const startTimeStr = new Date(currentPeriod.valid_from)
+      const priceStr = currentPeriod.value_inc_vat.toFixed(2);
+      priceEl.innerText = `Current Price: ${priceStr} p/kWh`;
+
+      const fromStr = new Date(currentPeriod.valid_from)
         .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const endTimeStr   = new Date(currentPeriod.valid_to)
+      const toStr   = new Date(currentPeriod.valid_to)
         .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      timestampEl.innerText = `Valid: ${startTimeStr} - ${endTimeStr}`;
+      timestampEl.innerText = `Valid: ${fromStr} - ${toStr}`;
     }
 
-    // Metrics
+    /************************************************************************
+     *                        RENDER METRICS                                 *
+     ************************************************************************/
     function renderMetrics() {
       if (!todayData.length) {
         minPriceEl.innerText = '-';
@@ -590,75 +523,67 @@
         avgPriceEl.innerText = '-';
         return;
       }
-      let minPrice = Infinity;
-      let maxPrice = -Infinity;
-      let sumPrice = 0;
+      let minP = Infinity, maxP = -Infinity, sum = 0;
       for (const item of todayData) {
         const p = item.value_inc_vat;
-        if (p < minPrice) minPrice = p;
-        if (p > maxPrice) maxPrice = p;
-        sumPrice += p;
+        if (p < minP) minP = p;
+        if (p > maxP) maxP = p;
+        sum += p;
       }
-      const avgPrice = sumPrice / todayData.length;
-      minPriceEl.innerText = `${minPrice.toFixed(2)} p/kWh`;
-      maxPriceEl.innerText = `${maxPrice.toFixed(2)} p/kWh`;
-      avgPriceEl.innerText = `${avgPrice.toFixed(2)} p/kWh`;
+      const avgP = sum / todayData.length;
+      minPriceEl.innerText = `${minP.toFixed(2)} p/kWh`;
+      maxPriceEl.innerText = `${maxP.toFixed(2)} p/kWh`;
+      avgPriceEl.innerText = `${avgP.toFixed(2)} p/kWh`;
     }
 
-    // Chart
+    /************************************************************************
+     *                        RENDER CHART                                   *
+     ************************************************************************/
     function renderChart() {
       const cWidth  = chartCanvas.clientWidth;
       const cHeight = chartCanvas.clientHeight;
-
-      // Adjust internal resolution
       chartCanvas.width  = cWidth  * window.devicePixelRatio;
       chartCanvas.height = cHeight * window.devicePixelRatio;
       chartCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
 
-      chartPoints = []; // clear old
+      chartPoints = [];
 
+      // No data?
       if (!todayData.length) {
         chartCtx.clearRect(0, 0, cWidth, cHeight);
         chartCtx.fillStyle = '#fff';
-        chartCtx.fillText('No data for chart.', 10, 30);
+        chartCtx.fillText('No data.', 10, 30);
         return;
       }
-
-      // Sort by time
-      todayData.sort((a, b) => new Date(a.valid_from) - new Date(b.valid_from));
-
-      // Min / max time & price
+      // sort
+      todayData.sort((a,b) => new Date(a.valid_from) - new Date(b.valid_from));
+      // compute min/max time & price
       const minTime = new Date(todayData[0].valid_from).getTime();
       const maxTime = new Date(todayData[todayData.length - 1].valid_to).getTime();
-      let minP = Infinity, maxP = -Infinity;
-      for (const d of todayData) {
-        if (d.value_inc_vat < minP) minP = d.value_inc_vat;
-        if (d.value_inc_vat > maxP) maxP = d.value_inc_vat;
-      }
+      let minPrice = Infinity, maxPrice = -Infinity;
+      todayData.forEach(d => {
+        if (d.value_inc_vat < minPrice) minPrice = d.value_inc_vat;
+        if (d.value_inc_vat > maxPrice) maxPrice = d.value_inc_vat;
+      });
       const timeRange  = maxTime - minTime || 1;
-      const priceRange = maxP - minP || 1;
+      const priceRange = maxPrice - minPrice || 1;
 
       // Clear
       chartCtx.clearRect(0, 0, cWidth, cHeight);
 
-      // Prepare path
+      // Plot
       chartCtx.strokeStyle = '#FF00E5';
       chartCtx.lineWidth   = 2;
       chartCtx.beginPath();
 
       todayData.forEach((item, i) => {
-        const t = new Date(item.valid_from).getTime();
-        const xNorm = (t - minTime) / timeRange; // 0..1
+        const fromT = new Date(item.valid_from).getTime();
+        const xNorm = (fromT - minTime) / timeRange;
         const x = xNorm * cWidth;
-
-        const yNorm = (item.value_inc_vat - minP) / priceRange; // 0..1
+        const yNorm = (item.value_inc_vat - minPrice) / priceRange;
         const y = cHeight - yNorm * cHeight;
 
-        // Store for hover
-        chartPoints.push({
-          x, y, price: item.value_inc_vat, 
-          from: item.valid_from, to: item.valid_to
-        });
+        chartPoints.push({ x, y, price: item.value_inc_vat });
 
         if (i === 0) {
           chartCtx.moveTo(x, y);
@@ -668,21 +593,20 @@
       });
       chartCtx.stroke();
 
-      // Draw circles
+      // Circle markers
       chartCtx.fillStyle = '#FF00E5';
       chartPoints.forEach(pt => {
         chartCtx.beginPath();
-        chartCtx.arc(pt.x, pt.y, 3, 0, 2 * Math.PI);
+        chartCtx.arc(pt.x, pt.y, 3, 0, 2*Math.PI);
         chartCtx.fill();
       });
 
-      // Label min / max
-      chartCtx.fillStyle = '#FFFFFF';
-      chartCtx.fillText(`Min: ${minP.toFixed(2)}`, 10, cHeight - 10);
-      chartCtx.fillText(`Max: ${maxP.toFixed(2)}`, 10, 20);
+      // Label min & max
+      chartCtx.fillStyle = '#fff';
+      chartCtx.fillText(`Min: ${minPrice.toFixed(2)}`, 10, cHeight - 10);
+      chartCtx.fillText(`Max: ${maxPrice.toFixed(2)}`, 10, 20);
     }
 
-    // Chart hover
     function onCanvasHover(e) {
       const rect = chartCanvas.getBoundingClientRect();
       let clientX, clientY;
@@ -696,7 +620,6 @@
       const x = clientX - rect.left;
       const y = clientY - rect.top;
 
-      // find closest point
       let closest = null;
       let minDist = Infinity;
       chartPoints.forEach(pt => {
@@ -709,8 +632,8 @@
         }
       });
 
+      // if near enough
       if (closest && minDist < 25) {
-        // Show tooltip
         chartTooltipEl.innerText = `${closest.price.toFixed(2)} p/kWh`;
         chartTooltipEl.style.left = (rect.left + closest.x + 10) + 'px';
         chartTooltipEl.style.top  = (rect.top  + closest.y - 20) + 'px';
@@ -720,56 +643,59 @@
       }
     }
 
-    // Table
+    /************************************************************************
+     *                        RENDER PRICE TABLE                             *
+     ************************************************************************/
     function renderPriceTable() {
       priceTableBodyEl.innerHTML = '';
       const now = new Date();
-      const futureIntervals = todayData.filter(d => {
+      const future = todayData.filter(d => {
         const end = new Date(d.valid_to);
         return end > now;
       });
-      if (!futureIntervals.length) {
+      if (!future.length) {
         const row = document.createElement('tr');
-        const cell = document.createElement('td');
+        const cell= document.createElement('td');
         cell.colSpan = 3;
         cell.innerText = 'No more intervals today.';
         row.appendChild(cell);
         priceTableBodyEl.appendChild(row);
         return;
       }
-      futureIntervals.forEach(item => {
+      future.forEach(item => {
         const row = document.createElement('tr');
-
         const fromStr = new Date(item.valid_from)
           .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const toStr   = new Date(item.valid_to)
           .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        const price   = item.value_inc_vat;
-
-        const fromCell  = document.createElement('td');
-        fromCell.innerText = fromStr;
-        const toCell    = document.createElement('td');
-        toCell.innerText   = toStr;
-        const priceCell = document.createElement('td');
-        priceCell.innerText= price.toFixed(2);
+        const p = item.value_inc_vat;
 
         // color-coded row
-        if (price < 15) {
+        if (p < 15) {
           row.classList.add('price-good');
-        } else if (price < 25) {
+        } else if (p < 25) {
           row.classList.add('price-ok');
         } else {
           row.classList.add('price-bad');
         }
 
-        row.appendChild(fromCell);
-        row.appendChild(toCell);
-        row.appendChild(priceCell);
+        const fromTd  = document.createElement('td');
+        fromTd.innerText = fromStr;
+        const toTd    = document.createElement('td');
+        toTd.innerText   = toStr;
+        const priceTd = document.createElement('td');
+        priceTd.innerText= p.toFixed(2);
+
+        row.appendChild(fromTd);
+        row.appendChild(toTd);
+        row.appendChild(priceTd);
         priceTableBodyEl.appendChild(row);
       });
     }
 
-    // Tomorrow preview
+    /************************************************************************
+     *                        TOMORROW PREVIEW                               *
+     ************************************************************************/
     function renderTomorrow() {
       if (!tomorrowData.length) {
         tomorrowInfoEl.innerText = 'No data for tomorrow yet.';
@@ -785,12 +711,12 @@
         `Min: ${minP.toFixed(2)} p/kWh, Max: ${maxP.toFixed(2)} p/kWh`;
     }
 
-    /*******************************************************************************
-     *                          DEBUG LOG UTILITIES                                *
-     ******************************************************************************/
+    /************************************************************************
+     *                        DEBUG LOG                                      *
+     ************************************************************************/
     function showDebug(msg) {
       debugLogEl.style.display = 'block';
-      debugLogEl.textContent = typeof msg === 'object' ? JSON.stringify(msg) : String(msg);
+      debugLogEl.textContent = (typeof msg === 'object') ? JSON.stringify(msg) : String(msg);
       console.error(msg);
     }
     function hideDebug() {
@@ -798,35 +724,33 @@
       debugLogEl.textContent = '';
     }
 
-    /*******************************************************************************
-     *                           MAIN WORKFLOW                                     *
-     ******************************************************************************/
+    /************************************************************************
+     *                           MAIN LOGIC                                  *
+     ************************************************************************/
     async function fetchAndRenderAll() {
       showDebug(`Fetching data for region: ${regionCode}...`);
       try {
         const data = await fetchAgileData();
         hideDebug();
         if (!data || !data.results) {
-          throw new Error('No data returned from API.');
+          throw new Error('No results from API');
         }
-
-        splitTodayAndTomorrowData(data.results);
+        splitTodayAndTomorrow(data.results);
 
         renderCurrentPrice();
         renderMetrics();
         renderChart();
         renderPriceTable();
         renderTomorrow();
-
       } catch (err) {
         showDebug(err);
-        priceEl.innerText = 'Error loading price data.';
+        priceEl.innerText = 'Error fetching data.';
       }
     }
 
-    // Initial run
+    // Run once, then every 30 minutes
     fetchAndRenderAll();
-    setInterval(fetchAndRenderAll, 30 * 60 * 1000); // every 30 minutes
+    setInterval(fetchAndRenderAll, 30 * 60 * 1000);
   </script>
 </body>
 </html>
