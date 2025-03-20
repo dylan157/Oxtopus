@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Octopus Agile - New Chart & Fun Features</title>
+  <title>Octopus Agile – Extended Layout</title>
 
-  <!-- OPTIONAL: Google Font -->
+  <!-- Optional Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link
@@ -14,56 +14,58 @@
   />
 
   <style>
-    /* =========================================
-       BASE / DARK THEME
-       ========================================= */
+    /* ==========================
+       BASE / THEME
+       ========================== */
     * {
-      margin: 0;
-      padding: 0;
+      margin: 0; 
+      padding: 0; 
       box-sizing: border-box;
     }
     body {
       min-height: 100vh;
-      background-color: #1E0D35; /* Dark purple */
+      background-color: #1E0D35; /* Dark purple background */
       color: #FFFFFF;
       font-family: 'Roboto', sans-serif;
       padding: 10px;
     }
 
-    /* Each section is top-level, no big container behind them. */
     section {
-      background-color: #2B1240; 
+      background-color: #2B1240;
       border-radius: 6px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.4);
       margin-bottom: 16px;
       padding: 16px;
     }
 
-    /* =========================================
-       HEADER
-       ========================================= */
-    .header {
-      text-align: center;
-      background-color: #3A1D50; /* Slightly lighter for variety */
-    }
-    .header h1 {
-      font-size: 1.6rem;
-      color: #FF00E5;
-      margin-bottom: 5px;
+    h1, h2, h3, h4, p {
+      margin: 0;
     }
 
-    .region-selector {
-      margin-top: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
+    /* ==========================
+       HEADER / REGION SELECTOR
+       ========================== */
+    .header {
+      text-align: center;
+      background-color: #3A1D50;
+      padding: 16px;
     }
-    .region-selector label {
+    .header h1 {
+      font-size: 1.4rem;
+      color: #FF00E5;
+      margin-bottom: 8px;
+    }
+    .region-select {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+    .region-select label {
       font-size: 0.9rem;
       color: #FF00E5;
     }
-    .region-selector select {
+    .region-select select {
       padding: 4px 8px;
       border-radius: 4px;
       border: 1px solid #999;
@@ -71,14 +73,14 @@
       color: #FFFFFF;
     }
 
-    /* =========================================
+    /* ==========================
        CURRENT PRICE
-       ========================================= */
-    .current-price {
+       ========================== */
+    .current-price-box {
       text-align: center;
     }
-    .price-display {
-      font-size: 1.4rem;
+    .current-price {
+      font-size: 1.3rem;
       font-weight: 700;
       margin-bottom: 5px;
     }
@@ -87,43 +89,61 @@
       color: #BBBBBB;
     }
 
-    /* =========================================
+    /* ==========================
        METRICS
-       ========================================= */
-    .metrics-title {
-      text-align: center;
+       ========================== */
+    .section-title {
       font-size: 1.2rem;
       color: #FF00E5;
       margin-bottom: 8px;
+      text-align: center;
       font-weight: 700;
     }
     .metrics-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 12px;
-      margin-top: 8px;
     }
     .metric-item {
       background-color: #3A1D50;
-      border-radius: 4px;
       padding: 10px;
+      border-radius: 4px;
       text-align: center;
     }
     .metric-item h2 {
-      font-size: 1rem;
-      color: #FF00E5;
       margin-bottom: 5px;
+      color: #FF00E5;
+      font-size: 1rem;
     }
 
-    /* =========================================
+    /* ==========================
+       BAR CHART
+       ========================== */
+    .chart-container {
+      width: 100%;
+      height: 300px; 
+      background-color: #3A1D50;
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+    .chart-label {
+      text-align: center;
+      font-size: 1.1rem;
+      color: #FF00E5;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    /* ==========================
        PRICE TABLE
-       ========================================= */
+       ========================== */
     .price-table-title {
       text-align: center;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       margin-bottom: 8px;
-      font-weight: 700;
       color: #FF00E5;
+      font-weight: 700;
     }
     table {
       width: 100%;
@@ -135,7 +155,7 @@
     }
     thead th {
       padding: 8px;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 700;
       color: #FFFFFF;
     }
@@ -147,16 +167,13 @@
     }
     td {
       padding: 8px;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       text-align: center;
       color: #FFFFFF;
     }
 
-    /* color-coded intervals:
-       gold if <10p,
-       green if <20p,
-       orange if <26p,
-       red otherwise
+    /* color-coded intervals: 
+       gold <10, green <20, orange <26, red >=26
     */
     .price-gold {
       background-color: rgba(255, 215, 0, 0.3);
@@ -171,45 +188,46 @@
       background-color: rgba(255, 0, 0, 0.2);
     }
 
-    /* highlight the current interval row */
-    .current-interval {
-      outline: 2px solid #FF00E5; 
-      background-color: rgba(255, 0, 229, 0.1) !important;
+    /* ==========================
+       ENERGY MIX
+       ========================== */
+    .energy-mix-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
     }
-
-    /* =========================================
-       TOMORROW PREVIEW
-       ========================================= */
-    .tomorrow-title {
-      text-align: center;
-      font-size: 1.2rem;
-      margin-bottom: 8px;
-      color: #FF00E5;
-      font-weight: 700;
+    .energy-mix-item {
+      background-color: #4A2E60;
+      border-radius: 4px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
-
-    /* =========================================
-       CHART (WITH GRID LINES)
-       ========================================= */
-    .chart-title {
-      text-align: center;
-      font-size: 1.2rem;
-      margin-bottom: 8px;
-      font-weight: 700;
+    .energy-mix-item h3 {
+      margin: 0;
+      font-size: 1rem;
       color: #FF00E5;
     }
-    .chart-container {
-      width: 100%;
-      height: 300px;
+    .energy-bar-container {
       background-color: #3A1D50;
+      height: 10px;
       border-radius: 4px;
       position: relative;
       overflow: hidden;
     }
+    .energy-bar {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      background-color: #FF00E5;
+    }
+    .energy-perc {
+      font-size: 0.8rem;
+    }
 
-    /* =========================================
+    /* ==========================
        DEBUG
-       ========================================= */
+       ========================== */
     #debugToggle {
       display: block;
       margin: 0 auto 10px auto;
@@ -223,42 +241,42 @@
     }
     #debugPanel {
       display: none;
-      background-color: rgba(255,0,0,0.2);
-      padding: 10px;
+      background-color: rgba(255,0,0,0.1);
       border-radius: 4px;
+      padding: 10px;
+      font-size: 0.8rem;
       max-height: 300px;
       overflow: auto;
       word-wrap: break-word;
-      font-size: 0.8rem;
     }
 
-    /* =========================================
-       RESPONSIVE TWEAKS
-       ========================================= */
+    /* ==========================
+       RESPONSIVE
+       ========================== */
     @media (max-width: 768px) {
       .metrics-grid {
         grid-template-columns: 1fr;
       }
-      table th, table td {
-        font-size: 0.75rem;
+      .energy-mix-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- HEADER -->
+  <!-- TITLE / REGION -->
   <section class="header">
-    <h1>Octopus Agile - Fun Features & Crisp Chart</h1>
-    <div class="region-selector">
+    <h1>Octopus Agile – New Layout</h1>
+    <div class="region-select">
       <label for="regionSelect">Region:</label>
       <select id="regionSelect">
         <option value="A">A (Eastern England)</option>
         <option value="B">B (East Midlands)</option>
         <option value="C">C (London)</option>
-        <option value="D">D (Merseyside/N.Wales)</option>
+        <option value="D">D (Merseyside/N. Wales)</option>
         <option value="E">E (West Midlands)</option>
-        <option value="F">F (N.E. England)</option>
+        <option value="F">F (N. Eastern Eng.)</option>
         <option value="G">G (North Western)</option>
         <option value="H">H (Southern Eng.)</option>
         <option value="J">J (South Eastern)</option>
@@ -271,42 +289,40 @@
     </div>
   </section>
 
-  <!-- CURRENT PRICE -->
-  <section class="current-price">
-    <div id="priceDisplay" class="price-display">Loading price...</div>
+  <!-- CURRENT PRICE BOX -->
+  <section class="current-price-box">
+    <div id="priceDisplay" class="current-price">Loading price...</div>
     <div id="timestampDisplay" class="timestamp"></div>
   </section>
 
-  <!-- METRICS -->
-  <section class="metrics">
-    <div class="metrics-title">Today’s Summary</div>
+  <!-- TODAY SUMMARY -->
+  <section>
+    <div class="section-title">Today’s Summary</div>
     <div class="metrics-grid">
       <div class="metric-item">
         <h2>Min Price</h2>
-        <p id="minPrice">-</p>
+        <p id="todayMin">-</p>
       </div>
       <div class="metric-item">
         <h2>Max Price</h2>
-        <p id="maxPrice">-</p>
+        <p id="todayMax">-</p>
       </div>
       <div class="metric-item">
         <h2>Average</h2>
-        <p id="avgPrice">-</p>
+        <p id="todayAvg">-</p>
       </div>
     </div>
   </section>
 
-  <!-- CHART -->
+  <!-- TODAY CHART -->
   <section>
-    <div class="chart-title">Today’s Price Chart</div>
-    <div id="chartContainer" class="chart-container">
-      <!-- We'll draw with JS -->
-    </div>
+    <div class="chart-label">Today’s Price Chart</div>
+    <div id="todayChart" class="chart-container"></div>
   </section>
 
-  <!-- PRICE TABLE -->
-  <section class="price-table">
-    <div class="price-table-title">Half-Hourly Prices</div>
+  <!-- TODAY HALF-HOUR PRICES -->
+  <section>
+    <div class="price-table-title">Today’s Half-Hour Prices</div>
     <table>
       <thead>
         <tr>
@@ -315,14 +331,54 @@
           <th>Price (p/kWh)</th>
         </tr>
       </thead>
-      <tbody id="priceTableBody"><!-- Filled by JS --></tbody>
+      <tbody id="todayTableBody"><!-- filled by JS --></tbody>
     </table>
   </section>
 
-  <!-- TOMORROW -->
+  <!-- TOMORROW SUMMARY -->
   <section>
-    <div class="tomorrow-title">Tomorrow’s Preview</div>
-    <div id="tomorrowInfo">Checking tomorrow’s data...</div>
+    <div class="section-title">Tomorrow’s Summary</div>
+    <div class="metrics-grid">
+      <div class="metric-item">
+        <h2>Min Price</h2>
+        <p id="tomorrowMin">-</p>
+      </div>
+      <div class="metric-item">
+        <h2>Max Price</h2>
+        <p id="tomorrowMax">-</p>
+      </div>
+      <div class="metric-item">
+        <h2>Average</h2>
+        <p id="tomorrowAvg">-</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOMORROW CHART -->
+  <section>
+    <div class="chart-label">Tomorrow’s Price Chart</div>
+    <div id="tomorrowChart" class="chart-container"></div>
+  </section>
+
+  <!-- TOMORROW HALF-HOUR PRICES -->
+  <section>
+    <div class="price-table-title">Tomorrow’s Half-Hour Prices</div>
+    <table>
+      <thead>
+        <tr>
+          <th>From</th>
+          <th>To</th>
+          <th>Price (p/kWh)</th>
+        </tr>
+      </thead>
+      <tbody id="tomorrowTableBody"><!-- filled by JS --></tbody>
+    </table>
+  </section>
+
+  <!-- WHERE ENERGY COMES FROM -->
+  <section>
+    <div class="section-title">Where the Energy Comes From</div>
+    <div id="energyMixContainer"><!-- filled by JS --></div>
   </section>
 
   <!-- DEBUG BUTTON & PANEL -->
@@ -330,49 +386,58 @@
   <div id="debugPanel"></div>
 
   <script>
-    /************************************************************************
-     *                          GLOBAL & DOM REFS
-     ************************************************************************/
-    const API_BASE = 'https://api.octopus.energy/v1/products/AGILE-18-02-21';
-    let regionCode = 'A';
+    /***********************************************************************
+     * GLOBAL CONSTANTS & DOM REFS
+     ***********************************************************************/
+    const AGILE_API_BASE = 'https://api.octopus.energy/v1/products/AGILE-18-02-21';
+    const ENERGY_MIX_API = 'https://api.carbonintensity.org.uk/generation';
 
+    let regionCode = 'A';
+    let rawAgileData = null;     // entire Agile API response
     let todayData = [];
     let tomorrowData = [];
-    let allFutureData = []; // combined "rest of today" + "tomorrow"
+    let energyMixData = null;
 
     // DOM
-    const regionSelectEl = document.getElementById('regionSelect');
-    const priceEl        = document.getElementById('priceDisplay');
-    const timestampEl    = document.getElementById('timestampDisplay');
-    const minPriceEl     = document.getElementById('minPrice');
-    const maxPriceEl     = document.getElementById('maxPrice');
-    const avgPriceEl     = document.getElementById('avgPrice');
-    const priceTableBodyEl = document.getElementById('priceTableBody');
-    const tomorrowInfoEl = document.getElementById('tomorrowInfo');
-    const chartContainerEl= document.getElementById('chartContainer');
-    const debugToggleEl  = document.getElementById('debugToggle');
-    const debugPanelEl   = document.getElementById('debugPanel');
+    const regionSelectEl    = document.getElementById('regionSelect');
+    const priceEl           = document.getElementById('priceDisplay');
+    const timestampEl       = document.getElementById('timestampDisplay');
+    const todayMinEl        = document.getElementById('todayMin');
+    const todayMaxEl        = document.getElementById('todayMax');
+    const todayAvgEl        = document.getElementById('todayAvg');
+    const todayTableBodyEl  = document.getElementById('todayTableBody');
+    const tomorrowMinEl     = document.getElementById('tomorrowMin');
+    const tomorrowMaxEl     = document.getElementById('tomorrowMax');
+    const tomorrowAvgEl     = document.getElementById('tomorrowAvg');
+    const tomorrowTableBodyEl = document.getElementById('tomorrowTableBody');
+    const energyMixContainerEl= document.getElementById('energyMixContainer');
+    const debugToggleEl     = document.getElementById('debugToggle');
+    const debugPanelEl      = document.getElementById('debugPanel');
 
-    /************************************************************************
-     *                          EVENT LISTENERS
-     ************************************************************************/
+    // Chart containers
+    const todayChartEl      = document.getElementById('todayChart');
+    const tomorrowChartEl   = document.getElementById('tomorrowChart');
+
+    /***********************************************************************
+     * EVENT LISTENERS
+     ***********************************************************************/
     regionSelectEl.addEventListener('change', () => {
       regionCode = regionSelectEl.value;
       fetchAndRenderAll();
     });
 
     debugToggleEl.addEventListener('click', () => {
-      debugPanelEl.style.display = debugPanelEl.style.display === 'block' ? 'none' : 'block';
+      debugPanelEl.style.display = (debugPanelEl.style.display==='block'?'none':'block');
     });
 
-    /************************************************************************
-     *                          FETCH AGILE DATA
-     ************************************************************************/
+    /***********************************************************************
+     * FETCH & PROCESS AGILE DATA
+     ***********************************************************************/
     async function fetchAgileData() {
-      const url = `${API_BASE}/electricity-tariffs/E-1R-AGILE-18-02-21-${regionCode}/standard-unit-rates/`;
+      const url = `${AGILE_API_BASE}/electricity-tariffs/E-1R-AGILE-18-02-21-${regionCode}/standard-unit-rates/`;
       const resp = await fetch(url);
       if (!resp.ok) {
-        throw new Error(`HTTP Error: ${resp.status}`);
+        throw new Error(`Agile HTTP error: ${resp.status}`);
       }
       return resp.json();
     }
@@ -384,124 +449,96 @@
       const now = new Date();
       const todayStr = formatDateYYYYMMDD(now);
 
-      const tomorrowDate = new Date(now);
-      tomorrowDate.setDate(now.getDate() + 1);
-      const tomorrowStr = formatDateYYYYMMDD(tomorrowDate);
+      const tDate = new Date(now);
+      tDate.setDate(now.getDate() + 1);
+      const tomorrowStr = formatDateYYYYMMDD(tDate);
 
-      results.sort((a, b) => new Date(a.valid_from) - new Date(b.valid_from));
-      for (const item of results) {
+      // sort by time ascending
+      results.sort((a,b) => new Date(a.valid_from) - new Date(b.valid_from));
+
+      results.forEach(item => {
         const d = new Date(item.valid_from);
         const dStr = formatDateYYYYMMDD(d);
-        if (dStr === todayStr) {
+        if (dStr===todayStr) {
           todayData.push(item);
-        } else if (dStr === tomorrowStr) {
+        } else if (dStr===tomorrowStr) {
           tomorrowData.push(item);
         }
-      }
-    }
-
-    // We'll combine "rest of today" + "all tomorrow" to display in the table
-    function buildAllFutureData() {
-      const now = new Date();
-      const futureToday = todayData.filter(d => new Date(d.valid_to) > now);
-      // tomorrow is already for the entire next day
-      allFutureData = [...futureToday, ...tomorrowData];
-      // Sort by start time
-      allFutureData.sort((a,b) => new Date(a.valid_from) - new Date(b.valid_from));
+      });
     }
 
     function formatDateYYYYMMDD(d) {
       const y = d.getFullYear();
       const m = String(d.getMonth()+1).padStart(2,'0');
-      const day = String(d.getDate()).padStart(2,'0');
+      const day= String(d.getDate()).padStart(2,'0');
       return `${y}-${m}-${day}`;
     }
 
-    /************************************************************************
-     *                       RENDER CURRENT PRICE
-     ************************************************************************/
+    /***********************************************************************
+     * RENDER CURRENT PRICE
+     ***********************************************************************/
     function renderCurrentPrice() {
       const now = new Date();
-      const currentPeriod = todayData.find(item => {
-        const start= new Date(item.valid_from);
-        const end  = new Date(item.valid_to);
-        return start <= now && end > now;
+      const current = todayData.find(item => {
+        const start = new Date(item.valid_from);
+        const end   = new Date(item.valid_to);
+        return (start<=now && end>now);
       });
-      if (!currentPeriod) {
-        priceEl.innerText = 'No current price data.';
-        timestampEl.innerText = '';
+      if (!current) {
+        priceEl.innerText='No current price data.';
+        timestampEl.innerText='';
         return;
       }
-      const pStr = currentPeriod.value_inc_vat.toFixed(2);
-      priceEl.innerText = `Current Price: ${pStr} p/kWh`;
+      const p = current.value_inc_vat.toFixed(2);
+      priceEl.innerText=`Current Price: ${p} p/kWh`;
 
-      const startStr = new Date(currentPeriod.valid_from)
-        .toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' });
-      const endStr   = new Date(currentPeriod.valid_to)
-        .toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' });
-      timestampEl.innerText= `Valid: ${startStr} - ${endStr}`;
+      const startStr = new Date(current.valid_from).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+      const endStr   = new Date(current.valid_to).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+      timestampEl.innerText=`Valid: ${startStr} - ${endStr}`;
     }
 
-    /************************************************************************
-     *                       RENDER METRICS
-     ************************************************************************/
-    function renderMetrics() {
+    /***********************************************************************
+     * RENDER TODAY METRICS & TABLE
+     ***********************************************************************/
+    function renderTodayMetrics() {
       if (!todayData.length) {
-        minPriceEl.innerText='-';
-        maxPriceEl.innerText='-';
-        avgPriceEl.innerText='-';
+        todayMinEl.innerText='-';
+        todayMaxEl.innerText='-';
+        todayAvgEl.innerText='-';
         return;
       }
       let minP=Infinity, maxP=-Infinity, sum=0;
-      todayData.forEach(d => {
-        const p = d.value_inc_vat;
-        if (p<minP) minP=p;
-        if (p>maxP) maxP=p;
-        sum+=p;
+      todayData.forEach(d=> {
+        if (d.value_inc_vat<minP) minP=d.value_inc_vat;
+        if (d.value_inc_vat>maxP) maxP=d.value_inc_vat;
+        sum+=d.value_inc_vat;
       });
       const avgP = sum / todayData.length;
-      minPriceEl.innerText= `${minP.toFixed(2)} p/kWh`;
-      maxPriceEl.innerText= `${maxP.toFixed(2)} p/kWh`;
-      avgPriceEl.innerText= `${avgP.toFixed(2)} p/kWh`;
+      todayMinEl.innerText = `${minP.toFixed(2)} p`;
+      todayMaxEl.innerText = `${maxP.toFixed(2)} p`;
+      todayAvgEl.innerText = `${avgP.toFixed(2)} p`;
     }
 
-    /************************************************************************
-     *                 RENDER TABLE (TODAY + TOMORROW)
-     ************************************************************************/
-    function renderPriceTable() {
-      priceTableBodyEl.innerHTML='';
-      if(!allFutureData.length) {
+    function renderTodayTable() {
+      todayTableBodyEl.innerHTML='';
+      if (!todayData.length) {
         const row = document.createElement('tr');
         const cell= document.createElement('td');
         cell.colSpan=3;
-        cell.innerText='No upcoming intervals.';
+        cell.innerText='No data for today.';
         row.appendChild(cell);
-        priceTableBodyEl.appendChild(row);
+        todayTableBodyEl.appendChild(row);
         return;
       }
-
-      const now = new Date();
-      allFutureData.forEach(item => {
+      // Only intervals that haven't ended? Or all? 
+      // The requirement says “Today’s half hour prices” – typically that means all intervals for the day.
+      todayData.forEach(item => {
         const row = document.createElement('tr');
 
-        const fromStr = new Date(item.valid_from)
-          .toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
-        const toStr   = new Date(item.valid_to)
-          .toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+        const fromStr = new Date(item.valid_from).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+        const toStr   = new Date(item.valid_to).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
         const p = item.value_inc_vat;
-
-        // color-coded row
-        if (p<10) row.classList.add('price-gold');
-        else if (p<20) row.classList.add('price-green');
-        else if (p<26) row.classList.add('price-orange');
-        else row.classList.add('price-red');
-
-        // highlight current interval if now is between valid_from & valid_to
-        const start= new Date(item.valid_from);
-        const end  = new Date(item.valid_to);
-        if (start<=now && end>now) {
-          row.classList.add('current-interval');
-        }
+        row.classList.add(getPriceClass(p));
 
         const fromTd  = document.createElement('td');
         fromTd.innerText= fromStr;
@@ -513,209 +550,306 @@
         row.appendChild(fromTd);
         row.appendChild(toTd);
         row.appendChild(priceTd);
-        priceTableBodyEl.appendChild(row);
+        todayTableBodyEl.appendChild(row);
       });
     }
 
-    /************************************************************************
-     *                    TOMORROW PREVIEW
-     ************************************************************************/
-    function renderTomorrow() {
-      if(!tomorrowData.length) {
-        tomorrowInfoEl.innerText='No data for tomorrow yet.';
+    /***********************************************************************
+     * RENDER TOMORROW METRICS & TABLE
+     ***********************************************************************/
+    function renderTomorrowMetrics() {
+      if (!tomorrowData.length) {
+        tomorrowMinEl.innerText='-';
+        tomorrowMaxEl.innerText='-';
+        tomorrowAvgEl.innerText='-';
         return;
       }
-      let minP=Infinity, maxP=-Infinity;
-      tomorrowData.forEach(d => {
-        if(d.value_inc_vat<minP) minP=d.value_inc_vat;
-        if(d.value_inc_vat>maxP) maxP=d.value_inc_vat;
+      let minP=Infinity, maxP=-Infinity, sum=0;
+      tomorrowData.forEach(d=> {
+        if (d.value_inc_vat<minP) minP=d.value_inc_vat;
+        if (d.value_inc_vat>maxP) maxP=d.value_inc_vat;
+        sum+=d.value_inc_vat;
       });
-      tomorrowInfoEl.innerText=
-        `Min: ${minP.toFixed(2)} p/kWh, Max: ${maxP.toFixed(2)} p/kWh`;
+      const avgP = sum / tomorrowData.length;
+      tomorrowMinEl.innerText= `${minP.toFixed(2)} p`;
+      tomorrowMaxEl.innerText= `${maxP.toFixed(2)} p`;
+      tomorrowAvgEl.innerText= `${avgP.toFixed(2)} p`;
     }
 
-    /************************************************************************
-     *                    CHART WITH GRID LINES
-     ************************************************************************/
-    function renderChart() {
-      chartContainerEl.innerHTML='';
-
-      if(!todayData.length) {
-        chartContainerEl.innerText='No data to chart.';
+    function renderTomorrowTable() {
+      tomorrowTableBodyEl.innerHTML='';
+      if (!tomorrowData.length) {
+        const row = document.createElement('tr');
+        const cell= document.createElement('td');
+        cell.colSpan=3;
+        cell.innerText='No data for tomorrow.';
+        row.appendChild(cell);
+        tomorrowTableBodyEl.appendChild(row);
         return;
       }
+      tomorrowData.forEach(item => {
+        const row = document.createElement('tr');
+        const fromStr = new Date(item.valid_from).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+        const toStr   = new Date(item.valid_to).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+        const p = item.value_inc_vat;
+        row.classList.add(getPriceClass(p));
 
-      // We'll create a canvas that scales with devicePixelRatio
-      const w = chartContainerEl.clientWidth;
-      const h = chartContainerEl.clientHeight;
-      const dpr = window.devicePixelRatio || 1;
+        const fromTd  = document.createElement('td');
+        fromTd.innerText= fromStr;
+        const toTd    = document.createElement('td');
+        toTd.innerText= toStr;
+        const priceTd = document.createElement('td');
+        priceTd.innerText= p.toFixed(2);
+
+        row.appendChild(fromTd);
+        row.appendChild(toTd);
+        row.appendChild(priceTd);
+        tomorrowTableBodyEl.appendChild(row);
+      });
+    }
+
+    /***********************************************************************
+     * HELPERS
+     ***********************************************************************/
+    function getPriceClass(p) {
+      // gold <10, green <20, orange <26, red otherwise
+      if (p<10) return 'price-gold';
+      if (p<20) return 'price-green';
+      if (p<26) return 'price-orange';
+      return 'price-red';
+    }
+
+    /***********************************************************************
+     * BAR CHARTS (TODAY / TOMORROW)
+     *  - Only label every 2 hours on bottom axis
+     ***********************************************************************/
+    function renderTodayChart() {
+      renderBarChart(todayData, todayChartEl);
+    }
+    function renderTomorrowChart() {
+      renderBarChart(tomorrowData, tomorrowChartEl);
+    }
+
+    function renderBarChart(dataArray, containerEl) {
+      containerEl.innerHTML='';
+      if (!dataArray.length) {
+        containerEl.innerText='No data to chart.';
+        return;
+      }
+      const w = containerEl.clientWidth;
+      const h = containerEl.clientHeight;
+      const dpr = window.devicePixelRatio||1;
 
       const canvas = document.createElement('canvas');
       canvas.style.width  = w+'px';
       canvas.style.height = h+'px';
-      canvas.width  = w * dpr;
-      canvas.height = h * dpr;
+      canvas.width  = w*dpr;
+      canvas.height = h*dpr;
+      containerEl.appendChild(canvas);
 
-      chartContainerEl.appendChild(canvas);
       const ctx = canvas.getContext('2d');
-      ctx.scale(dpr, dpr);
+      ctx.scale(dpr,dpr);
 
-      // Sort by time
-      todayData.sort((a,b)=> new Date(a.valid_from) - new Date(b.valid_from));
-      const minTime = new Date(todayData[0].valid_from).getTime();
-      const maxTime = new Date(todayData[todayData.length -1].valid_to).getTime();
+      // sort by time
+      dataArray.sort((a,b)=> new Date(a.valid_from) - new Date(b.valid_from));
+      const minTime = new Date(dataArray[0].valid_from).getTime();
+      const maxTime = new Date(dataArray[dataArray.length-1].valid_to).getTime();
 
-      let minPrice=Infinity, maxPrice=-Infinity;
-      todayData.forEach(d => {
-        if(d.value_inc_vat<minPrice) minPrice=d.value_inc_vat;
-        if(d.value_inc_vat>maxPrice) maxPrice=d.value_inc_vat;
+      // find min/max price
+      let minP=Infinity, maxP=-Infinity;
+      dataArray.forEach(d => {
+        if(d.value_inc_vat<minP) minP=d.value_inc_vat;
+        if(d.value_inc_vat>maxP) maxP=d.value_inc_vat;
       });
-
-      // Add ~10% padding top/bottom
-      const padding = (maxPrice-minPrice)*0.1 || 1;
-      const chartMinP = minPrice - padding;
-      const chartMaxP = maxPrice + padding;
+      const padding = (maxP-minP)*0.1 || 1;
+      const chartMinP= minP - padding;
+      const chartMaxP= maxP + padding;
 
       // fill background
-      ctx.fillStyle = '#4A2E60';
+      ctx.fillStyle='#4A2E60';
       ctx.fillRect(0,0,w,h);
 
-      ctx.lineWidth=1;
+      // draw horizontal grid lines at increments of 5
       ctx.strokeStyle='rgba(255,255,255,0.2)';
+      ctx.lineWidth=1;
       ctx.fillStyle='#fff';
       ctx.font='12px Roboto';
 
-      // horizontal grid lines at increments of 5
       const step=5;
-      const base = Math.floor(chartMinP/step)*step;
+      const base= Math.floor(chartMinP/step)*step;
       const limit= Math.ceil(chartMaxP/step)*step;
       for(let val=base; val<=limit; val+=step){
         const yNorm=(val-chartMinP)/(chartMaxP-chartMinP);
-        const yPos = h-(yNorm*h);
+        const y = h-(yNorm*h);
         ctx.beginPath();
-        ctx.moveTo(0,yPos);
-        ctx.lineTo(w,yPos);
+        ctx.moveTo(0,y);
+        ctx.lineTo(w,y);
         ctx.stroke();
 
         // label
-        ctx.fillText(val+'p', 5, yPos-2);
+        ctx.fillText(`${val}p`, 2, y-2);
       }
 
-      // vertical lines each hour
-      // skip half-hours for simpler labeling: "9pm" etc.
-      const oneHour = 3600000;
-      let tCur= minTime - (minTime%(oneHour)); // round down
-      while(tCur<= maxTime){
-        const date= new Date(tCur);
+      // bottom axis: only label every 2 hours
+      const twoHours= 2*3600000;
+      let t = minTime - (minTime%twoHours);
+      while(t<= maxTime) {
+        const date= new Date(t);
         const hours= date.getHours();
         const mins = date.getMinutes();
-        // only draw if mins==0 (top of hour)
-        if(mins===0){
-          const xNorm= (tCur-minTime)/(maxTime-minTime);
-          const xPos= xNorm*w;
+        if (mins===0) { // top of hour
+          const xNorm= (t-minTime)/(maxTime-minTime||1);
+          const x = xNorm*w;
           ctx.beginPath();
-          ctx.moveTo(xPos,0);
-          ctx.lineTo(xPos,h);
+          ctx.moveTo(x,0);
+          ctx.lineTo(x,h);
           ctx.stroke();
 
-          // label: e.g. "9pm"
+          // e.g. "9pm"
           const hour12 = (hours===0?12: (hours>12?hours-12:hours));
           const ampm   = (hours>=12?'pm':'am');
-          const label  = hour12 + ampm;
-          ctx.fillText(label, xPos, h-5);
+          ctx.fillText(`${hour12}${ampm}`, x, h-5);
         }
-        tCur+= oneHour;
+        t+= twoHours;
       }
 
-      // Draw the line in segments, coloring each segment by price
-      ctx.lineWidth=2;
-      for(let i=0; i< todayData.length; i++){
-        // find x,y for interval i
-        const d = todayData[i];
-        const start = new Date(d.valid_from).getTime();
-        const nextT= (i<todayData.length-1)
-          ? new Date(todayData[i+1].valid_from).getTime()
-          : new Date(d.valid_to).getTime();
-        // We'll treat the segment as [start -> nextT] or [start-> d.valid_to].
-        const x1Norm= (start- minTime)/(maxTime- minTime);
-        const x1= x1Norm*w;
-        const p = d.value_inc_vat;
-        const pNorm= (p-chartMinP)/(chartMaxP-chartMinP);
-        const y1= h-(pNorm*h);
+      // Now draw the bars
+      // Each half-hour is one bar in dataArray
+      const n = dataArray.length;
+      const barGap = 1; // small gap between bars
+      const barWidth = (w/n) - barGap;
 
-        const endTime = i<todayData.length-1
-          ? nextT 
-          : new Date(d.valid_to).getTime();
-        const x2Norm= (endTime- minTime)/(maxTime- minTime);
-        const x2= x2Norm*w;
+      dataArray.forEach((item, i) => {
+        const price = item.value_inc_vat;
+        const pNorm= (price-chartMinP)/(chartMaxP-chartMinP||1);
+        const barHeight= pNorm*h;
+        const x= i*(barWidth+barGap);
+        const y= h- barHeight;
 
-        // If we want a line to the next price specifically,
-        // we can average or we can just do a horizontal line segment.
-        // We'll just do a horizontal line for each half-hour. 
-        // Then connect the next segment in the next iteration, or not.
-
-        const color = getPriceColor(p);
-        ctx.strokeStyle = color;
-
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y1); // horizontal line
-        ctx.stroke();
-      }
+        ctx.fillStyle = getBarColor(price);
+        ctx.fillRect(x, y, barWidth, barHeight);
+      });
     }
 
-    // returns color for the line based on price
-    function getPriceColor(p) {
-      // gold if <10, green if <20, orange if <26, else red
+    function getBarColor(p) {
+      // gold <10, green <20, orange <26, red otherwise
       if(p<10) return 'gold';
       if(p<20) return 'limegreen';
       if(p<26) return 'orange';
       return 'red';
     }
 
-    /************************************************************************
-     *                     TOMORROW PREVIEW
-     ************************************************************************/
-    function renderDebugData(data) {
-      debugPanelEl.style.display='none';
-      debugPanelEl.textContent= JSON.stringify(data, null,2);
+    /***********************************************************************
+     * ENERGY MIX
+     ***********************************************************************/
+    async function fetchEnergyMix() {
+      const resp= await fetch(ENERGY_MIX_API);
+      if(!resp.ok) {
+        throw new Error(`Energy Mix error: ${resp.status}`);
+      }
+      return resp.json();
     }
 
-    /************************************************************************
-     *                           MAIN
-     ************************************************************************/
+    function renderEnergyMix() {
+      energyMixContainerEl.innerHTML='';
+      if(!energyMixData || !energyMixData.data || !energyMixData.data.generationmix) {
+        energyMixContainerEl.innerText='No energy mix data.';
+        return;
+      }
+      const arr= energyMixData.data.generationmix;
+      // sort by highest first
+      arr.sort((a,b)=> b.perc - a.perc);
+
+      const container= document.createElement('div');
+      container.className='energy-mix-grid';
+
+      arr.forEach(item => {
+        const wrap= document.createElement('div');
+        wrap.className='energy-mix-item';
+        const title= document.createElement('h3');
+        title.innerText= item.fuel;
+        wrap.appendChild(title);
+
+        const barC= document.createElement('div');
+        barC.className='energy-bar-container';
+        const bar= document.createElement('div');
+        bar.className='energy-bar';
+        bar.style.width=`${item.perc}%`;
+
+        barC.appendChild(bar);
+        wrap.appendChild(barC);
+
+        const perc= document.createElement('div');
+        perc.className='energy-perc';
+        perc.innerText=`${item.perc.toFixed(1)}%`;
+        wrap.appendChild(perc);
+
+        container.appendChild(wrap);
+      });
+      energyMixContainerEl.appendChild(container);
+    }
+
+    /***********************************************************************
+     * DEBUG INFO
+     ***********************************************************************/
+    function renderDebugInfo() {
+      const debugObj = {
+        rawAgileData,
+        todayData,
+        tomorrowData,
+        energyMix: energyMixData
+      };
+      debugPanelEl.textContent = JSON.stringify(debugObj, null, 2);
+    }
+
+    /***********************************************************************
+     * MAIN WORKFLOW
+     ***********************************************************************/
     async function fetchAndRenderAll() {
       try {
-        const data= await fetchAgileData();
-        if(!data || !data.results){
-          throw new Error('No data returned from API');
+        // 1) Fetch Agile
+        const agileJson = await fetchAgileData();
+        rawAgileData = agileJson; // store
+        if(!agileJson || !agileJson.results) {
+          throw new Error('No Agile data returned.');
         }
-        // Show raw data in debug panel (hidden by default)
-        renderDebugData(data);
+        splitTodayAndTomorrow(agileJson.results);
 
-        // split
-        splitTodayAndTomorrow(data.results);
-        buildAllFutureData();
+        // 2) Fetch Energy Mix
+        try {
+          energyMixData = await fetchEnergyMix();
+        } catch(eMix) {
+          console.error('Energy mix error:', eMix);
+          energyMixData=null; 
+        }
 
-        // render
+        // 3) Render
         renderCurrentPrice();
-        renderMetrics();
-        renderPriceTable();
-        renderTomorrow();
-        renderChart();
+        renderTodayMetrics();
+        renderTodayTable();
+        renderTodayChart();
 
-      } catch(err){
-        debugPanelEl.textContent= String(err);
+        renderTomorrowMetrics();
+        renderTomorrowTable();
+        renderTomorrowChart();
+
+        renderEnergyMix();
+
+        // 4) Debug panel
+        renderDebugInfo();
+
+      } catch(err) {
         debugPanelEl.style.display='block';
+        debugPanelEl.textContent = String(err);
         console.error(err);
-        priceEl.innerText='Error fetching data.';
+        priceEl.innerText='Error loading data.';
       }
     }
 
     // Initialize
+    regionSelectEl.value='A'; 
     fetchAndRenderAll();
     setInterval(fetchAndRenderAll, 30*60*1000);
-
   </script>
 </body>
 </html>
