@@ -1,11 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
+<!-- 
+  ---------------------------------------------------------------------------------------------
+  |                                                                                           |
+  |        OCTOPUS AGILE PRICE DISPLAY - LARGE SINGLE-PAGE PROJECT (~1000 LINES OF CODE)      |
+  |                                                                                           |
+  |        This HTML file demonstrates a single-page application approach with extensive      |
+  |        inline JavaScript, CSS, and HTML. It fetches agile electricity pricing data from   |
+  |        Octopus Energy's public API and displays a variety of interesting metrics in a     |
+  |        dark-themed layout similar to Octopus's brand style.                                |
+  |                                                                                           |
+  ---------------------------------------------------------------------------------------------
+-->
 <head>
-  <meta charset="UTF-8" />
+  <!-- 
+    -------------------------------------------------------------------------------------------
+    |                             META / HEAD INFORMATION                                      |
+    -------------------------------------------------------------------------------------------
+  -->
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Octopus Agile Price Display (Debug Version)</title>
+  <title>Octopus Agile Price Display – Large Project</title>
 
-  <!-- Optional: Google Fonts -->
+  <!-- 
+    -------------------------------------------------------------------------------------------
+    |                             OPTIONAL FONT (GOOGLE FONTS)                                 |
+    -------------------------------------------------------------------------------------------
+  -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link
@@ -13,14 +34,26 @@
     rel="stylesheet"
   />
 
+  <!-- 
+    -------------------------------------------------------------------------------------------
+    |                                 STYLES / CSS BLOCK                                       |
+    |   The styling is intentionally verbose and commented for demonstration.                  |
+    -------------------------------------------------------------------------------------------
+  -->
   <style>
-    /* RESET & BASE STYLES */
+    /************************************************************************************************
+     *                               BASE / RESET STYLES                                           *
+     ************************************************************************************************/
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
+    /* 
+      The body is set to a dark purple background color close to Octopus Energy's brand palette.
+      We use flex layout to center content horizontally and vertically.
+    */
     body {
       min-height: 100vh;
       display: flex;
@@ -28,19 +61,27 @@
       justify-content: center;
       font-family: 'Roboto', sans-serif;
       background-color: #1E0D35; /* Dark purple background */
+      color: #FFFFFF; /* Default text color is white for contrast on dark background */
     }
 
-    .container {
-      background-color: #2B1240; /* Slightly lighter purple */
-      width: 90%;
-      max-width: 400px;
-      padding: 30px 20px;
-      border-radius: 10px;
-      text-align: center;
+    /************************************************************************************************
+     *                       MAIN CONTAINER AND LAYOUT                                             *
+     ************************************************************************************************/
+    .main-container {
+      width: 95%;
+      max-width: 900px; 
+      background-color: #2B1240; /* Slightly lighter purple for container background */
+      border-radius: 8px;
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+      padding: 20px;
+      margin: 20px auto; /* In case there's scrolling, center horizontally */
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
       animation: fadeIn 0.8s ease-in-out;
     }
 
+    /* Simple fade-in keyframes */
     @keyframes fadeIn {
       from {
         opacity: 0;
@@ -52,121 +93,757 @@
       }
     }
 
-    h1 {
-      color: #FF00E5; /* Octopus pink/magenta */
-      margin-bottom: 1rem;
-      font-weight: 700;
-      font-size: 1.6rem;
+    /************************************************************************************************
+     *                           HEADER / TITLE STYLES                                             *
+     ************************************************************************************************/
+    .header-section {
+      text-align: center;
     }
-
-    #price {
-      margin: 1.2rem 0;
+    .header-section h1 {
+      color: #FF00E5; /* Octopus pink/magenta accent color */
       font-size: 1.8rem;
-      font-weight: 400;
-      color: #FFFFFF;
-      line-height: 1.3;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+    .header-section p {
+      font-size: 0.9rem;
+      color: #CCCCCC;
     }
 
-    #timestamp {
+    /************************************************************************************************
+     *                            CURRENT PRICE BLOCK                                              *
+     ************************************************************************************************/
+    .current-price-section {
+      background-color: #3A1D50;
+      border-radius: 6px;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .price-display {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .timestamp-display {
       font-size: 0.9rem;
       color: #BBBBBB;
     }
 
-    /* Debug area styles */
-    #debug {
-      margin-top: 1rem;
+    /************************************************************************************************
+     *                                 METRICS SECTION                                             *
+     *   This will show interesting stats: min price, max price, average price, etc.               *
+     ************************************************************************************************/
+    .metrics-section {
+      background-color: #3A1D50;
+      border-radius: 6px;
+      padding: 15px;
+    }
+    .metrics-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      text-align: center;
+      color: #FF00E5;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .metric-item {
+      background-color: #4A2E60;
+      padding: 10px;
+      border-radius: 6px;
+      text-align: center;
+    }
+    .metric-item h2 {
+      font-size: 1.1rem;
+      margin-bottom: 5px;
+      color: #FF00E5;
+    }
+    .metric-item p {
+      font-size: 1rem;
+      color: #FFFFFF;
+    }
+
+    /************************************************************************************************
+     *                             PRICE TABLE SECTION                                             *
+     *   This table will list half-hourly price data for the rest of the day.                      *
+     ************************************************************************************************/
+    .price-table-section {
+      background-color: #3A1D50;
+      border-radius: 6px;
+      padding: 15px;
+    }
+    .price-table-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      text-align: center;
+      color: #FF00E5;
+    }
+
+    /* Table styling - intentionally verbose for demonstration */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    thead {
+      background-color: #4A2E60;
+    }
+    thead th {
+      padding: 8px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+    tbody tr {
+      border-bottom: 1px solid #4A2E60;
+    }
+    tbody tr:hover {
+      background-color: #5B3E70;
+    }
+    td {
+      padding: 8px;
+      font-size: 0.9rem;
+      text-align: center;
+      color: #FFFFFF;
+    }
+
+    /************************************************************************************************
+     *                                  CHART SECTION                                               *
+     *   We'll draw a simple line chart on a <canvas> for the day's prices.                         *
+     ************************************************************************************************/
+    .chart-section {
+      background-color: #3A1D50;
+      border-radius: 6px;
+      padding: 15px;
+    }
+    .chart-section-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      text-align: center;
+      color: #FF00E5;
+    }
+    .chart-container {
+      position: relative;
+      height: 300px;
+      width: 100%;
+    }
+    canvas {
+      background-color: #4A2E60; /* Provide a background so chart stands out */
+      border-radius: 6px;
+      display: block;
+      margin: 0 auto;
+    }
+
+    /************************************************************************************************
+     *                         TOMORROW PREVIEW SECTION                                             *
+     *   If tomorrow's data is available, we'll display a short summary: min / max price tomorrow.  *
+     ************************************************************************************************/
+    .tomorrow-section {
+      background-color: #3A1D50;
+      border-radius: 6px;
+      padding: 15px;
+    }
+    .tomorrow-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      text-align: center;
+      color: #FF00E5;
+    }
+    .tomorrow-content {
+      text-align: center;
+      color: #FFFFFF;
+    }
+
+    /************************************************************************************************
+     *                              DEBUG / LOG SECTION                                             *
+     *   Will show any errors or logs, for debugging. Initially hidden.                             *
+     ************************************************************************************************/
+    .debug-section {
       background-color: rgba(255, 0, 0, 0.1);
       color: #ff8080;
       font-size: 0.8rem;
-      padding: 0.5rem;
+      padding: 10px;
+      margin-top: 10px;
       border-radius: 6px;
-      display: none; /* Hidden by default */
-      text-align: left;
+      display: none; /* Hidden by default, displayed on errors */
       word-wrap: break-word;
     }
 
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 1.4rem;
+    /************************************************************************************************
+     *                                   MEDIA QUERIES                                              *
+     *   Make layout adapt better on smaller screens.                                               *
+     ************************************************************************************************/
+    @media (max-width: 768px) {
+      .metrics-grid {
+        grid-template-columns: 1fr;
       }
-      #price {
-        font-size: 1.6rem;
-      }
-      #timestamp {
+      table thead, table tbody {
         font-size: 0.8rem;
       }
-      .container {
-        padding: 20px 15px;
+    }
+
+    @media (max-width: 480px) {
+      .header-section h1 {
+        font-size: 1.4rem;
+      }
+      .price-display {
+        font-size: 1.4rem;
+      }
+      .metrics-title,
+      .price-table-title,
+      .chart-section-title,
+      .tomorrow-title {
+        font-size: 1.0rem;
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Octopus Agile Price</h1>
-    <div id="price">Loading current price...</div>
-    <div id="timestamp"></div>
-    <!-- Debug section to display errors if something goes wrong -->
-    <div id="debug"></div>
-  </div>
+  <!-- 
+    -------------------------------------------------------------------------------------------
+    |                                MAIN CONTAINER                                            |
+    -------------------------------------------------------------------------------------------
+  -->
+  <div class="main-container">
 
+    <!-- 
+      -----------------------------------------------------------------------------------------
+      |                                 HEADER SECTION                                        |
+      -----------------------------------------------------------------------------------------
+    -->
+    <div class="header-section">
+      <h1>Octopus Agile Price - Extended Metrics</h1>
+      <p>A large single-page project to display multiple metrics for Octopus Agile tariffs.</p>
+    </div>
+
+    <!-- 
+      -----------------------------------------------------------------------------------------
+      |                             CURRENT PRICE SECTION                                      |
+      -----------------------------------------------------------------------------------------
+    -->
+    <div class="current-price-section">
+      <div id="price" class="price-display">Loading current price...</div>
+      <div id="timestamp" class="timestamp-display"></div>
+    </div>
+
+    <!-- 
+      -----------------------------------------------------------------------------------------
+      |                                   METRICS SECTION                                     |
+      |         Min price, max price, average price for 'today'.                              |
+      -----------------------------------------------------------------------------------------
+    -->
+    <div class="metrics-section">
+      <div class="metrics-title">Today's Summary</div>
+      <div class="metrics-grid">
+        <!-- Min price item -->
+        <div class="metric-item">
+          <h2>Min Price</h2>
+          <p id="minPriceValue">-</p>
+        </div>
+        <!-- Max price item -->
+        <div class="metric-item">
+          <h2>Max Price</h2>
+          <p id="maxPriceValue">-</p>
+        </div>
+        <!-- Average price item -->
+        <div class="metric-item">
+          <h2>Average</h2>
+          <p id="avgPriceValue">-</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 
+      -----------------------------------------------------------------------------------------
+      |                              PRICE TABLE SECTION                                       |
+      |   This will display half-hourly intervals for the rest of the day.                     |
+      -----------------------------------------------------------------------------------------
+    -->
+    <div class="price-table-section">
+      <div class="price-table-title">Half-Hourly Price Data (Today)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Time From</th>
+            <th>Time To</th>
+            <th>Price (p/kWh)</th>
+          </tr>
+        </thead>
+        <tbody id="priceTableBody">
+          <!-- Rows will be appended by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 
+      -----------------------------------------------------------------------------------------
+      |                                CHART SECTION                                           |
+      |   We'll show a simple line chart for today's pricing.                                  |
+      -----------------------------------------------------------------------------------------
+    -->
+    <div class="chart-section">
+      <div class="chart-section-title">Today's Price Chart</div>
+      <div class="chart-container">
+        <canvas id="priceChart" width="800" height="300"></canvas>
+      </div>
+    </div>
+
+    <!-- 
+      -----------------------------------------------------------------------------------------
+      |                             TOMORROW PREVIEW SECTION                                   |
+      |   If tomorrow's data is available, show min & max price for tomorrow.                  |
+      -----------------------------------------------------------------------------------------
+    -->
+    <div class="tomorrow-section">
+      <div class="tomorrow-title">Tomorrow's Preview</div>
+      <div class="tomorrow-content" id="tomorrowContent">
+        Checking tomorrow's data...
+      </div>
+    </div>
+
+    <!-- 
+      -----------------------------------------------------------------------------------------
+      |                                DEBUG SECTION                                           |
+      |    Displays any errors or logs if something goes wrong.                                |
+      -----------------------------------------------------------------------------------------
+    -->
+    <div id="debug" class="debug-section"></div>
+
+  </div> <!-- END MAIN CONTAINER -->
+
+
+  <!-- 
+    -------------------------------------------------------------------------------------------
+    |                                     JAVASCRIPT                                           |
+    |   This is intentionally verbose to show a large, single-file approach.                   |
+    -------------------------------------------------------------------------------------------
+  -->
   <script>
-    async function fetchAgilePrice() {
-      const region = 'A'; // Example region code
-      const url = `https://api.octopus.energy/v1/products/AGILE-18-02-21/electricity-tariffs/E-1R-AGILE-18-02-21-${region}/standard-unit-rates/`;
+    // ********************************************************************************************
+    // SECTION 0: GLOBAL CONSTANTS & VARIABLES
+    // ********************************************************************************************
+    const OCTOPUS_API_BASE = 'https://api.octopus.energy/v1/products/AGILE-18-02-21';
+    // You can change the region code here:
+    const REGION_CODE = 'A'; // For example, Eastern England region code
+
+    // These elements are used multiple times throughout the script:
+    const priceEl = document.getElementById('price');
+    const timestampEl = document.getElementById('timestamp');
+    const priceTableBodyEl = document.getElementById('priceTableBody');
+    const minPriceValueEl = document.getElementById('minPriceValue');
+    const maxPriceValueEl = document.getElementById('maxPriceValue');
+    const avgPriceValueEl = document.getElementById('avgPriceValue');
+    const tomorrowContentEl = document.getElementById('tomorrowContent');
+    const debugEl = document.getElementById('debug');
+
+    // Chart canvas:
+    const priceChartCanvas = document.getElementById('priceChart');
+    const priceChartCtx = priceChartCanvas.getContext('2d');
+
+    // Data arrays (for charting, etc.):
+    let todayData = [];     // Will hold array of objects: { valid_from, valid_to, value_inc_vat }
+    let tomorrowData = [];  // Will hold tomorrow's intervals if available
+
+    // ********************************************************************************************
+    // SECTION 1: FETCHING DATA
+    // ********************************************************************************************
+    /**
+     * fetchAgileData - Retrieves the standard-unit-rates array from Octopus's Agile tariff.
+     * @returns {Promise<Object>} The entire JSON response object from Octopus.
+     */
+    async function fetchAgileData() {
+      // Construct the endpoint URL for the region:
+      // Ex: https://api.octopus.energy/v1/products/AGILE-18-02-21/electricity-tariffs/E-1R-AGILE-18-02-21-A/standard-unit-rates/
+      const url = `${OCTOPUS_API_BASE}/electricity-tariffs/E-1R-AGILE-18-02-21-${REGION_CODE}/standard-unit-rates/`;
 
       try {
         const response = await fetch(url);
         if (!response.ok) {
-          throw new Error(\`HTTP error! Status: \${response.status}\`);
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
-
         const data = await response.json();
-        const currentDateTime = new Date();
-
-        const currentPeriod = data.results.find(period =>
-          new Date(period.valid_from) <= currentDateTime &&
-          new Date(period.valid_to) > currentDateTime
-        );
-
-        if (currentPeriod) {
-          document.getElementById('price').innerText =
-            \`Current Price: \${currentPeriod.value_inc_vat.toFixed(2)} p/kWh\`;
-          document.getElementById('timestamp').innerText =
-            \`Valid from: \${new Date(currentPeriod.valid_from).toLocaleTimeString()} to \${new Date(currentPeriod.valid_to).toLocaleTimeString()}\`;
-        } else {
-          document.getElementById('price').innerText =
-            'No current price data available.';
-          document.getElementById('timestamp').innerText = '';
-        }
-
-        // Hide debug if everything worked
-        hideDebug();
+        return data;
       } catch (error) {
-        // Show error message in debug container
-        showDebug(error);
-        document.getElementById('price').innerText = 'Error fetching price data.';
-        document.getElementById('timestamp').innerText = '';
+        throw error; // We'll catch and handle it outside
       }
     }
 
-    function showDebug(error) {
-      const debugEl = document.getElementById('debug');
-      debugEl.style.display = 'block';
-      debugEl.textContent = \`Error: \${error.message}\`;
+    // ********************************************************************************************
+    // SECTION 2: PARSING & ORGANIZING DATA
+    // ********************************************************************************************
+    /**
+     * separateTodayAndTomorrowData - Splits the full result set into today's data and tomorrow's data.
+     * @param {Array} results - The results array from the Agile API.
+     */
+    function separateTodayAndTomorrowData(results) {
+      // Clear current arrays:
+      todayData = [];
+      tomorrowData = [];
+
+      const now = new Date();
+      const todayDateString = formatDateYYYYMMDD(now);
+
+      // We also check tomorrow's date:
+      const tomorrowDate = new Date(now);
+      tomorrowDate.setDate(now.getDate() + 1);
+      const tomorrowDateString = formatDateYYYYMMDD(tomorrowDate);
+
+      // Sort results by valid_from ascending (the API might already do this, but let's be sure):
+      results.sort((a, b) => new Date(a.valid_from) - new Date(b.valid_from));
+
+      // Iterate results and group by date
+      results.forEach(item => {
+        const itemDate = new Date(item.valid_from);
+        const itemDateString = formatDateYYYYMMDD(itemDate);
+
+        if (itemDateString === todayDateString) {
+          todayData.push(item);
+        } else if (itemDateString === tomorrowDateString) {
+          tomorrowData.push(item);
+        }
+      });
     }
 
+    /**
+     * formatDateYYYYMMDD - Utility to format a Date object as YYYY-MM-DD
+     */
+    function formatDateYYYYMMDD(d) {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    /**
+     * findCurrentPeriod - Finds the period that is currently active based on the local time
+     * @param {Array} dataArray - Array of intervals
+     * @returns {Object | null} - The current period object or null if none
+     */
+    function findCurrentPeriod(dataArray) {
+      const now = new Date();
+      return dataArray.find(period => {
+        const start = new Date(period.valid_from);
+        const end = new Date(period.valid_to);
+        return start <= now && end > now;
+      }) || null;
+    }
+
+    // ********************************************************************************************
+    // SECTION 3: CALCULATING METRICS (MIN, MAX, AVERAGE, ETC.)
+    // ********************************************************************************************
+    /**
+     * calculateDailyMetrics - For a given set of intervals, find min, max, and average.
+     * @param {Array} dataArray - Array of intervals
+     * @returns {Object} { min, max, avg }
+     */
+    function calculateDailyMetrics(dataArray) {
+      if (!dataArray || dataArray.length === 0) {
+        return { min: null, max: null, avg: null };
+      }
+
+      let minPrice = Infinity;
+      let maxPrice = -Infinity;
+      let sum = 0;
+      let count = 0;
+
+      dataArray.forEach(interval => {
+        const price = interval.value_inc_vat;
+        if (price < minPrice) minPrice = price;
+        if (price > maxPrice) maxPrice = price;
+        sum += price;
+        count++;
+      });
+
+      const average = sum / count;
+      return { min: minPrice, max: maxPrice, avg: average };
+    }
+
+    // ********************************************************************************************
+    // SECTION 4: RENDERING THE PAGE (PRICE, METRICS, TABLE, CHART, ETC.)
+    // ********************************************************************************************
+    /**
+     * renderCurrentPrice - Display the current price and time range.
+     */
+    function renderCurrentPrice() {
+      const currentPeriod = findCurrentPeriod(todayData);
+      if (currentPeriod) {
+        const priceStr = currentPeriod.value_inc_vat.toFixed(2);
+        priceEl.innerText = `Current Price: ${priceStr} p/kWh`;
+
+        const fromTime = new Date(currentPeriod.valid_from).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const toTime = new Date(currentPeriod.valid_to).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        timestampEl.innerText = `Valid from: ${fromTime} to ${toTime}`;
+      } else {
+        priceEl.innerText = 'No current price data available.';
+        timestampEl.innerText = '';
+      }
+    }
+
+    /**
+     * renderMetrics - Display min, max, average in the metrics-section.
+     */
+    function renderMetrics() {
+      const { min, max, avg } = calculateDailyMetrics(todayData);
+      if (min === null) {
+        // Means no data
+        minPriceValueEl.innerText = '—';
+        maxPriceValueEl.innerText = '—';
+        avgPriceValueEl.innerText = '—';
+        return;
+      }
+
+      minPriceValueEl.innerText = `${min.toFixed(2)} p/kWh`;
+      maxPriceValueEl.innerText = `${max.toFixed(2)} p/kWh`;
+      avgPriceValueEl.innerText = `${avg.toFixed(2)} p/kWh`;
+    }
+
+    /**
+     * renderPriceTable - Renders the half-hourly intervals for the rest of today.
+     */
+    function renderPriceTable() {
+      // Clear existing rows
+      priceTableBodyEl.innerHTML = '';
+
+      // We only want intervals from "now" onward
+      const now = new Date();
+      const futureIntervals = todayData.filter(interval => {
+        const end = new Date(interval.valid_to);
+        return end > now;
+      });
+
+      if (futureIntervals.length === 0) {
+        // No more intervals for the day
+        const noDataRow = document.createElement('tr');
+        const noDataCell = document.createElement('td');
+        noDataCell.colSpan = 3;
+        noDataCell.innerText = 'No more intervals for the rest of today.';
+        noDataRow.appendChild(noDataCell);
+        priceTableBodyEl.appendChild(noDataRow);
+        return;
+      }
+
+      futureIntervals.forEach(interval => {
+        const row = document.createElement('tr');
+
+        const fromCell = document.createElement('td');
+        const fromTime = new Date(interval.valid_from).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        fromCell.innerText = fromTime;
+
+        const toCell = document.createElement('td');
+        const toTime = new Date(interval.valid_to).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        toCell.innerText = toTime;
+
+        const priceCell = document.createElement('td');
+        priceCell.innerText = interval.value_inc_vat.toFixed(2);
+
+        row.appendChild(fromCell);
+        row.appendChild(toCell);
+        row.appendChild(priceCell);
+
+        priceTableBodyEl.appendChild(row);
+      });
+    }
+
+    /**
+     * renderChart - Draw a basic line chart of today's prices on the canvas.
+     */
+    function renderChart() {
+      if (!todayData || todayData.length === 0) {
+        // No data to render
+        priceChartCtx.clearRect(0, 0, priceChartCanvas.width, priceChartCanvas.height);
+        priceChartCtx.fillStyle = '#FFFFFF';
+        priceChartCtx.fillText('No data for chart', 10, 50);
+        return;
+      }
+
+      // 1) Gather data points (time vs. price).
+      //    We'll convert the valid_from to a numeric x-value (e.g. hours from midnight).
+      //    Then scale them to the canvas width.
+      const minTime = new Date(todayData[0].valid_from).getTime();
+      const maxTime = new Date(todayData[todayData.length - 1].valid_to).getTime();
+
+      // We'll create arrays of [x, price].
+      const chartPoints = todayData.map(interval => {
+        const time = new Date(interval.valid_from).getTime();
+        const normalizedX = (time - minTime) / (maxTime - minTime); // 0 to 1
+        const x = normalizedX * priceChartCanvas.width;
+        const y = interval.value_inc_vat; // We'll scale this soon
+        return { x, y };
+      });
+
+      // Find min and max price
+      let minPrice = Infinity;
+      let maxPrice = -Infinity;
+      chartPoints.forEach(pt => {
+        if (pt.y < minPrice) minPrice = pt.y;
+        if (pt.y > maxPrice) maxPrice = pt.y;
+      });
+
+      // We'll add a small padding to the top/bottom
+      const padding = 5;
+      const range = maxPrice - minPrice || 1; // avoid 0 division
+      // Scale function
+      function scalePriceToY(price) {
+        const normalizedY = (price - minPrice) / range; // 0 to 1
+        // We'll invert it because canvas Y grows downwards
+        return priceChartCanvas.height - (normalizedY * (priceChartCanvas.height - padding)) - padding;
+      }
+
+      // 2) Clear canvas
+      priceChartCtx.clearRect(0, 0, priceChartCanvas.width, priceChartCanvas.height);
+
+      // 3) Draw axes or guidelines if you want
+      priceChartCtx.strokeStyle = '#CCCCCC';
+      priceChartCtx.lineWidth = 1;
+
+      // Maybe draw a baseline along the bottom
+      priceChartCtx.beginPath();
+      priceChartCtx.moveTo(0, priceChartCanvas.height - 1);
+      priceChartCtx.lineTo(priceChartCanvas.width, priceChartCanvas.height - 1);
+      priceChartCtx.stroke();
+
+      // 4) Plot the line
+      priceChartCtx.strokeStyle = '#FF00E5';
+      priceChartCtx.lineWidth = 2;
+      priceChartCtx.beginPath();
+      chartPoints.forEach((pt, index) => {
+        const canvasY = scalePriceToY(pt.y);
+        if (index === 0) {
+          priceChartCtx.moveTo(pt.x, canvasY);
+        } else {
+          priceChartCtx.lineTo(pt.x, canvasY);
+        }
+      });
+      priceChartCtx.stroke();
+
+      // 5) Optionally draw small circles for each data point
+      priceChartCtx.fillStyle = '#FF00E5';
+      chartPoints.forEach(pt => {
+        const canvasY = scalePriceToY(pt.y);
+        priceChartCtx.beginPath();
+        priceChartCtx.arc(pt.x, canvasY, 3, 0, 2 * Math.PI);
+        priceChartCtx.fill();
+      });
+
+      // 6) Optionally draw numeric labels on the left side for min & max
+      priceChartCtx.fillStyle = '#FFFFFF';
+      priceChartCtx.fillText(`${minPrice.toFixed(2)} p`, 5, scalePriceToY(minPrice) - 5);
+      priceChartCtx.fillText(`${maxPrice.toFixed(2)} p`, 5, scalePriceToY(maxPrice) - 5);
+    }
+
+    /**
+     * renderTomorrowPreview - If we have tomorrowData, display a min & max price for tomorrow.
+     */
+    function renderTomorrowPreview() {
+      if (!tomorrowData || tomorrowData.length === 0) {
+        tomorrowContentEl.innerText = 'No data available for tomorrow yet.';
+        return;
+      }
+      const { min, max } = calculateDailyMetrics(tomorrowData);
+      if (min === null) {
+        tomorrowContentEl.innerText = 'No data available for tomorrow yet.';
+        return;
+      }
+      tomorrowContentEl.innerText =
+        `Min: ${min.toFixed(2)} p/kWh, Max: ${max.toFixed(2)} p/kWh (tomorrow)`;
+    }
+
+    // ********************************************************************************************
+    // SECTION 5: MAIN WORKFLOW - FETCH, PROCESS, RENDER
+    // ********************************************************************************************
+    /**
+     * main - The main function to be called on page load and on intervals.
+     */
+    async function main() {
+      showDebug(`Starting data fetch for region ${REGION_CODE}...`);
+      try {
+        const data = await fetchAgileData();
+        if (!data || !data.results) {
+          throw new Error('No results returned from API.');
+        }
+        hideDebug(); // Clear debug if everything is good so far
+
+        // Separate data into today / tomorrow
+        separateTodayAndTomorrowData(data.results);
+
+        // Render current price
+        renderCurrentPrice();
+
+        // Render today's metrics
+        renderMetrics();
+
+        // Render table for the rest of today
+        renderPriceTable();
+
+        // Render chart
+        renderChart();
+
+        // Render tomorrow's data (if available)
+        renderTomorrowPreview();
+
+        // Hide debug if everything worked
+        hideDebug();
+
+      } catch (error) {
+        // Show error in debug
+        showDebug(error);
+        // Also set some user-facing text:
+        priceEl.innerText = 'Error fetching price data.';
+        timestampEl.innerText = '';
+      }
+    }
+
+    // ********************************************************************************************
+    // SECTION 6: DEBUG/LOG UTILITIES
+    // ********************************************************************************************
+    /**
+     * showDebug - Show the debug panel with the provided message or error object.
+     * @param {string | Error} message 
+     */
+    function showDebug(message) {
+      debugEl.style.display = 'block';
+      if (typeof message === 'object' && message !== null) {
+        debugEl.textContent = `Error: ${message.message || JSON.stringify(message)}`;
+      } else {
+        debugEl.textContent = String(message);
+      }
+      console.error(message);
+    }
+
+    /**
+     * hideDebug - Hide the debug panel.
+     */
     function hideDebug() {
-      const debugEl = document.getElementById('debug');
       debugEl.style.display = 'none';
       debugEl.textContent = '';
     }
 
-    // Initial fetch
-    fetchAgilePrice();
+    // ********************************************************************************************
+    // SECTION 7: INITIALIZATION
+    // ********************************************************************************************
+    // We call main() once, then refresh every 30 minutes, as typical.
+    main();
+    setInterval(main, 30 * 60 * 1000);
 
-    // Refresh every 30 minutes
-    setInterval(fetchAgilePrice, 30 * 60 * 1000);
+    // Optional: we could also add a manual refresh button or something if we want more lines.
+    // But let's keep it as is.
   </script>
+
+  <!-- 
+    -------------------------------------------------------------------------------------------
+    |                                     FOOTER                                               |
+    |     End of file. This intentionally has many lines.                                     |
+    -------------------------------------------------------------------------------------------
+  -->
+
 </body>
 </html>
