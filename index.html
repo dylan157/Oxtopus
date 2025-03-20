@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Octopus Agile Flex – UTC Queries (Fixed)</title>
+  <title>Octopus Agile Flex – New Layout</title>
 
   <!-- OPTIONAL: Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -172,8 +172,7 @@
     }
 
     /* color-coded intervals for table:
-       <22 => green, <30 => orange, >=30 => red
-       plus emojis if above 30 / 40 / 70 or below 15 /7
+       add emojis if above 30 / 40 / 70 or below 15 / 7
     */
     .price-green  { background-color: rgba(0, 255, 0, 0.2); }
     .price-orange { background-color: rgba(255, 165, 0, 0.2); }
@@ -260,7 +259,7 @@
 
   <!-- TITLE / REGION -->
   <section class="header">
-    <h1>Octopus Agile Flex – UTC Queries (Fixed)</h1>
+    <h1>Octopus Agile Flex – New Layout</h1>
     <div class="region-select">
       <label for="regionSelect">Region:</label>
       <select id="regionSelect">
@@ -382,34 +381,40 @@
     /************************************************************************
      * GLOBALS & CONSTANTS
      ************************************************************************/
+    // Use the new Agile-Flex product code:
     const PRODUCT_CODE = 'AGILE-FLEX-22-11-25';
+
+    // Example: https://api.octopus.energy/v1/products/AGILE-FLEX-22-11-25
+    // Build the tariff URL with region:
+    function agileTariffUrl(region) {
+      return `https://api.octopus.energy/v1/products/${PRODUCT_CODE}/electricity-tariffs/E-1R-${PRODUCT_CODE}-${region}/standard-unit-rates/`;
+    }
+
     const ENERGY_MIX_API = 'https://api.carbonintensity.org.uk/generation';
 
-    let regionCode = 'C'; // example default
-    let rawAgileDataToday    = null;
-    let rawAgileDataTomorrow = null;
-
+    let regionCode = 'A'; // default
+    let rawAgileData = null;
     let todayData    = [];
     let tomorrowData = [];
     let energyMixData= null;
 
     // DOM Refs
-    const regionSelectEl      = document.getElementById('regionSelect');
-    const priceEl             = document.getElementById('priceDisplay');
-    const timestampEl         = document.getElementById('timestampDisplay');
-    const todayMinEl          = document.getElementById('todayMin');
-    const todayMaxEl          = document.getElementById('todayMax');
-    const todayAvgEl          = document.getElementById('todayAvg');
-    const todayTableBodyEl    = document.getElementById('todayTableBody');
-    const tomorrowMinEl       = document.getElementById('tomorrowMin');
-    const tomorrowMaxEl       = document.getElementById('tomorrowMax');
-    const tomorrowAvgEl       = document.getElementById('tomorrowAvg');
-    const tomorrowTableBodyEl = document.getElementById('tomorrowTableBody');
-    const todayChartEl        = document.getElementById('todayChart');
-    const tomorrowChartEl     = document.getElementById('tomorrowChart');
+    const regionSelectEl   = document.getElementById('regionSelect');
+    const priceEl          = document.getElementById('priceDisplay');
+    const timestampEl      = document.getElementById('timestampDisplay');
+    const todayMinEl       = document.getElementById('todayMin');
+    const todayMaxEl       = document.getElementById('todayMax');
+    const todayAvgEl       = document.getElementById('todayAvg');
+    const todayTableBodyEl = document.getElementById('todayTableBody');
+    const tomorrowMinEl    = document.getElementById('tomorrowMin');
+    const tomorrowMaxEl    = document.getElementById('tomorrowMax');
+    const tomorrowAvgEl    = document.getElementById('tomorrowAvg');
+    const tomorrowTableBodyEl= document.getElementById('tomorrowTableBody');
+    const todayChartEl     = document.getElementById('todayChart');
+    const tomorrowChartEl  = document.getElementById('tomorrowChart');
     const energyMixContainerEl= document.getElementById('energyMixContainer');
-    const debugToggleEl       = document.getElementById('debugToggle');
-    const debugPanelEl        = document.getElementById('debugPanel');
+    const debugToggleEl    = document.getElementById('debugToggle');
+    const debugPanelEl     = document.getElementById('debugPanel');
 
     /************************************************************************
      * EVENT LISTENERS
@@ -419,52 +424,51 @@
       fetchAndRenderAll();
     });
     debugToggleEl.addEventListener('click', () => {
-      debugPanelEl.style.display = (debugPanelEl.style.display==='block'?'none':'block');
+      debugPanelEl.style.display = debugPanelEl.style.display==='block' ? 'none' : 'block';
     });
 
     /************************************************************************
-     * HELPER: Build a URL with period_from & period_to in UTC
+     * FETCH AGILE DATA
      ************************************************************************/
-    function getAgileUrlForDate(dateObj, region) {
-      // For “today” or “tomorrow” in local time, 
-      // we build period_from=YYYY-MM-DDT00:00Z to T23:59Z in UTC
-      const y = dateObj.getFullYear();
-      const m = String(dateObj.getMonth()+1).padStart(2,'0');
-      const d = String(dateObj.getDate()).padStart(2,'0');
-      const period_from = `${y}-${m}-${d}T00:00Z`;
-      const period_to   = `${y}-${m}-${d}T23:59Z`;
-
-      return `https://api.octopus.energy/v1/products/${PRODUCT_CODE}` +
-             `/electricity-tariffs/E-1R-${PRODUCT_CODE}-${region}/standard-unit-rates/` +
-             `?period_from=${period_from}&period_to=${period_to}`;
-    }
-
-    function getLocalTodayDate() {
-      const now = new Date();
-      return new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    }
-    function getLocalTomorrowDate() {
-      const today = getLocalTodayDate();
-      return new Date(today.getFullYear(), today.getMonth(), today.getDate()+1);
-    }
-
-    /************************************************************************
-     * FETCH & PROCESS DATA
-     ************************************************************************/
-    async function fetchAgileDataForDay(dateObj, region) {
-      const url = getAgileUrlForDate(dateObj, region);
+    async function fetchAgileData() {
+      const url = agileTariffUrl(regionCode);
+      // Optional: you can add &period_from=... &period_to=... to narrow date/time
+      // e.g. `&period_from=2023-03-26T00:00Z`
+      // if you specifically need intervals that break 40p at 5pm, etc.
       const resp = await fetch(url);
       if(!resp.ok) {
-        throw new Error(`Agile fetch error: ${resp.status} for day ${dateObj.toDateString()}`);
+        throw new Error(`Agile HTTP error: ${resp.status}`);
       }
       return resp.json();
     }
 
-    function processAgileResultsForDay(results) {
-      if(!results) return [];
-      // Sort by valid_from ascending
+    /************************************************************************
+     * SPLIT TODAY / TOMORROW
+     ************************************************************************/
+    function splitTodayAndTomorrow(results) {
+      todayData = [];
+      tomorrowData = [];
+
+      const now = new Date();
+      const todayStr = formatDateYYYYMMDD(now);
+
+      const tomorrowDate= new Date(now);
+      tomorrowDate.setDate(now.getDate() + 1);
+      const tomorrowStr = formatDateYYYYMMDD(tomorrowDate);
+
       results.sort((a,b)=> new Date(a.valid_from)- new Date(b.valid_from));
-      return results;
+      results.forEach(item => {
+        const dateStr= formatDateYYYYMMDD(new Date(item.valid_from));
+        if(dateStr=== todayStr) todayData.push(item);
+        else if(dateStr=== tomorrowStr) tomorrowData.push(item);
+      });
+    }
+
+    function formatDateYYYYMMDD(d) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth()+1).padStart(2,'0');
+      const day= String(d.getDate()).padStart(2,'0');
+      return `${y}-${m}-${day}`;
     }
 
     /************************************************************************
@@ -475,71 +479,68 @@
       const current = todayData.find(item => {
         const start = new Date(item.valid_from);
         const end   = new Date(item.valid_to);
-        return start<=now && end>now;
+        return start<= now && end> now;
       });
       if(!current) {
-        priceEl.innerText='No current price data.';
+        priceEl.innerText = 'No current price data.';
         timestampEl.innerText='';
         return;
       }
       const pStr= current.value_inc_vat.toFixed(2);
       priceEl.innerText= `Current Price: ${pStr} p/kWh`;
-
       const fromStr= new Date(current.valid_from)
-        .toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        .toLocaleTimeString([], { hour:'2-digit', minute:'2-digit'});
       const toStr= new Date(current.valid_to)
-        .toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-      timestampEl.innerText=`Valid: ${fromStr} - ${toStr}`;
+        .toLocaleTimeString([], { hour:'2-digit', minute:'2-digit'});
+      timestampEl.innerText= `Valid: ${fromStr} - ${toStr}`;
     }
 
     /************************************************************************
-     * RENDER METRICS
+     * RENDER TODAY METRICS & TABLE
      ************************************************************************/
-    function renderDayMetrics(dataArray, minEl, maxEl, avgEl) {
-      if(!dataArray.length) {
-        minEl.innerText='-';
-        maxEl.innerText='-';
-        avgEl.innerText='-';
+    function renderTodayMetrics() {
+      if(!todayData.length) {
+        todayMinEl.innerText='-';
+        todayMaxEl.innerText='-';
+        todayAvgEl.innerText='-';
         return;
       }
       let minP= Infinity, maxP= -Infinity, sum=0;
-      dataArray.forEach(d => {
-        const p= d.value_inc_vat;
-        if(p<minP) minP=p;
-        if(p>maxP) maxP=p;
-        sum+= p;
+      todayData.forEach(d => {
+        if(d.value_inc_vat < minP) minP= d.value_inc_vat;
+        if(d.value_inc_vat > maxP) maxP= d.value_inc_vat;
+        sum+= d.value_inc_vat;
       });
-      const avgP = sum/dataArray.length;
-      minEl.innerText= `${minP.toFixed(2)} p`;
-      maxEl.innerText= `${maxP.toFixed(2)} p`;
-      avgEl.innerText= `${avgP.toFixed(2)} p`;
+      const avgP= sum / todayData.length;
+      todayMinEl.innerText= `${minP.toFixed(2)} p`;
+      todayMaxEl.innerText= `${maxP.toFixed(2)} p`;
+      todayAvgEl.innerText= `${avgP.toFixed(2)} p`;
     }
-
-    function renderDayTable(dataArray, tableBodyEl) {
-      tableBodyEl.innerHTML='';
-      if(!dataArray.length) {
-        const row=document.createElement('tr');
-        const cell=document.createElement('td');
+    function renderTodayTable() {
+      todayTableBodyEl.innerHTML='';
+      if(!todayData.length) {
+        const row = document.createElement('tr');
+        const cell= document.createElement('td');
         cell.colSpan=3;
-        cell.innerText='No data.';
+        cell.innerText='No data for today.';
         row.appendChild(cell);
-        tableBodyEl.appendChild(row);
+        todayTableBodyEl.appendChild(row);
         return;
       }
-      dataArray.forEach(item => {
+      todayData.forEach(item => {
         const row= document.createElement('tr');
         const fromStr= new Date(item.valid_from)
           .toLocaleTimeString([], { hour:'2-digit', minute:'2-digit'});
         const toStr= new Date(item.valid_to)
           .toLocaleTimeString([], { hour:'2-digit', minute:'2-digit'});
-        const p= item.value_inc_vat;
-
-        // color-coded row
+        const p = item.value_inc_vat;
+        
+        // color-coded row (green/orange/red) – but less bright
         if(p<22) row.classList.add('price-green');
         else if(p<30) row.classList.add('price-orange');
         else row.classList.add('price-red');
 
-        // emojis
+        // add emojis
         let emoji='';
         if(p>70) emoji='💀';
         else if(p>40) emoji='❌';
@@ -557,27 +558,106 @@
         row.appendChild(fromTd);
         row.appendChild(toTd);
         row.appendChild(priceTd);
-        tableBodyEl.appendChild(row);
+        todayTableBodyEl.appendChild(row);
       });
     }
 
     /************************************************************************
-     * BAR CHART
+     * RENDER TOMORROW METRICS & TABLE
      ************************************************************************/
-    function renderDayChart(dataArray, containerEl) {
+    function renderTomorrowMetrics() {
+      if(!tomorrowData.length) {
+        tomorrowMinEl.innerText='-';
+        tomorrowMaxEl.innerText='-';
+        tomorrowAvgEl.innerText='-';
+        return;
+      }
+      let minP= Infinity, maxP= -Infinity, sum=0;
+      tomorrowData.forEach(d => {
+        if(d.value_inc_vat< minP) minP= d.value_inc_vat;
+        if(d.value_inc_vat> maxP) maxP= d.value_inc_vat;
+        sum+= d.value_inc_vat;
+      });
+      const avgP= sum/ tomorrowData.length;
+      tomorrowMinEl.innerText= `${minP.toFixed(2)} p`;
+      tomorrowMaxEl.innerText= `${maxP.toFixed(2)} p`;
+      tomorrowAvgEl.innerText= `${avgP.toFixed(2)} p`;
+    }
+    function renderTomorrowTable() {
+      tomorrowTableBodyEl.innerHTML='';
+      if(!tomorrowData.length) {
+        const row = document.createElement('tr');
+        const cell= document.createElement('td');
+        cell.colSpan=3;
+        cell.innerText='No data for tomorrow.';
+        row.appendChild(cell);
+        tomorrowTableBodyEl.appendChild(row);
+        return;
+      }
+      tomorrowData.forEach(item => {
+        const row= document.createElement('tr');
+        const fromStr= new Date(item.valid_from)
+          .toLocaleTimeString([], { hour:'2-digit', minute:'2-digit'});
+        const toStr= new Date(item.valid_to)
+          .toLocaleTimeString([], { hour:'2-digit', minute:'2-digit'});
+        const p= item.value_inc_vat;
+        
+        if(p<22) row.classList.add('price-green');
+        else if(p<30) row.classList.add('price-orange');
+        else row.classList.add('price-red');
+
+        let emoji='';
+        if(p>70) emoji='💀';
+        else if(p>40) emoji='❌';
+        else if(p>30) emoji='⚠️';
+        else if(p<7) emoji='🤑';
+        else if(p<15) emoji='😎';
+
+        const fromTd= document.createElement('td');
+        fromTd.innerText= fromStr;
+        const toTd= document.createElement('td');
+        toTd.innerText= toStr;
+        const priceTd= document.createElement('td');
+        priceTd.innerText= p.toFixed(2) + ' ' + emoji;
+
+        row.appendChild(fromTd);
+        row.appendChild(toTd);
+        row.appendChild(priceTd);
+        tomorrowTableBodyEl.appendChild(row);
+      });
+    }
+
+    /************************************************************************
+     * BAR CHART LOGIC
+     * - below 22 => green
+     * - 22..30  => orange
+     * - above 30=> red
+     * - Only label the bottom axis every 2 hours
+     * - Lines behind text => We'll do lines first, text second, bars third.
+     * - Shift bars up from bottom with margin, shift right for left margin.
+     ************************************************************************/
+    function renderTodayChart() {
+      renderBarChart(todayData, todayChartEl);
+    }
+    function renderTomorrowChart() {
+      renderBarChart(tomorrowData, tomorrowChartEl);
+    }
+
+    function renderBarChart(dataArray, containerEl) {
       containerEl.innerHTML='';
       if(!dataArray.length) {
         containerEl.innerText='No data to chart.';
         return;
       }
+
       const w= containerEl.clientWidth;
       const h= containerEl.clientHeight;
       const dpr= window.devicePixelRatio||1;
 
-      const canvas=document.createElement('canvas');
+      const canvas= document.createElement('canvas');
       canvas.style.width = w+'px';
       canvas.style.height= h+'px';
-      canvas.width= w*dpr;
+      canvas.width = w*dpr;
       canvas.height= h*dpr;
       containerEl.appendChild(canvas);
 
@@ -602,7 +682,7 @@
         if(d.value_inc_vat>maxP) maxP=d.value_inc_vat;
       });
       // small padding
-      const pad= (maxP-minP)*0.1 || 1;
+      const pad= (maxP - minP)*0.1 || 1;
       const chartMin= minP - pad;
       const chartMax= maxP + pad;
 
@@ -610,7 +690,7 @@
       ctx.fillStyle='#4A2E60';
       ctx.fillRect(0,0,w,h);
 
-      // horizontal grid lines
+      // 1) Draw horizontal grid lines behind everything
       ctx.strokeStyle='rgba(255,255,255,0.2)';
       ctx.lineWidth=1;
       ctx.fillStyle='#fff';
@@ -621,56 +701,61 @@
       const limit= Math.ceil(chartMax/step)*step;
       for(let val= base; val<=limit; val+= step) {
         const valNorm= (val-chartMin)/(chartMax-chartMin||1);
-        const y= innerHeight - (valNorm*innerHeight);
-        const yPos= y; 
+        const y= innerHeight - (valNorm* innerHeight);
+        const yPos= y; // since top is 0
         ctx.beginPath();
         ctx.moveTo(marginLeft,yPos);
         ctx.lineTo(w,yPos);
         ctx.stroke();
-        // label
+        // Price label on left
         ctx.fillText(`${val}p`, 2, yPos-2);
       }
 
-      // bottom axis every 2 hours
+      // 2) Bottom axis every 2 hours
       const twoHours= 2*3600000;
       let t= minTime - (minTime%twoHours);
       while(t<= maxTime) {
         const xNorm= (t- minTime)/(maxTime- minTime||1);
-        const x= marginLeft + (xNorm*innerWidth);
+        const x= marginLeft + (xNorm* innerWidth);
+        // vertical line
         ctx.beginPath();
         ctx.moveTo(x,0);
         ctx.lineTo(x,innerHeight);
         ctx.stroke();
-        // label
+        // time label at bottom
         const date= new Date(t);
         const hours= date.getHours();
         const mins = date.getMinutes();
         if(mins===0) {
-          const hour12= (hours===0?12:(hours>12?hours-12:hours));
-          const ampm= (hours>=12?'pm':'am');
+          const hour12= (hours===0?12: (hours>12?hours-12:hours));
+          const ampm= (hours>=12? 'pm':'am');
           ctx.fillText(`${hour12}${ampm}`, x-10, h-5);
         }
         t+= twoHours;
       }
 
-      // bars
+      // 3) Draw bars
+      // Each half-hour is one bar in dataArray
       const n= dataArray.length;
-      const gap=1;
+      const gap= 1; // small gap
       const barWidth= (innerWidth/n) - gap;
 
       dataArray.forEach((item,i)=>{
         const price= item.value_inc_vat;
-        const pNorm= (price-chartMin)/(chartMax-chartMin||1);
+        const pNorm= (price- chartMin)/(chartMax- chartMin||1);
         const barHeight= pNorm* innerHeight;
-        const x= marginLeft + i*(barWidth+gap);
-        const y= innerHeight- barHeight;
 
+        const x= marginLeft + i*(barWidth+gap);
+        const y= innerHeight - barHeight;
         ctx.fillStyle= getBarColor(price);
         ctx.fillRect(x,y,barWidth,barHeight);
       });
     }
 
     function getBarColor(p) {
+      // below 22 => green
+      // 22..30 => orange
+      // above 30 => red
       if(p<22) return 'green';
       if(p<30) return 'orange';
       return 'red';
@@ -691,11 +776,12 @@
         return;
       }
       const arr= energyMixData.data.generationmix;
+      // sort high->low
       arr.sort((a,b)=> b.perc- a.perc);
 
       const container= document.createElement('div');
       container.className='energy-mix-grid';
-      arr.forEach(item=>{
+      arr.forEach(item => {
         const wrap= document.createElement('div');
         wrap.className='energy-mix-item';
 
@@ -726,8 +812,7 @@
      ************************************************************************/
     function renderDebugInfo() {
       const debugObj= {
-        todayApiData: rawAgileDataToday,
-        tomorrowApiData: rawAgileDataTomorrow,
+        agileApiData: rawAgileData,
         todayData,
         tomorrowData,
         energyMixData
@@ -740,54 +825,36 @@
      ************************************************************************/
     async function fetchAndRenderAll() {
       try {
-        const localToday    = getLocalTodayDate();
-        const localTomorrow = getLocalTomorrowDate();
-
-        // 1) fetch today's data
-        const agileTodayJson    = await fetchAgileDataForDay(localToday, regionCode);
-        rawAgileDataToday       = agileTodayJson;
-        if(!agileTodayJson || !agileTodayJson.results) {
-          throw new Error('No Agile data for today');
+        // 1) Agile data
+        const agileResp= await fetchAgileData();
+        rawAgileData= agileResp;
+        if(!agileResp || !agileResp.results) {
+          throw new Error('No Agile data found');
         }
-        // 2) fetch tomorrow's data
-        const agileTomorrowJson = await fetchAgileDataForDay(localTomorrow, regionCode);
-        rawAgileDataTomorrow    = agileTomorrowJson;
-        if(!agileTomorrowJson || !agileTomorrowJson.results) {
-          // might be empty if tomorrow’s data not published yet
-          console.warn('No Agile data for tomorrow (maybe not published yet)');
-        }
+        splitTodayAndTomorrow(agileResp.results);
 
-        // process
-        todayData    = processAgileResultsForDay(agileTodayJson.results);
-        tomorrowData = agileTomorrowJson.results ? processAgileResultsForDay(agileTomorrowJson.results) : [];
-
-        // 3) fetch energy mix
+        // 2) Energy mix
         try {
           energyMixData= await fetchEnergyMix();
-        } catch(eMix) {
-          console.error('Energy mix fetch error:', eMix);
+        } catch(e) {
+          console.error('Energy mix fetch error:', e);
           energyMixData=null;
         }
 
-        // 4) RENDER
+        // RENDER
         renderCurrentPrice();
+        renderTodayMetrics();
+        renderTodayTable();
+        renderTodayChart();
 
-        // Render “today” metrics, table, chart
-        renderDayMetrics(todayData, todayMinEl, todayMaxEl, todayAvgEl);
-        renderDayTable(todayData, todayTableBodyEl);
-        renderDayChart(todayData, todayChartEl);
+        renderTomorrowMetrics();
+        renderTomorrowTable();
+        renderTomorrowChart();
 
-        // Render “tomorrow” metrics, table, chart
-        renderDayMetrics(tomorrowData, tomorrowMinEl, tomorrowMaxEl, tomorrowAvgEl);
-        renderDayTable(tomorrowData, tomorrowTableBodyEl);
-        renderDayChart(tomorrowData, tomorrowChartEl);
-
-        // Render energy mix
         renderEnergyMix();
 
-        // Debug
+        // DEBUG
         renderDebugInfo();
-
       } catch(err) {
         debugPanelEl.style.display='block';
         debugPanelEl.textContent= String(err);
@@ -801,6 +868,5 @@
     fetchAndRenderAll();
     setInterval(fetchAndRenderAll, 30*60*1000);
   </script>
-
 </body>
 </html>
