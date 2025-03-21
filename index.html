@@ -249,6 +249,30 @@
     }
 
     /* =========================
+       REFERRAL LINK BUTTON
+       ========================= */
+    .referral-section {
+      text-align: center;
+      margin: 16px 0;
+      padding: 16px;
+      background-color: #3A1D50;
+      border-radius: 6px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    .referral-button {
+      background-color: #FF00E5;
+      color: #FFFFFF;
+      text-decoration: none;
+      font-weight: bold;
+      padding: 10px 20px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    .referral-button:hover {
+      background-color: #ff40eb;
+    }
+
+    /* =========================
        RESPONSIVE
        ========================= */
     @media (max-width: 768px) {
@@ -385,6 +409,18 @@
   <!-- DEBUG BUTTON & PANEL -->
   <button id="debugToggle">Toggle Debug</button>
   <div id="debugPanel"></div>
+
+  <!-- REFERRAL BUTTON -->
+  <section class="referral-section">
+    <a
+      href="https://share.octopus.energy/eager-cliff-143"
+      class="referral-button"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Join Octopus and get £50 free credit
+    </a>
+  </section>
 
   <script>
     /************************************************************************
@@ -710,7 +746,7 @@
       const chartMinP= minP-pad;
       const chartMaxP= maxP+pad;
 
-      // 1) Draw vertical lines every 2 hours:
+      // 1) Draw vertical grid lines every 2 hours:
       const twoHours = 2 * 3600000;
       let tCur = minTime - (minTime % twoHours);
       ctx.strokeStyle = 'rgba(255,255,255,0.2)';
@@ -764,7 +800,6 @@
       }
 
       // 4) Draw Y-axis labels (price steps)
-      // We already have step=5, base, limit from above:
       for(let val=base; val<=limit; val+=step){
         const yNorm= (val-chartMinP)/(chartMaxP-chartMinP||1);
         const y= marginTop + (chartH - yNorm*chartH);
