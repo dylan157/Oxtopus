@@ -5,13 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Octopus Agile – Margins & Tomorrow Data</title>
 
-  <!-- Optional Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link
     href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap"
     rel="stylesheet"
   />
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     /* =========================
@@ -287,7 +288,6 @@
 </head>
 <body>
 
-  <!-- HEADER / REGION -->
   <section class="header">
     <h1>Octopus Agile – Margins & Tomorrow Data</h1>
     <div class="region-select">
@@ -311,13 +311,11 @@
     </div>
   </section>
 
-  <!-- CURRENT PRICE BOX -->
   <section class="current-price-box">
     <div id="priceDisplay" class="current-price">Loading price...</div>
     <div id="timestampDisplay" class="timestamp"></div>
   </section>
 
-  <!-- TODAY SUMMARY -->
   <section id="todaySection">
     <div class="section-title">Today’s Summary</div>
     <div class="metrics-grid">
@@ -336,13 +334,11 @@
     </div>
   </section>
 
-  <!-- TODAY CHART -->
   <section id="todayChartSection">
     <div class="chart-label">Today’s Price Chart</div>
     <div id="todayChart" class="chart-container"></div>
   </section>
 
-  <!-- TODAY HALF-HOUR PRICES -->
   <section id="todayTableSection">
     <div class="price-table-title">Today’s Half-Hour Prices</div>
     <table>
@@ -353,11 +349,10 @@
           <th>Price (p/kWh)</th>
         </tr>
       </thead>
-      <tbody id="todayTableBody"><!-- filled by JS --></tbody>
+      <tbody id="todayTableBody"></tbody>
     </table>
   </section>
 
-  <!-- TOMORROW SUMMARY -->
   <section id="tomorrowSection">
     <div class="section-title">Tomorrow’s Summary</div>
     <div id="tomorrowNotAvailable" style="display:none; text-align:center; font-style:italic;">
@@ -379,13 +374,11 @@
     </div>
   </section>
 
-  <!-- TOMORROW CHART -->
   <section id="tomorrowChartSection">
     <div class="chart-label">Tomorrow’s Price Chart</div>
     <div id="tomorrowChart" class="chart-container"></div>
   </section>
 
-  <!-- TOMORROW HALF-HOUR PRICES -->
   <section id="tomorrowTableSection">
     <div class="price-table-title">Tomorrow’s Half-Hour Prices</div>
     <table>
@@ -396,21 +389,18 @@
           <th>Price (p/kWh)</th>
         </tr>
       </thead>
-      <tbody id="tomorrowTableBody"><!-- filled by JS --></tbody>
+      <tbody id="tomorrowTableBody"></tbody>
     </table>
   </section>
 
-  <!-- ENERGY MIX -->
   <section>
     <div class="section-title">Where the Energy Comes From</div>
     <div id="energyMixContainer"></div>
   </section>
 
-  <!-- DEBUG BUTTON & PANEL -->
   <button id="debugToggle">Toggle Debug</button>
   <div id="debugPanel"></div>
 
-  <!-- REFERRAL BUTTON -->
   <section class="referral-section">
     <a
       href="https://share.octopus.energy/eager-cliff-143"
@@ -431,8 +421,8 @@
 
     let regionCode = 'A';
     let rawAgileData = null;
-    let todayData = [];
-    let tomorrowData = [];
+    let todayData =;
+    let tomorrowData =;
     let energyMixData= null;
 
     const regionSelectEl = document.getElementById('regionSelect');
@@ -498,8 +488,8 @@
     }
 
     function splitTodayAndTomorrow(results){
-      todayData=[];
-      tomorrowData=[];
+      todayData=;
+      tomorrowData=;
 
       const now= new Date();
       const todayStr= formatDateYYYYMMDD(now);
@@ -545,8 +535,9 @@
       const p= current.value_inc_vat.toFixed(2);
       priceEl.innerText=`Current Price: ${p} p/kWh`;
 
-      const fromStr= new Date(current.valid_from).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-      const toStr  = new Date(current.valid_to).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+      const timeFormat = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit' });
+      const fromStr= timeFormat.format(new Date(current.valid_from));
+      const toStr  = timeFormat.format(new Date(current.valid_to));
       timestampEl.innerText= `Valid: ${fromStr} - ${toStr}`;
     }
 
@@ -584,14 +575,15 @@
         todayTableBodyEl.appendChild(row);
         return;
       }
+      const timeFormat = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit' });
       todayData.forEach(item => {
         const row= document.createElement('tr');
         const p= item.value_inc_vat;
 
         row.classList.add(getPriceClass(p));
 
-        const fromStr= new Date(item.valid_from).toLocaleTimeString([],{hour:'2-digit', minute:'2-digit'});
-        const toStr  = new Date(item.valid_to).toLocaleTimeString([],{hour:'2-digit', minute:'2-digit'});
+        const fromStr= timeFormat.format(new Date(item.valid_from));
+        const toStr  = timeFormat.format(new Date(item.valid_to));
 
         const fromTd= document.createElement('td');
         fromTd.innerText= fromStr;
@@ -643,15 +635,16 @@
       tomorrowTableBodyEl.innerHTML='';
       if(!tomorrowData.length) return;
       // If we do have data, fill table
+      const timeFormat = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit' });
       tomorrowData.forEach(item => {
         const row= document.createElement('tr');
         const p= item.value_inc_vat;
 
         row.classList.add(getPriceClass(p));
 
-        const fromStr= new Date(item.valid_from).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-        const toStr  = new Date(item.valid_to).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-        
+        const fromStr= timeFormat.format(new Date(item.valid_from));
+        const toStr  = timeFormat.format(new Date(item.valid_to));
+
         const fromTd= document.createElement('td');
         fromTd.innerText= fromStr;
         const toTd= document.createElement('td');
@@ -690,143 +683,109 @@
     }
 
     /************************************************************************
-     * BAR CHARTS (MARGINS)
+     * BAR CHARTS (MARGINS) - Using Chart.js
      ************************************************************************/
     function renderTodayChart(){
-      renderBarChart(todayData, todayChartEl);
+      renderChart(todayData, todayChartEl, "Today's Prices");
     }
     function renderTomorrowChart(){
-      renderBarChart(tomorrowData, tomorrowChartEl);
+      renderChart(tomorrowData, tomorrowChartEl, "Tomorrow's Prices");
     }
 
-    function renderBarChart(dataArray, containerEl){
-      containerEl.innerHTML='';
-      if(!dataArray.length){
-        containerEl.innerText='No data to chart.';
+    function renderChart(dataArray, containerEl, chartTitle) {
+      containerEl.innerHTML = '<canvas></canvas>';
+      const canvas = containerEl.querySelector('canvas');
+      const ctx = canvas.getContext('2d');
+
+      if (!dataArray.length) {
+        ctx.fillText('No data to chart.', 20, 20);
         return;
       }
-      const w= containerEl.clientWidth;
-      const h= containerEl.clientHeight;
-      const dpr= window.devicePixelRatio||1;
 
-      const canvas= document.createElement('canvas');
-      canvas.style.width= w+'px';
-      canvas.style.height= h+'px';
-      canvas.width= w*dpr;
-      canvas.height= h*dpr;
-      containerEl.appendChild(canvas);
-
-      const ctx= canvas.getContext('2d');
-      ctx.scale(dpr,dpr);
-
-      // chart margins
-      const marginLeft= 40;
-      const marginRight= 10;
-      const marginTop= 10;
-      const marginBottom= 30;
-      const chartW= w - marginLeft - marginRight;
-      const chartH= h - marginTop - marginBottom;
-
-      // background
-      ctx.fillStyle='#4A2E60';
-      ctx.fillRect(0,0,w,h);
-
-      // sort intervals
-      dataArray.sort((a,b)=> new Date(a.valid_from) - new Date(b.valid_from));
-      const minTime= new Date(dataArray[0].valid_from).getTime();
-      const maxTime= new Date(dataArray[dataArray.length-1].valid_to).getTime();
-
-      // find min / max price
-      let minP=Infinity, maxP=-Infinity;
-      dataArray.forEach(d => {
-        if(d.value_inc_vat<minP) minP=d.value_inc_vat;
-        if(d.value_inc_vat>maxP) maxP=d.value_inc_vat;
+      const labels = dataArray.map(item => {
+        const startTime = new Date(item.valid_from);
+        const endTime = new Date(item.valid_to);
+        const timeFormat = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit' });
+        return `${timeFormat.format(startTime)} - ${timeFormat.format(endTime)}`;
       });
-      const pad= (maxP-minP)*0.1||1;
-      const chartMinP= minP-pad;
-      const chartMaxP= maxP+pad;
 
-      // 1) Draw vertical grid lines every 2 hours:
-      const twoHours = 2 * 3600000;
-      let tCur = minTime - (minTime % twoHours);
-      ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-      ctx.lineWidth = 1;
-      while (tCur <= maxTime) {
-        const xNorm = (tCur - minTime) / (maxTime - minTime || 1);
-        const x = marginLeft + xNorm * chartW;
-
-        // Draw the vertical line
-        ctx.beginPath();
-        ctx.moveTo(x, marginTop);
-        ctx.lineTo(x, marginTop + chartH);
-        ctx.stroke();
-
-        tCur += twoHours;
-      }
-
-      // 2) Draw horizontal grid lines at increments of 5p:
-      ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-      const step=5;
-      const base= Math.floor(chartMinP/step)*step;
-      const limit= Math.ceil(chartMaxP/step)*step;
-      for(let val=base; val<=limit; val+=step){
-        const yNorm= (val-chartMinP)/(chartMaxP-chartMinP||1);
-        const y= marginTop + (chartH - yNorm*chartH);
-        ctx.beginPath();
-        ctx.moveTo(marginLeft,y);
-        ctx.lineTo(marginLeft+chartW,y);
-        ctx.stroke();
-      }
-
-      // 3) Draw labels along the bottom every 6 hours:
-      const sixHours = 6 * 3600000;
-      tCur = minTime - (minTime % twoHours);
-      ctx.fillStyle='#fff';
-      ctx.font='12px Roboto';
-      while (tCur <= maxTime) {
-        const date = new Date(tCur);
-        const hours = date.getHours();
-        const mins = date.getMinutes();
-        
-        // If it’s exactly on a 6-hour mark, draw the text
-        if (hours % 6 === 0 && mins === 0) {
-          const xNorm = (tCur - minTime) / (maxTime - minTime || 1);
-          const x = marginLeft + xNorm * chartW;
-          const hour12 = (hours===0 ? 12 : (hours>12 ? hours-12 : hours));
-          const ampm = (hours>=12 ? 'pm' : 'am');
-          ctx.fillText(`${hour12}${ampm}`, x-10, marginTop + chartH + 15);
+      const prices = dataArray.map(item => item.value_inc_vat);
+      const backgroundColors = prices.map(price => {
+        if (price < 22) {
+          return 'rgba(0, 255, 0, 0.6)';
+        } else if (price < 30) {
+          return 'rgba(255, 165, 0, 0.6)';
+        } else {
+          return 'rgba(255, 0, 0, 0.6)';
         }
-        tCur += twoHours;
-      }
-
-      // 4) Draw Y-axis labels (price steps)
-      for(let val=base; val<=limit; val+=step){
-        const yNorm= (val-chartMinP)/(chartMaxP-chartMinP||1);
-        const y= marginTop + (chartH - yNorm*chartH);
-        ctx.fillText(`${val}p`, marginLeft-35, y+4); // place to the left
-      }
-
-      // 5) Draw the bars
-      const n= dataArray.length;
-      const barGap=1;
-      const barWidth= chartW/n - barGap;
-      dataArray.forEach((item, i)=>{
-        const p= item.value_inc_vat;
-        const pNorm= (p-chartMinP)/(chartMaxP-chartMinP||1);
-        const barH= pNorm*chartH;
-        const x= marginLeft + i*(barWidth+barGap);
-        const y= marginTop + (chartH - barH);
-
-        ctx.fillStyle= getBarColor(p);
-        ctx.fillRect(x,y, barWidth, barH);
       });
-    }
+      const borderColors = prices.map(price => {
+        if (price < 22) {
+          return 'rgba(0, 255, 0, 1)';
+        } else if (price < 30) {
+          return 'rgba(255, 165, 0, 1)';
+        } else {
+          return 'rgba(255, 0, 0, 1)';
+        }
+      });
 
-    function getBarColor(p){
-      // <22 => greenish, <30 => orangeish, else redish
-      if(p<22) return '#70D670';  // pastel green
-      if(p<30) return '#FFB266';  // pastel orange
-      return '#FF6666';           // pastel red
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: chartTitle,
+            data: prices,
+            backgroundColor: backgroundColors,
+            borderColor: borderColors,
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: false,
+              title: {
+                display: true,
+                text: 'Price (p/kWh)',
+                color: '#FFFFFF'
+              },
+              ticks: {
+                color: '#FFFFFF'
+              },
+              grid: {
+                color: 'rgba(255,255,255,0.1)'
+              }
+            },
+            x: {
+              ticks: {
+                color: '#FFFFFF',
+                maxRotation: 90,
+                minRotation: 45,
+                autoSkip: true,
+                maxTicksLimit: 20 // Adjust as needed
+              },
+              grid: {
+                color: 'rgba(255,255,255,0.1)'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              labels: {
+                color: '#FFFFFF'
+              }
+            },
+            title: {
+              display: false,
+              text: chartTitle,
+              color: '#FFFFFF'
+            }
+          }
+        }
+      });
     }
 
     /************************************************************************
