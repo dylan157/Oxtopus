@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Octopus Agile – New Color Palette & Margins</title>
+  <title>Octopus Agile – Margins & Tomorrow Data</title>
 
   <!-- Optional Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -14,45 +14,43 @@
   />
 
   <style>
-    /* ===============================
-       BASE STYLES / NEW COLOR PALETTE
-       =============================== */
+    /* =========================
+       BASE / DARK THEME
+       ========================= */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
     body {
-      /* Deep purple background */
-      background-color: #1A0033;
-      color: #FFFFFF; /* Main text color */
+      min-height: 100vh;
+      background-color: #121B40; /* Deeper Octopus-style dark blue/purple */
+      color: #FFFFFF;
       font-family: 'Roboto', sans-serif;
       padding: 10px;
-      min-height: 100vh;
     }
     section {
-      /* Slightly lighter section background */
-      background-color: #260032;
+      background-color: #1F1749; /* Slightly lighter for sections */
       border-radius: 6px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
       margin-bottom: 16px;
       padding: 16px;
     }
+    h1, h2, h3, h4, p {
+      margin: 0;
+    }
 
-    /* ===============================
-       HEADER / REGION SELECTOR
-       =============================== */
+    /* =========================
+       HEADER / REGION
+       ========================= */
     .header {
       text-align: center;
-      background-color: #260032; /* Same as sections for consistency */
+      background-color: #2E125B; /* Octopus purple for header */
       padding: 16px;
-      border-radius: 6px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
     }
     .header h1 {
-      /* Hot Pink or Violet? Let’s use bright violet accent: */
       font-size: 1.4rem;
-      color: #7B5CFF; 
+      color: #FF00E5; /* Octopus pink accent */
       margin-bottom: 8px;
     }
     .region-select {
@@ -63,21 +61,19 @@
     }
     .region-select label {
       font-size: 0.9rem;
-      /* Another accent color or subdued text? Let's use #A69BB2 (muted). */
-      color: #A69BB2;
+      color: #FF00E5;
     }
     .region-select select {
       padding: 4px 8px;
       border-radius: 4px;
       border: 1px solid #999;
-      /* Light Purple or slightly darker for select? Let's do #B189FF as a nod to your palette. */
-      background-color: #B189FF;
-      color: #1A0033; /* Dark text on lighter background */
+      background-color: #3F2B6D; /* Dark purple for select box */
+      color: #FFFFFF;
     }
 
-    /* ===============================
-       CURRENT PRICE BOX
-       =============================== */
+    /* =========================
+       CURRENT PRICE
+       ========================= */
     .current-price-box {
       text-align: center;
     }
@@ -88,53 +84,44 @@
     }
     .timestamp {
       font-size: 0.85rem;
-      color: #A69BB2; /* muted subtext */
+      color: #BBBBBB;
     }
 
-    /* ===============================
-       SECTION TITLES
-       =============================== */
+    /* =========================
+       METRICS
+       ========================= */
     .section-title {
       font-size: 1.2rem;
-      /* Let’s use bright violet again to accent titles */
-      color: #7B5CFF;
+      color: #FF00E5;
       margin-bottom: 8px;
       text-align: center;
       font-weight: 700;
     }
-
-    /* ===============================
-       METRICS GRID
-       =============================== */
     .metrics-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 12px;
     }
     .metric-item {
-      background-color: #B189FF; /* Light Purple for secondary UI elements */
+      background-color: #2E125B; /* Slight variation for metric boxes */
       padding: 10px;
       border-radius: 4px;
       text-align: center;
     }
     .metric-item h2 {
       margin-bottom: 5px;
-      /* Another accent color: perhaps hot pink for headings inside metrics? */
-      color: #FF4FD8;
+      color: #FF00E5;
       font-size: 1rem;
     }
-    .metric-item p {
-      color: #1A0033; /* Dark text on the lighter purple */
-    }
 
-    /* ===============================
+    /* =========================
        PRICE TABLE
-       =============================== */
+       ========================= */
     .price-table-title {
       text-align: center;
       font-size: 1.1rem;
       margin-bottom: 8px;
-      color: #7B5CFF; 
+      color: #FF00E5;
       font-weight: 700;
     }
     table {
@@ -143,19 +130,19 @@
       margin-top: 6px;
     }
     thead {
-      background-color: #B189FF; /* Light Purple for the table header */
+      background-color: #2E125B; /* Table header */
     }
     thead th {
       padding: 8px;
       font-size: 0.8rem;
       font-weight: 700;
-      color: #1A0033; /* Dark text on light purple */
+      color: #FFFFFF;
     }
     tbody tr {
-      border-bottom: 1px solid #7B5CFF; /* a subtle violet line */
+      border-bottom: 1px solid #473073; /* Subtle table row divider */
     }
     tbody tr:hover {
-      background-color: rgba(123, 92, 255, 0.2); /* violet accent on hover */
+      background-color: #473073; /* Row hover */
     }
     td {
       padding: 8px;
@@ -165,50 +152,50 @@
     }
 
     /*
-      Color-coded intervals for half-hour rows (just the background highlight):
-      p < 22 => greenish,
-      p < 30 => orangeish,
-      else => redish
+      Color-coded intervals for half-hour rows:
+      below 22 => green
+      below 30 => orange
+      else => red
     */
     .price-green {
-      background-color: rgba(86, 234, 251, 0.2); /* #56EAFB (cyan) with 0.2 alpha */
+      background-color: rgba(0, 255, 0, 0.2);
     }
     .price-orange {
-      background-color: rgba(255, 178, 102, 0.2); /* a pastel orange look */
+      background-color: rgba(255, 165, 0, 0.2);
     }
     .price-red {
-      background-color: rgba(255, 102, 102, 0.2); /* pastel red look */
+      background-color: rgba(255, 0, 0, 0.2);
     }
 
-    /* ===============================
-       CHART SECTION
-       =============================== */
+    /* =========================
+       BAR CHART
+       ========================= */
     .chart-label {
       text-align: center;
       font-size: 1.1rem;
-      color: #7B5CFF;
+      color: #FF00E5;
       margin-bottom: 10px;
       font-weight: 700;
     }
     .chart-container {
       width: 100%;
       height: 300px;
-      background-color: #260032; 
+      background-color: #2E125B; /* Chart background */
       border-radius: 4px;
       position: relative;
       overflow: hidden;
     }
 
-    /* ===============================
+    /* =========================
        ENERGY MIX
-       =============================== */
+       ========================= */
     .energy-mix-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
     }
     .energy-mix-item {
-      background-color: #B189FF; 
+      background-color: #473073; /* Slightly lighter/different block behind bar */
       border-radius: 4px;
       padding: 8px;
       display: flex;
@@ -218,10 +205,10 @@
     .energy-mix-item h3 {
       margin: 0;
       font-size: 1rem;
-      color: #FF4FD8; /* hot pink */
+      color: #FF00E5;
     }
     .energy-bar-container {
-      background-color: #260032;
+      background-color: #2E125B;
       height: 10px;
       border-radius: 4px;
       position: relative;
@@ -230,28 +217,25 @@
     .energy-bar {
       position: absolute;
       left: 0; top: 0; bottom: 0;
-      background-color: #56EAFB; /* cyan bar for the fill */
+      background-color: #FF00E5;
     }
     .energy-perc {
       font-size: 0.8rem;
-      color: #1A0033;
     }
 
-    /* ===============================
+    /* =========================
        DEBUG
-       =============================== */
+       ========================= */
     #debugToggle {
       display: block;
       margin: 0 auto 10px auto;
       padding: 6px 10px;
-      /* Use bright violet accent for the button background */
-      background-color: #7B5CFF;
+      background-color: #FF00E5;
       border: none;
       border-radius: 4px;
-      color: #1A0033; /* Dark text to contrast the bright violet */
+      color: #FFF;
       cursor: pointer;
       font-size: 0.9rem;
-      font-weight: 700;
     }
     #debugPanel {
       display: none;
@@ -264,9 +248,9 @@
       word-wrap: break-word;
     }
 
-    /* ===============================
+    /* =========================
        RESPONSIVE
-       =============================== */
+       ========================= */
     @media (max-width: 768px) {
       .metrics-grid {
         grid-template-columns: 1fr;
@@ -277,11 +261,11 @@
     }
   </style>
 </head>
-
 <body>
+
   <!-- HEADER / REGION -->
   <section class="header">
-    <h1>Octopus Agile – New Color Palette & Margins</h1>
+    <h1>Octopus Agile – Margins & Tomorrow Data</h1>
     <div class="region-select">
       <label for="regionSelect">Region:</label>
       <select id="regionSelect">
@@ -345,7 +329,7 @@
           <th>Price (p/kWh)</th>
         </tr>
       </thead>
-      <tbody id="todayTableBody"><!-- Populated by JS --></tbody>
+      <tbody id="todayTableBody"><!-- filled by JS --></tbody>
     </table>
   </section>
 
@@ -388,11 +372,11 @@
           <th>Price (p/kWh)</th>
         </tr>
       </thead>
-      <tbody id="tomorrowTableBody"><!-- Populated by JS --></tbody>
+      <tbody id="tomorrowTableBody"><!-- filled by JS --></tbody>
     </table>
   </section>
 
-  <!-- WHERE THE ENERGY COMES FROM -->
+  <!-- ENERGY MIX -->
   <section>
     <div class="section-title">Where the Energy Comes From</div>
     <div id="energyMixContainer"></div>
@@ -406,48 +390,43 @@
     /************************************************************************
      * GLOBAL CONSTANTS & DOM REFS
      ************************************************************************/
-    const AGILE_PRODUCT_CODE = 'AGILE-24-10-01'; 
+    const AGILE_PRODUCT_CODE = 'AGILE-24-10-01';
     const ENERGY_MIX_API     = 'https://api.carbonintensity.org.uk/generation';
 
-    let regionCode = 'A'; // default
-    let rawAgileData  = null;
-    let todayData     = [];
-    let tomorrowData  = [];
-    let energyMixData = null;
+    let regionCode = 'A';
+    let rawAgileData= null;
+    let todayData = [];
+    let tomorrowData = [];
+    let energyMixData= null;
 
-    // DOM
-    const regionSelectEl       = document.getElementById('regionSelect');
-    const priceEl              = document.getElementById('priceDisplay');
-    const timestampEl          = document.getElementById('timestampDisplay');
-
+    const regionSelectEl = document.getElementById('regionSelect');
+    const priceEl        = document.getElementById('priceDisplay');
+    const timestampEl    = document.getElementById('timestampDisplay');
     // Today
-    const todayMinEl           = document.getElementById('todayMin');
-    const todayMaxEl           = document.getElementById('todayMax');
-    const todayAvgEl           = document.getElementById('todayAvg');
-    const todayTableBodyEl     = document.getElementById('todayTableBody');
-    const todayChartEl         = document.getElementById('todayChart');
-    const todaySectionEl       = document.getElementById('todaySection');
-    const todayChartSectionEl  = document.getElementById('todayChartSection');
-    const todayTableSectionEl  = document.getElementById('todayTableSection');
-
+    const todayMinEl     = document.getElementById('todayMin');
+    const todayMaxEl     = document.getElementById('todayMax');
+    const todayAvgEl     = document.getElementById('todayAvg');
+    const todayTableBodyEl= document.getElementById('todayTableBody');
+    const todayChartEl   = document.getElementById('todayChart');
+    const todaySectionEl = document.getElementById('todaySection');
+    const todayChartSectionEl= document.getElementById('todayChartSection');
+    const todayTableSectionEl= document.getElementById('todayTableSection');
     // Tomorrow
-    const tomorrowSectionEl     = document.getElementById('tomorrowSection');
-    const tomorrowNotAvailableEl= document.getElementById('tomorrowNotAvailable');
-    const tomorrowMetricsGridEl = document.getElementById('tomorrowMetricsGrid');
-    const tomorrowMinEl         = document.getElementById('tomorrowMin');
-    const tomorrowMaxEl         = document.getElementById('tomorrowMax');
-    const tomorrowAvgEl         = document.getElementById('tomorrowAvg');
-    const tomorrowChartEl       = document.getElementById('tomorrowChart');
+    const tomorrowSectionEl    = document.getElementById('tomorrowSection');
+    const tomorrowNotAvailableEl = document.getElementById('tomorrowNotAvailable');
+    const tomorrowMetricsGridEl  = document.getElementById('tomorrowMetricsGrid');
+    const tomorrowMinEl       = document.getElementById('tomorrowMin');
+    const tomorrowMaxEl       = document.getElementById('tomorrowMax');
+    const tomorrowAvgEl       = document.getElementById('tomorrowAvg');
+    const tomorrowChartEl     = document.getElementById('tomorrowChart');
     const tomorrowChartSectionEl= document.getElementById('tomorrowChartSection');
     const tomorrowTableSectionEl= document.getElementById('tomorrowTableSection');
-    const tomorrowTableBodyEl   = document.getElementById('tomorrowTableBody');
-
+    const tomorrowTableBodyEl = document.getElementById('tomorrowTableBody');
     // Energy
-    const energyMixContainerEl  = document.getElementById('energyMixContainer');
-
+    const energyMixContainerEl= document.getElementById('energyMixContainer');
     // Debug
-    const debugToggleEl         = document.getElementById('debugToggle');
-    const debugPanelEl          = document.getElementById('debugPanel');
+    const debugToggleEl   = document.getElementById('debugToggle');
+    const debugPanelEl    = document.getElementById('debugPanel');
 
     /************************************************************************
      * EVENT LISTENERS
@@ -457,134 +436,131 @@
       fetchAndRenderAll();
     });
     debugToggleEl.addEventListener('click', () => {
-      debugPanelEl.style.display = (debugPanelEl.style.display === 'block' ? 'none' : 'block');
+      debugPanelEl.style.display= (debugPanelEl.style.display==='block'?'none':'block');
     });
 
     /************************************************************************
-     * FETCH AGILE DATA (AGILE-24-10-01) FOR TODAY + NEXT 2 DAYS
+     * FETCH AGILE DATA
      ************************************************************************/
     async function fetchAgileData() {
-      const now     = new Date();
-      const future  = new Date(now);
+      const now = new Date();
+      const future = new Date(now);
       future.setDate(now.getDate() + 2);
 
       const fromISO = now.toISOString();
       const toISO   = future.toISOString();
 
-      const url = `https://api.octopus.energy/v1/products/${AGILE_PRODUCT_CODE}` 
-                + `/electricity-tariffs/E-1R-${AGILE_PRODUCT_CODE}-${regionCode}/standard-unit-rates/`
-                + `?period_from=${fromISO}&period_to=${toISO}&page_size=100`;
+      // Example:
+      // https://api.octopus.energy/v1/products/AGILE-24-10-01/electricity-tariffs/E-1R-AGILE-24-10-01-A/standard-unit-rates/?period_from=xxx&period_to=xxx&page_size=100
+      const url = `https://api.octopus.energy/v1/products/${AGILE_PRODUCT_CODE}/electricity-tariffs/E-1R-${AGILE_PRODUCT_CODE}-${regionCode}/standard-unit-rates/?period_from=${fromISO}&period_to=${toISO}&page_size=100`;
 
-      const resp = await fetch(url);
-      if (!resp.ok) {
+      const resp= await fetch(url);
+      if(!resp.ok) {
         throw new Error(\`Agile fetch error: \${resp.status}\`);
       }
       return resp.json();
     }
 
-    function splitTodayAndTomorrow(results) {
-      todayData = [];
-      tomorrowData = [];
+    function splitTodayAndTomorrow(results){
+      todayData=[];
+      tomorrowData=[];
 
-      const now        = new Date();
-      const todayStr   = formatDateYYYYMMDD(now);
-      const nextDay    = new Date(now);
-      nextDay.setDate(now.getDate() + 1);
-      const tomorrowStr= formatDateYYYYMMDD(nextDay);
+      const now= new Date();
+      const todayStr= formatDateYYYYMMDD(now);
 
-      results.sort((a,b) => new Date(a.valid_from) - new Date(b.valid_from));
+      const tDay= new Date(now);
+      tDay.setDate(now.getDate()+1);
+      const tomorrowStr= formatDateYYYYMMDD(tDay);
+
+      results.sort((a,b)=> new Date(a.valid_from) - new Date(b.valid_from));
       results.forEach(item => {
-        const d  = new Date(item.valid_from);
+        const d= new Date(item.valid_from);
         const dStr= formatDateYYYYMMDD(d);
-        if (dStr === todayStr) {
+        if(dStr=== todayStr) {
           todayData.push(item);
-        } else if (dStr === tomorrowStr) {
+        } else if(dStr=== tomorrowStr) {
           tomorrowData.push(item);
         }
       });
     }
 
-    function formatDateYYYYMMDD(d) {
-      const y  = d.getFullYear();
-      const m  = String(d.getMonth() + 1).padStart(2,'0');
-      const dd = String(d.getDate()).padStart(2,'0');
-      return \`\${y}-\${m}-\${dd}\`;
+    function formatDateYYYYMMDD(d){
+      const y= d.getFullYear();
+      const m= String(d.getMonth()+1).padStart(2,'0');
+      const day= String(d.getDate()).padStart(2,'0');
+      return \`\${y}-\${m}-\${day}\`;
     }
 
     /************************************************************************
      * RENDER CURRENT PRICE
      ************************************************************************/
-    function renderCurrentPrice() {
-      const now = new Date();
-      const current = todayData.find(item => {
-        const start = new Date(item.valid_from);
-        const end   = new Date(item.valid_to);
-        return (start <= now && end > now);
+    function renderCurrentPrice(){
+      const now= new Date();
+      const current= todayData.find(item => {
+        const start= new Date(item.valid_from);
+        const end  = new Date(item.valid_to);
+        return (start<= now && end> now);
       });
-      if (!current) {
-        priceEl.innerText = 'No current price data.';
-        timestampEl.innerText = '';
+      if(!current){
+        priceEl.innerText='No current price data.';
+        timestampEl.innerText='';
         return;
       }
-      const pStr = current.value_inc_vat.toFixed(2);
-      priceEl.innerText = \`Current Price: \${pStr} p/kWh\`;
+      const p= current.value_inc_vat.toFixed(2);
+      priceEl.innerText=\`Current Price: \${p} p/kWh\`;
 
-      const fromStr = new Date(current.valid_from)
-        .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const toStr   = new Date(current.valid_to)
-        .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      timestampEl.innerText = \`Valid: \${fromStr} - \${toStr}\`;
+      const fromStr= new Date(current.valid_from).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+      const toStr  = new Date(current.valid_to).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+      timestampEl.innerText= \`Valid: \${fromStr} - \${toStr}\`;
     }
 
     /************************************************************************
      * RENDER TODAY
      ************************************************************************/
     function renderTodayMetrics() {
-      if (!todayData.length) {
-        todayMinEl.innerText = '-';
-        todayMaxEl.innerText = '-';
-        todayAvgEl.innerText = '-';
+      if(!todayData.length){
+        todayMinEl.innerText='-';
+        todayMaxEl.innerText='-';
+        todayAvgEl.innerText='-';
         return;
       }
-      let minP = Infinity, maxP = -Infinity, sum=0;
-      todayData.forEach(d => {
-        const p = d.value_inc_vat;
-        if (p < minP) minP = p;
-        if (p > maxP) maxP = p;
-        sum += p;
+      let minP=Infinity, maxP=-Infinity, sum=0;
+      todayData.forEach(d=>{
+        const p=d.value_inc_vat;
+        if(p<minP) minP=p;
+        if(p>maxP) maxP=p;
+        sum+=p;
       });
-      const avgP = sum / todayData.length;
-      todayMinEl.innerText = \`\${minP.toFixed(2)} p\`;
-      todayMaxEl.innerText = \`\${maxP.toFixed(2)} p\`;
-      todayAvgEl.innerText = \`\${avgP.toFixed(2)} p\`;
+      const avgP= sum / todayData.length;
+      todayMinEl.innerText= \`\${minP.toFixed(2)} p\`;
+      todayMaxEl.innerText= \`\${maxP.toFixed(2)} p\`;
+      todayAvgEl.innerText= \`\${avgP.toFixed(2)} p\`;
     }
 
     function renderTodayTable() {
-      todayTableBodyEl.innerHTML = '';
-      if (!todayData.length) {
-        const row  = document.createElement('tr');
-        const cell = document.createElement('td');
+      todayTableBodyEl.innerHTML='';
+      if(!todayData.length){
+        const row= document.createElement('tr');
+        const cell= document.createElement('td');
         cell.colSpan=3;
-        cell.innerText = 'No data for today.';
+        cell.innerText='No data for today.';
         row.appendChild(cell);
         todayTableBodyEl.appendChild(row);
         return;
       }
       todayData.forEach(item => {
         const row= document.createElement('tr');
-        const p  = item.value_inc_vat;
+        const p= item.value_inc_vat;
 
         row.classList.add(getPriceClass(p));
 
-        const fromStr = new Date(item.valid_from)
-          .toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-        const toStr   = new Date(item.valid_to)
-          .toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        const fromStr= new Date(item.valid_from).toLocaleTimeString([],{hour:'2-digit', minute:'2-digit'});
+        const toStr  = new Date(item.valid_to).toLocaleTimeString([],{hour:'2-digit', minute:'2-digit'});
 
         const fromTd= document.createElement('td');
-        fromTd.innerText = fromStr;
-        const toTd  = document.createElement('td');
-        toTd.innerText   = toStr;
+        fromTd.innerText= fromStr;
+        const toTd= document.createElement('td');
+        toTd.innerText= toStr;
         const priceTd= document.createElement('td');
         priceTd.innerText= p.toFixed(2) + getPriceEmoji(p);
 
@@ -599,28 +575,29 @@
      * RENDER TOMORROW
      ************************************************************************/
     function renderTomorrowMetrics() {
-      if (!tomorrowData.length) {
-        // Hide tomorrow sections & show the 4pm note
-        tomorrowSectionEl.style.display      = 'none';
-        tomorrowChartSectionEl.style.display = 'none';
-        tomorrowTableSectionEl.style.display = 'none';
-        tomorrowNotAvailableEl.style.display = 'block';
+      if(!tomorrowData.length){
+        // Hide tomorrow sections entirely
+        tomorrowSectionEl.style.display='none';
+        tomorrowChartSectionEl.style.display='none';
+        tomorrowTableSectionEl.style.display='none';
+        // Show the “4pm availability” message
+        tomorrowNotAvailableEl.style.display='block';
         return;
       }
-      // If we do have data
-      tomorrowSectionEl.style.display      = 'block';
-      tomorrowChartSectionEl.style.display = 'block';
-      tomorrowTableSectionEl.style.display = 'block';
-      tomorrowNotAvailableEl.style.display = 'none';
+      // If we have data, show everything & hide the "4pm" message
+      tomorrowSectionEl.style.display='block';
+      tomorrowChartSectionEl.style.display='block';
+      tomorrowTableSectionEl.style.display='block';
+      tomorrowNotAvailableEl.style.display='none';
 
       let minP=Infinity, maxP=-Infinity, sum=0;
-      tomorrowData.forEach(d => {
-        const p= d.value_inc_vat;
+      tomorrowData.forEach(d=>{
+        const p=d.value_inc_vat;
         if(p<minP) minP=p;
         if(p>maxP) maxP=p;
         sum+=p;
       });
-      const avgP= sum/tomorrowData.length;
+      const avgP= sum / tomorrowData.length;
       tomorrowMinEl.innerText= \`\${minP.toFixed(2)} p\`;
       tomorrowMaxEl.innerText= \`\${maxP.toFixed(2)} p\`;
       tomorrowAvgEl.innerText= \`\${avgP.toFixed(2)} p\`;
@@ -629,23 +606,22 @@
     function renderTomorrowTable() {
       tomorrowTableBodyEl.innerHTML='';
       if(!tomorrowData.length) return;
+      // If we do have data, fill table
       tomorrowData.forEach(item => {
         const row= document.createElement('tr');
-        const p  = item.value_inc_vat;
+        const p= item.value_inc_vat;
 
         row.classList.add(getPriceClass(p));
 
-        const fromStr = new Date(item.valid_from)
-          .toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-        const toStr   = new Date(item.valid_to)
-          .toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-
+        const fromStr= new Date(item.valid_from).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+        const toStr  = new Date(item.valid_to).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+        
         const fromTd= document.createElement('td');
         fromTd.innerText= fromStr;
         const toTd= document.createElement('td');
         toTd.innerText= toStr;
         const priceTd= document.createElement('td');
-        priceTd.innerText= p.toFixed(2)+ getPriceEmoji(p);
+        priceTd.innerText= p.toFixed(2) + getPriceEmoji(p);
 
         row.appendChild(fromTd);
         row.appendChild(toTd);
@@ -655,16 +631,20 @@
     }
 
     /************************************************************************
-     * PRICE CLASS & EMOJIS
+     * PRICE CLASS / EMOJIS
      ************************************************************************/
     function getPriceClass(p) {
-      // <22 => green, <30 => orange, else => red
-      if(p < 22) return 'price-green';
-      if(p < 30) return 'price-orange';
+      // <22 => green, <30 => orange, else red
+      if(p<22) return 'price-green';
+      if(p<30) return 'price-orange';
       return 'price-red';
     }
     function getPriceEmoji(p) {
-      // >70 => 💀, >40 => ❌, >30 => ⚠️, <7 => 🤑, <15 => 😎
+      // above 70 => 💀
+      // above 40 => ❌
+      // above 30 => ⚠️
+      // below 7 => 🤑
+      // below 15 => 😎
       if(p>70) return ' 💀';
       if(p>40) return ' ❌';
       if(p>30) return ' ⚠️';
@@ -674,7 +654,7 @@
     }
 
     /************************************************************************
-     * BAR CHARTS WITH MARGINS
+     * BAR CHARTS (MARGINS)
      ************************************************************************/
     function renderTodayChart(){
       renderBarChart(todayData, todayChartEl);
@@ -689,110 +669,109 @@
         containerEl.innerText='No data to chart.';
         return;
       }
-      const w = containerEl.clientWidth;
-      const h = containerEl.clientHeight;
-      const dpr = window.devicePixelRatio || 1;
+      const w= containerEl.clientWidth;
+      const h= containerEl.clientHeight;
+      const dpr= window.devicePixelRatio||1;
 
       const canvas= document.createElement('canvas');
-      canvas.style.width  = w+'px';
-      canvas.style.height = h+'px';
-      canvas.width  = w*dpr;
-      canvas.height = h*dpr;
+      canvas.style.width= w+'px';
+      canvas.style.height= h+'px';
+      canvas.width= w*dpr;
+      canvas.height= h*dpr;
       containerEl.appendChild(canvas);
 
       const ctx= canvas.getContext('2d');
       ctx.scale(dpr,dpr);
 
-      // Margins to avoid overlap
-      const marginLeft   = 40;
-      const marginRight  = 10;
-      const marginTop    = 10;
-      const marginBottom = 30;
-      const chartW = w - marginLeft - marginRight;
-      const chartH = h - marginTop - marginBottom;
+      // chart margins
+      const marginLeft= 40;
+      const marginRight= 10;
+      const marginTop= 10;
+      const marginBottom= 30;
+      const chartW= w - marginLeft - marginRight;
+      const chartH= h - marginTop - marginBottom;
 
-      // Fill entire background
-      ctx.fillStyle = '#260032';
+      // background
+      ctx.fillStyle='#2E125B'; /* Match chart container background */
       ctx.fillRect(0, 0, w, h);
 
-      // Sort intervals by time
+      // sort intervals
       dataArray.sort((a,b)=> new Date(a.valid_from) - new Date(b.valid_from));
       const minTime= new Date(dataArray[0].valid_from).getTime();
       const maxTime= new Date(dataArray[dataArray.length-1].valid_to).getTime();
 
-      // Find min / max price
+      // find min / max price
       let minP=Infinity, maxP=-Infinity;
       dataArray.forEach(d => {
-        if(d.value_inc_vat < minP) minP=d.value_inc_vat;
-        if(d.value_inc_vat > maxP) maxP=d.value_inc_vat;
+        if(d.value_inc_vat<minP) minP=d.value_inc_vat;
+        if(d.value_inc_vat>maxP) maxP=d.value_inc_vat;
       });
-      const pad = (maxP-minP)*0.1||1;
+      const pad= (maxP-minP)*0.1 || 1;
       const chartMinP= minP - pad;
       const chartMaxP= maxP + pad;
 
-      // Draw grid lines first (behind text)
-      ctx.strokeStyle='rgba(166,155,178,0.3)';  /* a subtle tinted line #A69BB2 with alpha */
+      // draw grid lines first
+      ctx.strokeStyle='rgba(255, 255, 255, 0.2)';
       ctx.lineWidth=1;
-
-      // horizontal lines each 5 p
+      // horizontal lines at increments of 5
       const step=5;
       const base= Math.floor(chartMinP/step)*step;
       const limit= Math.ceil(chartMaxP/step)*step;
       for(let val=base; val<=limit; val+=step){
-        const yNorm=(val-chartMinP)/(chartMaxP-chartMinP||1);
+        const yNorm= (val-chartMinP)/(chartMaxP-chartMinP||1);
         const y= marginTop + (chartH - yNorm*chartH);
         ctx.beginPath();
         ctx.moveTo(marginLeft, y);
         ctx.lineTo(marginLeft+chartW, y);
         ctx.stroke();
       }
-      // vertical lines every 2 hours
-      const twoHours=2*3600000;
-      let tCur= minTime - (minTime%twoHours);
+      // vertical lines every 2h
+      const twoHours= 2 * 3600000;
+      let tCur= minTime - (minTime % twoHours);
       while(tCur<= maxTime){
-        const xNorm= (tCur-minTime)/(maxTime-minTime||1);
+        const xNorm= (tCur - minTime)/(maxTime - minTime || 1);
         const x= marginLeft + xNorm*chartW;
         ctx.beginPath();
         ctx.moveTo(x, marginTop);
         ctx.lineTo(x, marginTop+chartH);
         ctx.stroke();
-        tCur += twoHours;
+        tCur+= twoHours;
       }
 
-      // Now draw text for lines (price & time)
-      ctx.fillStyle='#CFC5E3'; /* a slightly muted text color */
+      // draw text for lines
+      ctx.fillStyle='#FFF';
       ctx.font='12px Roboto';
       // horizontal labels
       for(let val=base; val<=limit; val+=step){
         const yNorm= (val-chartMinP)/(chartMaxP-chartMinP||1);
         const y= marginTop + (chartH - yNorm*chartH);
-        ctx.fillText(`${val}p`, marginLeft - 35, y+4);
+        ctx.fillText(\`\${val}p\`, marginLeft-35, y+4); // place to left
       }
-      // bottom (time) labels
-      tCur= minTime - (minTime%twoHours);
+      // bottom axis labels
+      tCur= minTime - (minTime % twoHours);
       while(tCur<= maxTime){
         const date= new Date(tCur);
-        const hours= date.getHours();
-        const mins = date.getMinutes();
+        const hours=date.getHours();
+        const mins=date.getMinutes();
         if(mins===0){
-          const xNorm= (tCur-minTime)/(maxTime-minTime||1);
+          const xNorm= (tCur - minTime)/(maxTime - minTime || 1);
           const x= marginLeft + xNorm*chartW;
           const hour12= (hours===0?12:(hours>12?hours-12:hours));
-          const ampm  = (hours>=12?'pm':'am');
-          ctx.fillText(`${hour12}${ampm}`, x-10, marginTop+chartH+15);
+          const ampm= (hours>=12?'pm':'am');
+          ctx.fillText(\`\${hour12}\${ampm}\`, x-10, marginTop+chartH+15);
         }
-        tCur += twoHours;
+        tCur+= twoHours;
       }
 
       // draw bars
       const n= dataArray.length;
       const barGap=1;
-      const barWidth= (chartW/n) - barGap;
+      const barWidth= chartW/n - barGap;
       dataArray.forEach((item, i)=>{
-        const p = item.value_inc_vat;
-        const pNorm= (p-chartMinP)/(chartMaxP-chartMinP||1);
-        const barH= pNorm*chartH;
-        const x= marginLeft + i*(barWidth+barGap);
+        const p= item.value_inc_vat;
+        const pNorm= (p - chartMinP)/(chartMaxP - chartMinP || 1);
+        const barH= pNorm * chartH;
+        const x= marginLeft + i * (barWidth + barGap);
         const y= marginTop + (chartH - barH);
 
         ctx.fillStyle= getBarColor(p);
@@ -800,13 +779,11 @@
       });
     }
 
-    function getBarColor(p) {
-      // <22 => #56EAFB (cyan),
-      // <30 => #7B5CFF (bright violet),
-      // else => #FF4FD8 (hot pink)
-      if (p < 22) return '#56EAFB';
-      if (p < 30) return '#7B5CFF';
-      return '#FF4FD8';
+    function getBarColor(p){
+      // <22 => greenish, <30 => orangeish, else redish
+      if(p<22) return '#70D670';  // pastel green
+      if(p<30) return '#FFB266';  // pastel orange
+      return '#FF6666';           // pastel red
     }
 
     /************************************************************************
@@ -815,7 +792,7 @@
     async function fetchEnergyMix() {
       const resp= await fetch(ENERGY_MIX_API);
       if(!resp.ok) {
-        throw new Error(`Energy Mix error: ${resp.status}`);
+        throw new Error(\`Energy Mix error: \${resp.status}\`);
       }
       return resp.json();
     }
@@ -825,7 +802,7 @@
         energyMixContainerEl.innerText='No energy mix data.';
         return;
       }
-      // filter out zero-percent
+      // filter out zero-percentage
       const arr= energyMixData.data.generationmix.filter(item => item.perc>0);
       // sort by highest
       arr.sort((a,b)=> b.perc - a.perc);
@@ -840,7 +817,6 @@
       arr.forEach(item=>{
         const wrap= document.createElement('div');
         wrap.className='energy-mix-item';
-
         const title= document.createElement('h3');
         title.innerText= item.fuel;
         wrap.appendChild(title);
@@ -849,13 +825,13 @@
         barC.className='energy-bar-container';
         const bar= document.createElement('div');
         bar.className='energy-bar';
-        bar.style.width=`${item.perc}%`;
+        bar.style.width=\`\${item.perc}%\`;
         barC.appendChild(bar);
         wrap.appendChild(barC);
 
         const perc= document.createElement('div');
         perc.className='energy-perc';
-        perc.innerText= `${item.perc.toFixed(1)}%`;
+        perc.innerText= \`\${item.perc.toFixed(1)}%\`;
         wrap.appendChild(perc);
 
         container.appendChild(wrap);
@@ -877,7 +853,7 @@
     }
 
     /************************************************************************
-     * MAIN WORKFLOW
+     * MAIN
      ************************************************************************/
     async function fetchAndRenderAll(){
       try {
@@ -886,7 +862,6 @@
         if(!agileJson.results) throw new Error('No Agile results found.');
 
         splitTodayAndTomorrow(agileJson.results);
-        
         // fetch energy mix
         try {
           energyMixData= await fetchEnergyMix();
@@ -895,25 +870,22 @@
           energyMixData=null;
         }
 
-        // current
+        // render current
         renderCurrentPrice();
-
-        // today
+        // render today
         renderTodayMetrics();
         renderTodayChart();
         renderTodayTable();
-
-        // tomorrow
+        // render tomorrow
         renderTomorrowMetrics();
         renderTomorrowChart();
         renderTomorrowTable();
 
-        // energy
+        // energy mix
         renderEnergyMix();
 
         // debug
         renderDebugInfo();
-
       } catch(err){
         debugPanelEl.style.display='block';
         debugPanelEl.textContent= String(err);
@@ -922,8 +894,8 @@
       }
     }
 
-    // Initialization
-    regionSelectEl.value='A'; 
+    // init
+    regionSelectEl.value='A';
     fetchAndRenderAll();
     setInterval(fetchAndRenderAll, 30*60*1000);
   </script>
