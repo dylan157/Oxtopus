@@ -151,22 +151,6 @@
       color: #FFFFFF;
     }
 
-    /*
-      Color-coded intervals for half-hour rows:
-      below 22 => green
-      below 30 => orange
-      else => red
-    */
-    .price-green {
-      background-color: rgba(0,255,0,0.2);
-    }
-    .price-orange {
-      background-color: rgba(255,165,0,0.2);
-    }
-    .price-red {
-      background-color: rgba(255,0,0,0.2);
-    }
-
     /* =========================
        BAR CHART
        ========================= */
@@ -588,7 +572,8 @@
         const row= document.createElement('tr');
         const p= item.value_inc_vat;
 
-        row.classList.add(getPriceClass(p));
+        // Apply dynamic background color
+        row.style.backgroundColor = getDynamicColor(p);
 
         const fromStr= new Date(item.valid_from).toLocaleTimeString([],{hour:'2-digit', minute:'2-digit'});
         const toStr  = new Date(item.valid_to).toLocaleTimeString([],{hour:'2-digit', minute:'2-digit'});
@@ -598,7 +583,7 @@
         const toTd= document.createElement('td');
         toTd.innerText= toStr;
         const priceTd= document.createElement('td');
-        priceTd.innerText= p.toFixed(2)+ getPriceEmoji(p);
+        priceTd.innerText= p.toFixed(2) + getPriceEmoji(p);
 
         row.appendChild(fromTd);
         row.appendChild(toTd);
@@ -647,7 +632,8 @@
         const row= document.createElement('tr');
         const p= item.value_inc_vat;
 
-        row.classList.add(getPriceClass(p));
+        // Apply dynamic background color
+        row.style.backgroundColor = getDynamicColor(p);
 
         const fromStr= new Date(item.valid_from).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
         const toStr  = new Date(item.valid_to).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
@@ -657,7 +643,7 @@
         const toTd= document.createElement('td');
         toTd.innerText= toStr;
         const priceTd= document.createElement('td');
-        priceTd.innerText= p.toFixed(2)+ getPriceEmoji(p);
+        priceTd.innerText= p.toFixed(2) + getPriceEmoji(p);
 
         row.appendChild(fromTd);
         row.appendChild(toTd);
@@ -669,12 +655,6 @@
     /************************************************************************
      * PRICE CLASS / EMOJIS
      ************************************************************************/
-    function getPriceClass(p) {
-      // <22 => green, <30 => orange, else red
-      if(p<22) return 'price-green';
-      if(p<30) return 'price-orange';
-      return 'price-red';
-    }
     function getPriceEmoji(p) {
       // above 70 => 💀
       // above 40 => ❌
@@ -687,6 +667,38 @@
       if(p<7)  return ' 🤑';
       if(p<15) return ' 😎';
       return '';
+    }
+
+    /**
+     * Returns a background color (rgba) that varies by price:
+     * - p < 22 => greenish, alpha changes with p
+     * - p < 30 => orangeish, alpha changes with p
+     * - >= 30 => redish, alpha changes with p
+     *
+     * Lower p => more saturated color (higher alpha).
+     * Higher p => less saturated color (lower alpha).
+     */
+    function getDynamicColor(p) {
+      if (p < 22) {
+        // Green band (0 to 22)
+        // We'll map p in [0..22] to alpha in [0.7..0.2]
+        const fraction = Math.min(Math.max(p, 0), 22) / 22; 
+        const alpha = 0.7 - fraction * 0.5;
+        return `rgba(0, 255, 0, ${alpha.toFixed(2)})`;
+      } else if (p < 30) {
+        // Orange band (22 to 30)
+        // map p in [22..30] to alpha in [0.7..0.2]
+        const fraction = (p - 22) / 8;
+        const alpha = 0.7 - fraction * 0.5;
+        return `rgba(255, 165, 0, ${alpha.toFixed(2)})`;
+      } else {
+        // Red band (30 up to 70+)
+        // map p in [30..70] to alpha in [0.7..0.2]
+        const clamped = Math.min(p, 70);
+        const fraction = (clamped - 30) / 40;
+        const alpha = 0.7 - fraction * 0.5;
+        return `rgba(255, 0, 0, ${alpha.toFixed(2)})`;
+      }
     }
 
     /************************************************************************
@@ -810,6 +822,7 @@
       const n= dataArray.length;
       const barGap=1;
       const barWidth= chartW/n - barGap;
+
       dataArray.forEach((item, i)=>{
         const p= item.value_inc_vat;
         const pNorm= (p-chartMinP)/(chartMaxP-chartMinP||1);
@@ -817,16 +830,14 @@
         const x= marginLeft + i*(barWidth+barGap);
         const y= marginTop + (chartH - barH);
 
-        ctx.fillStyle= getBarColor(p);
+        // We'll keep the same color logic as the table:
+        const color = getDynamicColor(p).replace(', 0.', ', 0.8'); 
+        // (If you want bars also to be see-through, keep alpha from getDynamicColor. 
+        // Otherwise, we can override for a more solid bar color, e.g. alpha=0.8.)
+
+        ctx.fillStyle= color;
         ctx.fillRect(x,y, barWidth, barH);
       });
-    }
-
-    function getBarColor(p){
-      // <22 => greenish, <30 => orangeish, else redish
-      if(p<22) return '#70D670';  // pastel green
-      if(p<30) return '#FFB266';  // pastel orange
-      return '#FF6666';           // pastel red
     }
 
     /************************************************************************
