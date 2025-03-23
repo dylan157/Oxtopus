@@ -390,6 +390,21 @@
     <div id="energyMixContainer"></div>
   </section>
 
+  <!-- TOMORROW WIND & SOLAR FORECAST -->
+  <section id="forecastSection">
+    <div class="section-title">Tomorrow’s Wind & Solar Forecast</div>
+    <div class="metrics-grid" id="forecastMetricsGrid">
+      <div class="metric-item">
+        <h2>Wind</h2>
+        <p id="forecastWind">Loading...</p>
+      </div>
+      <div class="metric-item">
+        <h2>Solar</h2>
+        <p id="forecastSolar">Loading...</p>
+      </div>
+    </div>
+  </section>
+
   <!-- DEBUG BUTTON & PANEL -->
   <button id="debugToggle">Toggle Debug</button>
   <div id="debugPanel"></div>
@@ -442,8 +457,11 @@
     const tomorrowChartSectionEl= document.getElementById('tomorrowChartSection');
     const tomorrowTableSectionEl= document.getElementById('tomorrowTableSection');
     const tomorrowTableBodyEl = document.getElementById('tomorrowTableBody');
-    // Energy
+    // Energy Mix
     const energyMixContainerEl= document.getElementById('energyMixContainer');
+    // Forecast (Wind & Solar for tomorrow)
+    const forecastWindEl = document.getElementById('forecastWind');
+    const forecastSolarEl = document.getElementById('forecastSolar');
     // Debug
     const debugToggleEl   = document.getElementById('debugToggle');
     const debugPanelEl    = document.getElementById('debugPanel');
@@ -681,19 +699,16 @@
     function getDynamicColor(p) {
       if (p < 22) {
         // Green band (0 to 22)
-        // We'll map p in [0..22] to alpha in [0.7..0.2]
         const fraction = Math.min(Math.max(p, 0), 22) / 22; 
         const alpha = 0.7 - fraction * 0.5;
         return `rgba(0, 255, 0, ${alpha.toFixed(2)})`;
       } else if (p < 30) {
         // Orange band (22 to 30)
-        // map p in [22..30] to alpha in [0.7..0.2]
         const fraction = (p - 22) / 8;
         const alpha = 0.7 - fraction * 0.5;
         return `rgba(255, 165, 0, ${alpha.toFixed(2)})`;
       } else {
         // Red band (30 up to 70+)
-        // map p in [30..70] to alpha in [0.7..0.2]
         const clamped = Math.min(p, 70);
         const fraction = (clamped - 30) / 40;
         const alpha = 0.7 - fraction * 0.5;
@@ -800,7 +815,6 @@
         const hours = date.getHours();
         const mins = date.getMinutes();
         
-        // If it’s exactly on a 6-hour mark, draw the text
         if (hours % 6 === 0 && mins === 0) {
           const xNorm = (tCur - minTime) / (maxTime - minTime || 1);
           const x = marginLeft + xNorm * chartW;
@@ -815,7 +829,7 @@
       for(let val=base; val<=limit; val+=step){
         const yNorm= (val-chartMinP)/(chartMaxP-chartMinP||1);
         const y= marginTop + (chartH - yNorm*chartH);
-        ctx.fillText(`${val}p`, marginLeft-35, y+4); // place to the left
+        ctx.fillText(`${val}p`, marginLeft-35, y+4);
       }
 
       // 5) Draw the bars
@@ -830,11 +844,7 @@
         const x= marginLeft + i*(barWidth+barGap);
         const y= marginTop + (chartH - barH);
 
-        // We'll keep the same color logic as the table:
-        const color = getDynamicColor(p).replace(', 0.', ', 0.8'); 
-        // (If you want bars also to be see-through, keep alpha from getDynamicColor. 
-        // Otherwise, we can override for a more solid bar color, e.g. alpha=0.8.)
-
+        const color = getDynamicColor(p).replace(', 0.', ', 0.8');
         ctx.fillStyle= color;
         ctx.fillRect(x,y, barWidth, barH);
       });
@@ -856,9 +866,7 @@
         energyMixContainerEl.innerText='No energy mix data.';
         return;
       }
-      // filter out zero-percentage
       const arr= energyMixData.data.generationmix.filter(item => item.perc>0);
-      // sort by highest
       arr.sort((a,b)=> b.perc - a.perc);
       if(!arr.length){
         energyMixContainerEl.innerText='No sources above 0% right now.';
@@ -891,6 +899,58 @@
         container.appendChild(wrap);
       });
       energyMixContainerEl.appendChild(container);
+    }
+
+    /************************************************************************
+     * FORECAST (Wind & Solar for Tomorrow)
+     ************************************************************************/
+    async function fetchForecastData() {
+      const now = new Date();
+      const t = new Date(now);
+      t.setDate(t.getDate()+1);
+      t.setHours(0,0,0,0);
+      const fromISO = t.toISOString();
+      t.setDate(t.getDate()+1);
+      const toISO = t.toISOString();
+      const forecastUrl = `https://api.carbonintensity.org.uk/generation/expected?from=${fromISO}&to=${toISO}`;
+      const resp = await fetch(forecastUrl);
+      if(!resp.ok) {
+        throw new Error(`Forecast fetch error: ${resp.status}`);
+      }
+      return resp.json();
+    }
+
+    function processForecastData(forecastJson) {
+      // Assuming forecastJson.data is an array of forecast periods with a generationmix array each
+      let windSum = 0, solarSum = 0, count = 0;
+      forecastJson.data.forEach(period => {
+        period.generationmix.forEach(source => {
+          const fuelLower = source.fuel.toLowerCase();
+          if (fuelLower.includes("wind")) {
+            windSum += source.perc;
+          }
+          if (fuelLower.includes("solar")) {
+            solarSum += source.perc;
+          }
+        });
+        count++;
+      });
+      const avgWind = count > 0 ? windSum / count : 0;
+      const avgSolar = count > 0 ? solarSum / count : 0;
+      return { avgWind, avgSolar };
+    }
+
+    async function renderForecast() {
+      try {
+        const forecastJson = await fetchForecastData();
+        const { avgWind, avgSolar } = processForecastData(forecastJson);
+        forecastWindEl.innerText = `${avgWind.toFixed(1)}%`;
+        forecastSolarEl.innerText = `${avgSolar.toFixed(1)}%`;
+      } catch(err) {
+        console.error('Forecast error:', err);
+        forecastWindEl.innerText = 'Error';
+        forecastSolarEl.innerText = 'Error';
+      }
     }
 
     /************************************************************************
@@ -937,6 +997,9 @@
 
         // energy mix
         renderEnergyMix();
+
+        // render forecast for wind & solar tomorrow
+        renderForecast();
 
         // debug
         renderDebugInfo();
