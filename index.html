@@ -428,10 +428,9 @@
     const AGILE_PRODUCT_CODE = 'AGILE-24-10-01';
     const ENERGY_MIX_API     = 'https://api.carbonintensity.org.uk/generation';
 
-    // For demonstration, we pick a central-UK location (latitude=55, longitude=-2).
-    // Open-Meteo is free and does not require an API key.
+    // Using coordinates for a renewable hotspot in Yorkshire and the Humber (Flamborough Head)
     const FORECAST_API = 'https://api.open-meteo.com/v1/forecast?'
-      + 'latitude=55.0&longitude=-2.0'
+      + 'latitude=54.3&longitude=-0.1'
       + '&daily=windspeed_10m_max,shortwave_radiation_sum'
       + '&forecast_days=4'
       + '&timezone=Europe%2FLondon';
@@ -885,13 +884,11 @@
     }
 
     function renderForecastTable(forecastJson) {
-      // We'll display only the next 3 days beyond 'day 0'.
-      // forecastJson.daily.time[0] is "today". So we show indexes 1,2,3 = tomorrow + 2 more.
+      // Display the next 3 days beyond today (indexes 1 to 3)
       const daily = forecastJson.daily;
       forecastTableBodyEl.innerHTML = '';
 
       for (let i = 1; i < daily.time.length; i++) {
-        // Stop at 3 additional days (i.e. i=1..3)
         if (i > 3) break;
 
         const tr = document.createElement('tr');
