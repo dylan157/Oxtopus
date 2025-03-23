@@ -208,6 +208,24 @@
     }
 
     /* =========================
+       AGGREGATE FORECAST GRADES
+       ========================= */
+    #aggregateForecastSection {
+      text-align: center;
+      margin: 16px 0;
+      padding: 16px;
+      background-color: #3A1D50;
+      border-radius: 6px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    #aggregateForecastSection div {
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+      color: #FF00E5;
+      font-weight: 700;
+    }
+
+    /* =========================
        DEBUG
        ========================= */
     #debugToggle {
@@ -405,6 +423,13 @@
     </table>
   </section>
 
+  <!-- AGGREGATE FORECAST GRADES -->
+  <section id="aggregateForecastSection">
+    <div class="section-title">Aggregate Renewable Influence Forecast (Next 3 Days)</div>
+    <div id="windGrade">Wind: Loading...</div>
+    <div id="solarGrade">Solar: Loading...</div>
+  </section>
+
   <!-- DEBUG BUTTON & PANEL -->
   <button id="debugToggle">Toggle Debug</button>
   <div id="debugPanel"></div>
@@ -428,22 +453,41 @@
     const AGILE_PRODUCT_CODE = 'AGILE-24-10-01';
     const ENERGY_MIX_API     = 'https://api.carbonintensity.org.uk/generation';
 
-    // Using coordinates for a renewable hotspot in Yorkshire and the Humber (Flamborough Head)
-    const FORECAST_API = 'https://api.open-meteo.com/v1/forecast?'
+    // Existing forecast for the main page uses Flamborough Head in Yorkshire:
+    const MAIN_FORECAST_API = 'https://api.open-meteo.com/v1/forecast?'
       + 'latitude=54.3&longitude=-0.1'
       + '&daily=windspeed_10m_max,shortwave_radiation_sum'
       + '&forecast_days=4'
       + '&timezone=Europe%2FLondon';
 
-    let regionCode = 'A';
+    // Define influential wind farm locations:
+    const windLocations = [
+      { name: "Hornsea One", latitude: 53.5, longitude: -0.9 },
+      { name: "Walney Wind Farm", latitude: 54.0, longitude: -3.2 },
+      { name: "Beatrice Offshore", latitude: 57.0, longitude: -1.8 }
+    ];
+
+    // Define influential solar farm locations:
+    const solarLocations = [
+      { name: "South Farm Solar Park", latitude: 51.0, longitude: -3.0 },
+      { name: "Cirencester Solar Farm", latitude: 51.7, longitude: -2.2 },
+      { name: "Thornham Solar Farm", latitude: 52.0, longitude: 0.5 }
+    ];
+
+    // We'll store the entire forecast JSON for the main API here
     let rawAgileData = null;
     let todayData = [];
     let tomorrowData = [];
     let energyMixData = null;
+    let mainForecastData = null;
 
-    // We'll store the entire forecast JSON here
-    let openMeteoForecastData = null;
+    // For aggregated forecasts
+    let windForecasts = [];
+    let solarForecasts = [];
+    let aggregatedWindGrade = null;
+    let aggregatedSolarGrade = null;
 
+    // DOM Elements
     const regionSelectEl = document.getElementById('regionSelect');
     const priceEl        = document.getElementById('priceDisplay');
     const timestampEl    = document.getElementById('timestampDisplay');
@@ -468,6 +512,9 @@
     const energyMixContainerEl= document.getElementById('energyMixContainer');
     // Forecast table
     const forecastTableBodyEl = document.getElementById('forecastTableBody');
+    // Aggregate grades
+    const windGradeEl = document.getElementById('windGrade');
+    const solarGradeEl = document.getElementById('solarGrade');
     // Debug
     const debugToggleEl   = document.getElementById('debugToggle');
     const debugPanelEl    = document.getElementById('debugPanel');
@@ -476,7 +523,6 @@
      * EVENT LISTENERS
      ************************************************************************/
     regionSelectEl.addEventListener('change', () => {
-      regionCode = regionSelectEl.value;
       fetchAndRenderAll();
     });
     debugToggleEl.addEventListener('click', () => {
@@ -490,12 +536,9 @@
       const now = new Date();
       const future = new Date(now);
       future.setDate(now.getDate() + 2);
-
       const fromISO = now.toISOString();
       const toISO   = future.toISOString();
-
-      const url = `https://api.octopus.energy/v1/products/${AGILE_PRODUCT_CODE}/electricity-tariffs/E-1R-${AGILE_PRODUCT_CODE}-${regionCode}/standard-unit-rates/?period_from=${fromISO}&period_to=${toISO}&page_size=100`;
-
+      const url = `https://api.octopus.energy/v1/products/${AGILE_PRODUCT_CODE}/electricity-tariffs/E-1R-${AGILE_PRODUCT_CODE}-${regionSelectEl.value}/standard-unit-rates/?period_from=${fromISO}&period_to=${toISO}&page_size=100`;
       const resp = await fetch(url);
       if(!resp.ok) {
         throw new Error(`Agile fetch error: ${resp.status}`);
@@ -506,14 +549,11 @@
     function splitTodayAndTomorrow(results) {
       todayData = [];
       tomorrowData = [];
-
       const now = new Date();
       const todayStr = formatDateYYYYMMDD(now);
-
       const tDay = new Date(now);
       tDay.setDate(now.getDate() + 1);
       const tomorrowStr = formatDateYYYYMMDD(tDay);
-
       results.sort((a, b) => new Date(a.valid_from) - new Date(b.valid_from));
       results.forEach(item => {
         const d = new Date(item.valid_from);
@@ -550,14 +590,13 @@
       }
       const p = current.value_inc_vat.toFixed(2);
       priceEl.innerText = `Current Price: ${p} p/kWh`;
-
       const fromStr = new Date(current.valid_from).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
       const toStr   = new Date(current.valid_to).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
       timestampEl.innerText = `Valid: ${fromStr} - ${toStr}`;
     }
 
     /************************************************************************
-     * RENDER TODAY
+     * RENDER TODAY / TOMORROW METRICS & TABLES (UNCHANGED)
      ************************************************************************/
     function renderTodayMetrics() {
       if(!todayData.length) {
@@ -593,19 +632,15 @@
       todayData.forEach(item => {
         const row = document.createElement('tr');
         const p = item.value_inc_vat;
-
         row.style.backgroundColor = getDynamicColor(p);
-
         const fromStr = new Date(item.valid_from).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-        const toStr   = new Date(item.valid_to).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-
+        const toStr = new Date(item.valid_to).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
         const fromTd = document.createElement('td');
         fromTd.innerText = fromStr;
         const toTd = document.createElement('td');
         toTd.innerText = toStr;
         const priceTd = document.createElement('td');
         priceTd.innerText = p.toFixed(2) + getPriceEmoji(p);
-
         row.appendChild(fromTd);
         row.appendChild(toTd);
         row.appendChild(priceTd);
@@ -613,9 +648,6 @@
       });
     }
 
-    /************************************************************************
-     * RENDER TOMORROW
-     ************************************************************************/
     function renderTomorrowMetrics() {
       if(!tomorrowData.length) {
         tomorrowSectionEl.style.display = 'none';
@@ -628,7 +660,6 @@
       tomorrowChartSectionEl.style.display = 'block';
       tomorrowTableSectionEl.style.display = 'block';
       tomorrowNotAvailableEl.style.display = 'none';
-
       let minP = Infinity, maxP = -Infinity, sum = 0;
       tomorrowData.forEach(d => {
         const p = d.value_inc_vat;
@@ -648,19 +679,15 @@
       tomorrowData.forEach(item => {
         const row = document.createElement('tr');
         const p = item.value_inc_vat;
-
         row.style.backgroundColor = getDynamicColor(p);
-
         const fromStr = new Date(item.valid_from).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-        const toStr   = new Date(item.valid_to).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-        
+        const toStr = new Date(item.valid_to).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
         const fromTd = document.createElement('td');
         fromTd.innerText = fromStr;
         const toTd = document.createElement('td');
         toTd.innerText = toStr;
         const priceTd = document.createElement('td');
         priceTd.innerText = p.toFixed(2) + getPriceEmoji(p);
-
         row.appendChild(fromTd);
         row.appendChild(toTd);
         row.appendChild(priceTd);
@@ -706,7 +733,6 @@
     function renderTomorrowChart(){
       renderBarChart(tomorrowData, tomorrowChartEl);
     }
-
     function renderBarChart(dataArray, containerEl){
       containerEl.innerHTML = '';
       if(!dataArray.length){
@@ -716,31 +742,22 @@
       const w = containerEl.clientWidth;
       const h = containerEl.clientHeight;
       const dpr = window.devicePixelRatio || 1;
-
       const canvas = document.createElement('canvas');
       canvas.style.width = w + 'px';
       canvas.style.height = h + 'px';
       canvas.width = w * dpr;
       canvas.height = h * dpr;
       containerEl.appendChild(canvas);
-
       const ctx = canvas.getContext('2d');
       ctx.scale(dpr, dpr);
-
-      const marginLeft = 40;
-      const marginRight = 10;
-      const marginTop = 10;
-      const marginBottom = 30;
+      const marginLeft = 40, marginRight = 10, marginTop = 10, marginBottom = 30;
       const chartW = w - marginLeft - marginRight;
       const chartH = h - marginTop - marginBottom;
-
       ctx.fillStyle = '#4A2E60';
       ctx.fillRect(0, 0, w, h);
-
       dataArray.sort((a, b) => new Date(a.valid_from) - new Date(b.valid_from));
       const minTime = new Date(dataArray[0].valid_from).getTime();
       const maxTime = new Date(dataArray[dataArray.length - 1].valid_to).getTime();
-
       let minP = Infinity, maxP = -Infinity;
       dataArray.forEach(d => {
         if(d.value_inc_vat < minP) minP = d.value_inc_vat;
@@ -749,7 +766,6 @@
       const pad = (maxP - minP) * 0.1 || 1;
       const chartMinP = minP - pad;
       const chartMaxP = maxP + pad;
-
       // Vertical grid lines (every 2 hours)
       const twoHours = 2 * 3600000;
       let tCur = minTime - (minTime % twoHours);
@@ -764,7 +780,6 @@
         ctx.stroke();
         tCur += twoHours;
       }
-
       // Horizontal lines (price lines)
       ctx.strokeStyle = 'rgba(255,255,255,0.2)';
       const step = 5;
@@ -778,7 +793,6 @@
         ctx.lineTo(marginLeft + chartW, y);
         ctx.stroke();
       }
-
       // X axis time labels (every 6 hours)
       ctx.fillStyle = '#fff';
       ctx.font = '12px Roboto';
@@ -796,19 +810,16 @@
         }
         tCur += twoHours;
       }
-
       // Y axis price labels
       for(let val = base; val <= limit; val += step){
         const yNorm = (val - chartMinP) / (chartMaxP - chartMinP || 1);
         const y = marginTop + (chartH - yNorm * chartH);
         ctx.fillText(`${val}p`, marginLeft - 35, y + 4);
       }
-
       // Bars
       const n = dataArray.length;
       const barGap = 1;
       const barWidth = chartW / n - barGap;
-
       dataArray.forEach((item, i) => {
         const p = item.value_inc_vat;
         const pNorm = (p - chartMinP) / (chartMaxP - chartMinP || 1);
@@ -843,17 +854,14 @@
         energyMixContainerEl.innerText = 'No sources above 0% right now.';
         return;
       }
-
       const container = document.createElement('div');
       container.className = 'energy-mix-grid';
-
       arr.forEach(item => {
         const wrap = document.createElement('div');
         wrap.className = 'energy-mix-item';
         const title = document.createElement('h3');
         title.innerText = item.fuel;
         wrap.appendChild(title);
-
         const barC = document.createElement('div');
         barC.className = 'energy-bar-container';
         const bar = document.createElement('div');
@@ -861,60 +869,109 @@
         bar.style.width = `${item.perc}%`;
         barC.appendChild(bar);
         wrap.appendChild(barC);
-
         const perc = document.createElement('div');
         perc.className = 'energy-perc';
         perc.innerText = `${item.perc.toFixed(1)}%`;
         wrap.appendChild(perc);
-
         container.appendChild(wrap);
       });
       energyMixContainerEl.appendChild(container);
     }
 
     /************************************************************************
-     * OPEN-METEO FORECAST (NEXT FEW DAYS)
+     * OPEN-METEO FORECAST (MAIN API)
      ************************************************************************/
-    async function fetchOpenMeteoForecast() {
-      const resp = await fetch(FORECAST_API);
+    async function fetchMainForecast() {
+      const resp = await fetch(MAIN_FORECAST_API);
       if(!resp.ok) {
-        throw new Error(`Forecast fetch error: ${resp.status}`);
+        throw new Error(`Main forecast fetch error: ${resp.status}`);
       }
       return resp.json();
     }
 
     function renderForecastTable(forecastJson) {
-      // Display the next 3 days beyond today (indexes 1 to 3)
       const daily = forecastJson.daily;
       forecastTableBodyEl.innerHTML = '';
-
       for (let i = 1; i < daily.time.length; i++) {
         if (i > 3) break;
-
         const tr = document.createElement('tr');
-
-        // Date
         const dateTd = document.createElement('td');
         dateTd.style.padding = '8px';
         dateTd.style.fontSize = '0.8rem';
         dateTd.innerText = daily.time[i];
         tr.appendChild(dateTd);
-
-        // Max wind speed
         const windTd = document.createElement('td');
         windTd.style.padding = '8px';
         windTd.style.fontSize = '0.8rem';
         windTd.innerText = daily.windspeed_10m_max[i] ? daily.windspeed_10m_max[i].toFixed(1) : '-';
         tr.appendChild(windTd);
-
-        // Solar radiation sum
         const solarTd = document.createElement('td');
         solarTd.style.padding = '8px';
         solarTd.style.fontSize = '0.8rem';
         solarTd.innerText = daily.shortwave_radiation_sum[i] ? daily.shortwave_radiation_sum[i].toFixed(1) : '-';
         tr.appendChild(solarTd);
-
         forecastTableBodyEl.appendChild(tr);
+      }
+    }
+
+    /************************************************************************
+     * AGGREGATE FORECAST FOR INFLUENTIAL LOCATIONS
+     ************************************************************************/
+    // Helper function: fetch forecast for a given location and variable
+    async function fetchLocationForecast(lat, lon, variable) {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+                  `&daily=${variable}&forecast_days=4&timezone=Europe%2FLondon`;
+      const resp = await fetch(url);
+      if(!resp.ok) {
+        throw new Error(`Forecast fetch error for [${lat}, ${lon}]: ${resp.status}`);
+      }
+      return resp.json();
+    }
+
+    // Process forecasts for a group of locations.
+    // For each location, we average days 1-3 from daily[variable].
+    async function aggregateForecast(locations, variable) {
+      const averages = await Promise.all(locations.map(async loc => {
+        const data = await fetchLocationForecast(loc.latitude, loc.longitude, variable);
+        // Assuming daily[variable] exists and has at least 4 entries (day0 = today, days 1-3 are forecast)
+        const values = data.daily[variable].slice(1, 4);
+        const sum = values.reduce((a, b) => a + b, 0);
+        const avg = sum / values.length;
+        return avg;
+      }));
+      // Average across all locations
+      const total = averages.reduce((a, b) => a + b, 0);
+      return total / averages.length;
+    }
+
+    // Map average forecast value to grade for wind and solar respectively.
+    function gradeWind(avgWind) {
+      // Using thresholds: High if avgWind >= 12, Medium if >= 8, else Low.
+      if(avgWind >= 12) return "High";
+      else if(avgWind >= 8) return "Medium";
+      else return "Low";
+    }
+    function gradeSolar(avgSolar) {
+      // Using thresholds: High if avgSolar >= 10, Medium if >= 5, else Low.
+      if(avgSolar >= 10) return "High";
+      else if(avgSolar >= 5) return "Medium";
+      else return "Low";
+    }
+
+    async function fetchAndRenderAggregateForecast() {
+      try {
+        // For wind: variable = "windspeed_10m_max"
+        const avgWind = await aggregateForecast(windLocations, "windspeed_10m_max");
+        aggregatedWindGrade = gradeWind(avgWind);
+        windGradeEl.innerText = `Wind Production Influence: ${aggregatedWindGrade}`;
+        // For solar: variable = "shortwave_radiation_sum"
+        const avgSolar = await aggregateForecast(solarLocations, "shortwave_radiation_sum");
+        aggregatedSolarGrade = gradeSolar(avgSolar);
+        solarGradeEl.innerText = `Solar Production Influence: ${aggregatedSolarGrade}`;
+      } catch(err) {
+        windGradeEl.innerText = 'Wind: Error';
+        solarGradeEl.innerText = 'Solar: Error';
+        console.error(err);
       }
     }
 
@@ -927,7 +984,9 @@
         todayData,
         tomorrowData,
         energyMixData,
-        openMeteoForecastData
+        mainForecastData,
+        aggregatedWindGrade,
+        aggregatedSolarGrade
       };
       debugPanelEl.textContent = JSON.stringify(debugObj, null, 2);
     }
@@ -951,34 +1010,33 @@
           energyMixData = null;
         }
 
-        // 3. Weather Forecast (Open-Meteo)
+        // 3. Main Weather Forecast for page (using MAIN_FORECAST_API)
         try {
-          openMeteoForecastData = await fetchOpenMeteoForecast();
-        } catch(eForecast) {
-          console.error('Open-Meteo error:', eForecast);
-          openMeteoForecastData = null;
+          mainForecastData = await fetchMainForecast();
+        } catch(eMain) {
+          console.error('Main forecast error:', eMain);
+          mainForecastData = null;
         }
 
-        // 4. Render everything
+        // 4. Render sections
         renderCurrentPrice();
-
         renderTodayMetrics();
         renderTodayChart();
         renderTodayTable();
-
         renderTomorrowMetrics();
         renderTomorrowChart();
         renderTomorrowTable();
-
         renderEnergyMix();
-
-        if(openMeteoForecastData) {
-          renderForecastTable(openMeteoForecastData);
+        if(mainForecastData) {
+          renderForecastTable(mainForecastData);
         } else {
           forecastTableBodyEl.innerHTML = '<tr><td colspan="3">No forecast data.</td></tr>';
         }
 
-        // 5. Render debug
+        // 5. Fetch and render aggregated forecast grades for influential locations
+        await fetchAndRenderAggregateForecast();
+
+        // 6. Render debug info
         renderDebugInfo();
       } catch(err) {
         debugPanelEl.style.display = 'block';
