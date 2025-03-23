@@ -390,19 +390,19 @@
     <div id="energyMixContainer"></div>
   </section>
 
-  <!-- TOMORROW WIND & SOLAR FORECAST -->
+  <!-- WIND & SOLAR FORECAST (NEXT 3 DAYS) -->
   <section id="forecastSection">
-    <div class="section-title">Tomorrow’s Wind & Solar Forecast</div>
-    <div class="metrics-grid" id="forecastMetricsGrid">
-      <div class="metric-item">
-        <h2>Wind</h2>
-        <p id="forecastWind">Loading...</p>
-      </div>
-      <div class="metric-item">
-        <h2>Solar</h2>
-        <p id="forecastSolar">Loading...</p>
-      </div>
-    </div>
+    <div class="section-title">Wind & Solar Forecast (Next 3 Days)</div>
+    <table style="width:100%; border-collapse: collapse; margin-top: 6px;">
+      <thead style="background-color: #3A1D50;">
+        <tr>
+          <th style="padding:8px; font-size:0.8rem;">Date</th>
+          <th style="padding:8px; font-size:0.8rem;">Max Wind Speed (m/s)</th>
+          <th style="padding:8px; font-size:0.8rem;">Solar (MJ/m²)</th>
+        </tr>
+      </thead>
+      <tbody id="forecastTableBody"></tbody>
+    </table>
   </section>
 
   <!-- DEBUG BUTTON & PANEL -->
@@ -428,12 +428,22 @@
     const AGILE_PRODUCT_CODE = 'AGILE-24-10-01';
     const ENERGY_MIX_API     = 'https://api.carbonintensity.org.uk/generation';
 
+    // For demonstration, we pick a central-UK location (latitude=55, longitude=-2).
+    // Open-Meteo is free and does not require an API key.
+    const FORECAST_API = 'https://api.open-meteo.com/v1/forecast?'
+      + 'latitude=55.0&longitude=-2.0'
+      + '&daily=windspeed_10m_max,shortwave_radiation_sum'
+      + '&forecast_days=4'
+      + '&timezone=Europe%2FLondon';
+
     let regionCode = 'A';
     let rawAgileData = null;
     let todayData = [];
     let tomorrowData = [];
     let energyMixData = null;
-    let forecastError = null; // Global variable for forecast errors
+
+    // We'll store the entire forecast JSON here
+    let openMeteoForecastData = null;
 
     const regionSelectEl = document.getElementById('regionSelect');
     const priceEl        = document.getElementById('priceDisplay');
@@ -444,9 +454,6 @@
     const todayAvgEl      = document.getElementById('todayAvg');
     const todayTableBodyEl= document.getElementById('todayTableBody');
     const todayChartEl    = document.getElementById('todayChart');
-    const todaySectionEl  = document.getElementById('todaySection');
-    const todayChartSectionEl= document.getElementById('todayChartSection');
-    const todayTableSectionEl= document.getElementById('todayTableSection');
     // Tomorrow
     const tomorrowSectionEl     = document.getElementById('tomorrowSection');
     const tomorrowNotAvailableEl= document.getElementById('tomorrowNotAvailable');
@@ -455,14 +462,13 @@
     const tomorrowMaxEl       = document.getElementById('tomorrowMax');
     const tomorrowAvgEl       = document.getElementById('tomorrowAvg');
     const tomorrowChartEl     = document.getElementById('tomorrowChart');
+    const tomorrowTableBodyEl = document.getElementById('tomorrowTableBody');
     const tomorrowChartSectionEl= document.getElementById('tomorrowChartSection');
     const tomorrowTableSectionEl= document.getElementById('tomorrowTableSection');
-    const tomorrowTableBodyEl = document.getElementById('tomorrowTableBody');
     // Energy Mix
     const energyMixContainerEl= document.getElementById('energyMixContainer');
-    // Forecast (Wind & Solar for tomorrow)
-    const forecastWindEl = document.getElementById('forecastWind');
-    const forecastSolarEl = document.getElementById('forecastSolar');
+    // Forecast table
+    const forecastTableBodyEl = document.getElementById('forecastTableBody');
     // Debug
     const debugToggleEl   = document.getElementById('debugToggle');
     const debugPanelEl    = document.getElementById('debugPanel');
@@ -745,6 +751,7 @@
       const chartMinP = minP - pad;
       const chartMaxP = maxP + pad;
 
+      // Vertical grid lines (every 2 hours)
       const twoHours = 2 * 3600000;
       let tCur = minTime - (minTime % twoHours);
       ctx.strokeStyle = 'rgba(255,255,255,0.2)';
@@ -759,6 +766,7 @@
         tCur += twoHours;
       }
 
+      // Horizontal lines (price lines)
       ctx.strokeStyle = 'rgba(255,255,255,0.2)';
       const step = 5;
       const base = Math.floor(chartMinP / step) * step;
@@ -772,10 +780,10 @@
         ctx.stroke();
       }
 
-      const sixHours = 6 * 3600000;
-      tCur = minTime - (minTime % twoHours);
+      // X axis time labels (every 6 hours)
       ctx.fillStyle = '#fff';
       ctx.font = '12px Roboto';
+      tCur = minTime - (minTime % twoHours);
       while (tCur <= maxTime) {
         const date = new Date(tCur);
         const hours = date.getHours();
@@ -790,12 +798,14 @@
         tCur += twoHours;
       }
 
+      // Y axis price labels
       for(let val = base; val <= limit; val += step){
         const yNorm = (val - chartMinP) / (chartMaxP - chartMinP || 1);
         const y = marginTop + (chartH - yNorm * chartH);
         ctx.fillText(`${val}p`, marginLeft - 35, y + 4);
       }
 
+      // Bars
       const n = dataArray.length;
       const barGap = 1;
       const barWidth = chartW / n - barGap;
@@ -813,7 +823,7 @@
     }
 
     /************************************************************************
-     * ENERGY MIX (filter out 0% sources)
+     * ENERGY MIX
      ************************************************************************/
     async function fetchEnergyMix() {
       const resp = await fetch(ENERGY_MIX_API);
@@ -864,55 +874,50 @@
     }
 
     /************************************************************************
-     * FORECAST (Wind & Solar for Tomorrow)
+     * OPEN-METEO FORECAST (NEXT FEW DAYS)
      ************************************************************************/
-    async function fetchForecastData() {
-      const now = new Date();
-      const t = new Date(now);
-      t.setDate(t.getDate() + 1);
-      t.setHours(0, 0, 0, 0);
-      const fromISO = t.toISOString();
-      t.setDate(t.getDate() + 1);
-      const toISO = t.toISOString();
-      const forecastUrl = `https://api.carbonintensity.org.uk/generation/expected?from=${fromISO}&to=${toISO}`;
-      const resp = await fetch(forecastUrl);
+    async function fetchOpenMeteoForecast() {
+      const resp = await fetch(FORECAST_API);
       if(!resp.ok) {
         throw new Error(`Forecast fetch error: ${resp.status}`);
       }
       return resp.json();
     }
 
-    function processForecastData(forecastJson) {
-      let windSum = 0, solarSum = 0, count = 0;
-      forecastJson.data.forEach(period => {
-        period.generationmix.forEach(source => {
-          const fuelLower = source.fuel.toLowerCase();
-          if (fuelLower.includes("wind")) {
-            windSum += source.perc;
-          }
-          if (fuelLower.includes("solar")) {
-            solarSum += source.perc;
-          }
-        });
-        count++;
-      });
-      const avgWind = count > 0 ? windSum / count : 0;
-      const avgSolar = count > 0 ? solarSum / count : 0;
-      return { avgWind, avgSolar };
-    }
+    function renderForecastTable(forecastJson) {
+      // We'll display only the next 3 days beyond 'day 0'.
+      // forecastJson.daily.time[0] is "today". So we show indexes 1,2,3 = tomorrow + 2 more.
+      const daily = forecastJson.daily;
+      forecastTableBodyEl.innerHTML = '';
 
-    async function renderForecast() {
-      try {
-        forecastError = null;
-        const forecastJson = await fetchForecastData();
-        const { avgWind, avgSolar } = processForecastData(forecastJson);
-        forecastWindEl.innerText = `${avgWind.toFixed(1)}%`;
-        forecastSolarEl.innerText = `${avgSolar.toFixed(1)}%`;
-      } catch(err) {
-        forecastError = 'Forecast error: ' + err.message;
-        forecastWindEl.innerText = 'Error';
-        forecastSolarEl.innerText = 'Error';
-        renderDebugInfo();
+      for (let i = 1; i < daily.time.length; i++) {
+        // Stop at 3 additional days (i.e. i=1..3)
+        if (i > 3) break;
+
+        const tr = document.createElement('tr');
+
+        // Date
+        const dateTd = document.createElement('td');
+        dateTd.style.padding = '8px';
+        dateTd.style.fontSize = '0.8rem';
+        dateTd.innerText = daily.time[i];
+        tr.appendChild(dateTd);
+
+        // Max wind speed
+        const windTd = document.createElement('td');
+        windTd.style.padding = '8px';
+        windTd.style.fontSize = '0.8rem';
+        windTd.innerText = daily.windspeed_10m_max[i] ? daily.windspeed_10m_max[i].toFixed(1) : '-';
+        tr.appendChild(windTd);
+
+        // Solar radiation sum
+        const solarTd = document.createElement('td');
+        solarTd.style.padding = '8px';
+        solarTd.style.fontSize = '0.8rem';
+        solarTd.innerText = daily.shortwave_radiation_sum[i] ? daily.shortwave_radiation_sum[i].toFixed(1) : '-';
+        tr.appendChild(solarTd);
+
+        forecastTableBodyEl.appendChild(tr);
       }
     }
 
@@ -925,7 +930,7 @@
         todayData,
         tomorrowData,
         energyMixData,
-        forecastError
+        openMeteoForecastData
       };
       debugPanelEl.textContent = JSON.stringify(debugObj, null, 2);
     }
@@ -935,11 +940,13 @@
      ************************************************************************/
     async function fetchAndRenderAll(){
       try {
+        // 1. Agile Data
         const agileJson = await fetchAgileData();
         rawAgileData = agileJson;
         if(!agileJson.results) throw new Error('No Agile results found.');
-
         splitTodayAndTomorrow(agileJson.results);
+
+        // 2. Energy Mix
         try {
           energyMixData = await fetchEnergyMix();
         } catch(eMix) {
@@ -947,15 +954,34 @@
           energyMixData = null;
         }
 
+        // 3. Weather Forecast (Open-Meteo)
+        try {
+          openMeteoForecastData = await fetchOpenMeteoForecast();
+        } catch(eForecast) {
+          console.error('Open-Meteo error:', eForecast);
+          openMeteoForecastData = null;
+        }
+
+        // 4. Render everything
         renderCurrentPrice();
+
         renderTodayMetrics();
         renderTodayChart();
         renderTodayTable();
+
         renderTomorrowMetrics();
         renderTomorrowChart();
         renderTomorrowTable();
+
         renderEnergyMix();
-        renderForecast();
+
+        if(openMeteoForecastData) {
+          renderForecastTable(openMeteoForecastData);
+        } else {
+          forecastTableBodyEl.innerHTML = '<tr><td colspan="3">No forecast data.</td></tr>';
+        }
+
+        // 5. Render debug
         renderDebugInfo();
       } catch(err) {
         debugPanelEl.style.display = 'block';
@@ -965,8 +991,11 @@
       }
     }
 
+    // Initial load
     regionSelectEl.value = 'A';
     fetchAndRenderAll();
+
+    // Refresh data every 30 min
     setInterval(fetchAndRenderAll, 30 * 60 * 1000);
   </script>
 </body>
