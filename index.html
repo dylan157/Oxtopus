@@ -1,17 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Octopus Agile – Margins & Tomorrow Data</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Octopus Agile - Single-File PWA</title>
 
-  <!-- Optional Google Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap"
-    rel="stylesheet"
-  />
+  <!-- Minimal embedded manifest using URL-encoded JSON so quotes are not escaped -->
+  <link rel="manifest" 
+    href="data:application/json,%7B%22name%22%3A%22SingleFilePWA%22%2C%22short_name%22%3A%22SFPWA%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%7D">
+
+  <!-- Optional theme-color for the PWA title bar -->
+  <meta name="theme-color" content="#210035">
 
   <style>
     /* =========================
@@ -26,7 +25,7 @@
       min-height: 100vh;
       background-color: #210035;
       color: #FFFFFF;
-      font-family: 'Roboto', sans-serif;
+      font-family: sans-serif;
       padding: 10px;
     }
     section {
@@ -36,13 +35,11 @@
       margin-bottom: 16px;
       padding: 16px;
     }
-    h1, h2, h3, h4, p {
+    h1, h2, h3, p {
       margin: 0;
     }
 
-    /* =========================
-       HEADER / REGION
-       ========================= */
+    /* HEADER / REGION */
     .header {
       text-align: center;
       background-color: #360040;
@@ -71,9 +68,7 @@
       color: #FFFFFF;
     }
 
-    /* =========================
-       CURRENT PRICE
-       ========================= */
+    /* CURRENT PRICE */
     .current-price-box {
       text-align: center;
     }
@@ -87,9 +82,7 @@
       color: #BBBBBB;
     }
 
-    /* =========================
-       METRICS
-       ========================= */
+    /* METRICS */
     .section-title {
       font-size: 1.2rem;
       color: #FF00E5;
@@ -114,9 +107,7 @@
       font-size: 1rem;
     }
 
-    /* =========================
-       PRICE TABLE
-       ========================= */
+    /* PRICE TABLE */
     .price-table-title {
       text-align: center;
       font-size: 1.1rem;
@@ -151,9 +142,7 @@
       color: #FFFFFF;
     }
 
-    /* =========================
-       BAR CHART
-       ========================= */
+    /* BAR CHART */
     .chart-label {
       text-align: center;
       font-size: 1.1rem;
@@ -170,9 +159,7 @@
       overflow: hidden;
     }
 
-    /* =========================
-       ENERGY MIX
-       ========================= */
+    /* ENERGY MIX */
     .energy-mix-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -200,16 +187,16 @@
     }
     .energy-bar {
       position: absolute;
-      left: 0; top: 0; bottom: 0;
+      left: 0; 
+      top: 0; 
+      bottom: 0;
       background-color: #FF00E5;
     }
     .energy-perc {
       font-size: 0.8rem;
     }
 
-    /* =========================
-       DEBUG
-       ========================= */
+    /* DEBUG */
     #debugToggle {
       display: block;
       margin: 0 auto 10px auto;
@@ -232,9 +219,7 @@
       word-wrap: break-word;
     }
 
-    /* =========================
-       REFERRAL LINK BUTTON
-       ========================= */
+    /* REFERRAL BUTTON */
     .referral-section {
       text-align: center;
       margin: 16px 0;
@@ -256,9 +241,20 @@
       background-color: #ff40eb;
     }
 
-    /* =========================
-       RESPONSIVE
-       ========================= */
+    /* INSTALL BUTTON */
+    #installBtn {
+      display: none;
+      margin: 0 auto 10px auto;
+      padding: 6px 10px;
+      background-color: #FF00E5;
+      border: none;
+      border-radius: 4px;
+      color: #FFF;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    /* RESPONSIVE */
     @media (max-width: 768px) {
       .metrics-grid {
         grid-template-columns: 1fr;
@@ -273,7 +269,7 @@
 
   <!-- HEADER / REGION -->
   <section class="header">
-    <h1>Octopus Agile – Margins & Tomorrow Data</h1>
+    <h1>Octopus Agile - Single-File PWA</h1>
     <div class="region-select">
       <label for="regionSelect">Region:</label>
       <select id="regionSelect">
@@ -303,7 +299,7 @@
 
   <!-- TODAY SUMMARY -->
   <section id="todaySection">
-    <div class="section-title">Today’s Summary</div>
+    <div class="section-title">Today Summary</div>
     <div class="metrics-grid">
       <div class="metric-item">
         <h2>Min Price</h2>
@@ -322,13 +318,13 @@
 
   <!-- TODAY CHART -->
   <section id="todayChartSection">
-    <div class="chart-label">Today’s Price Chart</div>
+    <div class="chart-label">Today Price Chart</div>
     <div id="todayChart" class="chart-container"></div>
   </section>
 
   <!-- TODAY HALF-HOUR PRICES -->
   <section id="todayTableSection">
-    <div class="price-table-title">Today’s Half-Hour Prices</div>
+    <div class="price-table-title">Today Half-Hour Prices</div>
     <table>
       <thead>
         <tr>
@@ -337,15 +333,15 @@
           <th>Price (p/kWh)</th>
         </tr>
       </thead>
-      <tbody id="todayTableBody"><!-- filled by JS --></tbody>
+      <tbody id="todayTableBody"></tbody>
     </table>
   </section>
 
   <!-- TOMORROW SUMMARY -->
   <section id="tomorrowSection">
-    <div class="section-title">Tomorrow’s Summary</div>
+    <div class="section-title">Tomorrow Summary</div>
     <div id="tomorrowNotAvailable" style="display:none; text-align:center; font-style:italic;">
-      Tomorrow’s prices will be available at 4pm.
+      Tomorrow prices will be available at 4pm.
     </div>
     <div class="metrics-grid" id="tomorrowMetricsGrid">
       <div class="metric-item">
@@ -365,13 +361,13 @@
 
   <!-- TOMORROW CHART -->
   <section id="tomorrowChartSection">
-    <div class="chart-label">Tomorrow’s Price Chart</div>
+    <div class="chart-label">Tomorrow Price Chart</div>
     <div id="tomorrowChart" class="chart-container"></div>
   </section>
 
   <!-- TOMORROW HALF-HOUR PRICES -->
   <section id="tomorrowTableSection">
-    <div class="price-table-title">Tomorrow’s Half-Hour Prices</div>
+    <div class="price-table-title">Tomorrow Half-Hour Prices</div>
     <table>
       <thead>
         <tr>
@@ -380,7 +376,7 @@
           <th>Price (p/kWh)</th>
         </tr>
       </thead>
-      <tbody id="tomorrowTableBody"><!-- filled by JS --></tbody>
+      <tbody id="tomorrowTableBody"></tbody>
     </table>
   </section>
 
@@ -397,8 +393,8 @@
       <thead style="background-color: #3A1D50;">
         <tr>
           <th style="padding:8px; font-size:0.8rem;">Date</th>
-          <th style="padding:8px; font-size:0.8rem;">Max Wind Speed (m/s)</th>
-          <th style="padding:8px; font-size:0.8rem;">Solar (MJ/m²)</th>
+          <th style="padding:8px; font-size:0.8rem;">Max Wind (m/s)</th>
+          <th style="padding:8px; font-size:0.8rem;">Solar (MJ/m2)</th>
         </tr>
       </thead>
       <tbody id="forecastTableBody"></tbody>
@@ -417,549 +413,648 @@
       target="_blank"
       rel="noopener noreferrer"
     >
-      Join Octopus and get £50 free credit
+      Join Octopus and get 50 free credit
     </a>
   </section>
 
+  <!-- INSTALL BUTTON (Optional) -->
+  <button id="installBtn">Install App</button>
+
+  <!-- Service Worker code embedded in a Blob -->
   <script>
-    /************************************************************************
-     * GLOBAL CONSTANTS & DOM REFS
-     ************************************************************************/
-    const AGILE_PRODUCT_CODE = 'AGILE-24-10-01';
-    const ENERGY_MIX_API     = 'https://api.carbonintensity.org.uk/generation';
+  // Minimal service worker code as a string:
+  var serviceWorkerCode = ""
+    + "'use strict';\n\n"
+    + "var CACHE_NAME = 'octopus-agile-singlefile-v1';\n"
+    + "var ASSETS_TO_CACHE = ['./'];\n\n"
+    + "self.addEventListener('install', function(event) {\n"
+    + "  event.waitUntil(\n"
+    + "    caches.open(CACHE_NAME).then(function(cache) {\n"
+    + "      return cache.addAll(ASSETS_TO_CACHE);\n"
+    + "    })\n"
+    + "  );\n"
+    + "});\n\n"
+    + "self.addEventListener('fetch', function(event) {\n"
+    + "  event.respondWith(\n"
+    + "    caches.match(event.request).then(function(response) {\n"
+    + "      return response || fetch(event.request);\n"
+    + "    })\n"
+    + "  );\n"
+    + "});\n";
 
-    // Using coordinates for a renewable hotspot in Yorkshire and the Humber (Flamborough Head)
-    const FORECAST_API = 'https://api.open-meteo.com/v1/forecast?'
-      + 'latitude=54.3&longitude=-0.1'
-      + '&daily=windspeed_10m_max,shortwave_radiation_sum'
-      + '&forecast_days=4'
-      + '&timezone=Europe%2FLondon';
+  if ('serviceWorker' in navigator) {
+    var blob = new Blob([serviceWorkerCode], {type: 'text/javascript'});
+    var swURL = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(swURL)
+      .then(function() {
+        console.log('Service Worker Registered (single-file)!');
+      })
+      .catch(function(err) {
+        console.error('Service Worker Registration Failed:', err);
+      });
+  }
+  </script>
 
-    let regionCode = 'A';
-    let rawAgileData = null;
-    let todayData = [];
-    let tomorrowData = [];
-    let energyMixData = null;
+  <!-- Main page script -->
+  <script>
+  "use strict";
 
-    // We'll store the entire forecast JSON here
-    let openMeteoForecastData = null;
+  /************************************************************************
+   * GLOBAL CONSTANTS & DOM REFS
+   ************************************************************************/
+  var AGILE_PRODUCT_CODE = "AGILE-24-10-01";
+  var ENERGY_MIX_API     = "https://api.carbonintensity.org.uk/generation";
 
-    const regionSelectEl = document.getElementById('regionSelect');
-    const priceEl        = document.getElementById('priceDisplay');
-    const timestampEl    = document.getElementById('timestampDisplay');
-    // Today
-    const todayMinEl      = document.getElementById('todayMin');
-    const todayMaxEl      = document.getElementById('todayMax');
-    const todayAvgEl      = document.getElementById('todayAvg');
-    const todayTableBodyEl= document.getElementById('todayTableBody');
-    const todayChartEl    = document.getElementById('todayChart');
-    // Tomorrow
-    const tomorrowSectionEl     = document.getElementById('tomorrowSection');
-    const tomorrowNotAvailableEl= document.getElementById('tomorrowNotAvailable');
-    const tomorrowMetricsGridEl = document.getElementById('tomorrowMetricsGrid');
-    const tomorrowMinEl       = document.getElementById('tomorrowMin');
-    const tomorrowMaxEl       = document.getElementById('tomorrowMax');
-    const tomorrowAvgEl       = document.getElementById('tomorrowAvg');
-    const tomorrowChartEl     = document.getElementById('tomorrowChart');
-    const tomorrowTableBodyEl = document.getElementById('tomorrowTableBody');
-    const tomorrowChartSectionEl= document.getElementById('tomorrowChartSection');
-    const tomorrowTableSectionEl= document.getElementById('tomorrowTableSection');
-    // Energy Mix
-    const energyMixContainerEl= document.getElementById('energyMixContainer');
-    // Forecast table
-    const forecastTableBodyEl = document.getElementById('forecastTableBody');
-    // Debug
-    const debugToggleEl   = document.getElementById('debugToggle');
-    const debugPanelEl    = document.getElementById('debugPanel');
+  // Using coordinates for a renewable hotspot in Yorkshire
+  var FORECAST_API = "https://api.open-meteo.com/v1/forecast?"
+    + "latitude=54.3&longitude=-0.1"
+    + "&daily=windspeed_10m_max,shortwave_radiation_sum"
+    + "&forecast_days=4"
+    + "&timezone=Europe%2FLondon";
 
-    /************************************************************************
-     * EVENT LISTENERS
-     ************************************************************************/
-    regionSelectEl.addEventListener('change', () => {
-      regionCode = regionSelectEl.value;
-      fetchAndRenderAll();
+  // Retrieve a saved region if it exists in localStorage
+  var savedRegion = localStorage.getItem("selectedRegion") || "A";
+  var regionCode = savedRegion;
+
+  var rawAgileData = null;
+  var todayData = [];
+  var tomorrowData = [];
+  var energyMixData = null;
+  var openMeteoForecastData = null;
+
+  // DOM references
+  var regionSelectEl = document.getElementById("regionSelect");
+  regionSelectEl.value = regionCode;
+
+  var priceEl     = document.getElementById("priceDisplay");
+  var timestampEl = document.getElementById("timestampDisplay");
+
+  // Today
+  var todayMinEl       = document.getElementById("todayMin");
+  var todayMaxEl       = document.getElementById("todayMax");
+  var todayAvgEl       = document.getElementById("todayAvg");
+  var todayTableBodyEl = document.getElementById("todayTableBody");
+  var todayChartEl     = document.getElementById("todayChart");
+
+  // Tomorrow
+  var tomorrowSectionEl      = document.getElementById("tomorrowSection");
+  var tomorrowNotAvailableEl = document.getElementById("tomorrowNotAvailable");
+  var tomorrowMetricsGridEl  = document.getElementById("tomorrowMetricsGrid");
+  var tomorrowMinEl          = document.getElementById("tomorrowMin");
+  var tomorrowMaxEl          = document.getElementById("tomorrowMax");
+  var tomorrowAvgEl          = document.getElementById("tomorrowAvg");
+  var tomorrowChartEl        = document.getElementById("tomorrowChart");
+  var tomorrowTableBodyEl    = document.getElementById("tomorrowTableBody");
+  var tomorrowChartSectionEl = document.getElementById("tomorrowChartSection");
+  var tomorrowTableSectionEl = document.getElementById("tomorrowTableSection");
+
+  // Energy Mix
+  var energyMixContainerEl = document.getElementById("energyMixContainer");
+
+  // Forecast table
+  var forecastTableBodyEl = document.getElementById("forecastTableBody");
+
+  // Debug
+  var debugToggleEl = document.getElementById("debugToggle");
+  var debugPanelEl  = document.getElementById("debugPanel");
+
+  // Install button
+  var installBtnEl = document.getElementById("installBtn");
+  var deferredPrompt = null;
+
+  /************************************************************************
+   * EVENT LISTENERS
+   ************************************************************************/
+  // 1. Region select -> saves to localStorage, fetches new data
+  regionSelectEl.addEventListener("change", function() {
+    regionCode = regionSelectEl.value;
+    localStorage.setItem("selectedRegion", regionCode);
+    fetchAndRenderAll();
+  });
+
+  // 2. Debug toggle
+  debugToggleEl.addEventListener("click", function() {
+    debugPanelEl.style.display = (debugPanelEl.style.display === "block" ? "none" : "block");
+  });
+
+  // 3. Listen for "beforeinstallprompt" to enable the "Install" button
+  window.addEventListener("beforeinstallprompt", function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtnEl.style.display = "inline-block";
+  });
+
+  // 4. Handle the "Install" button click
+  installBtnEl.addEventListener("click", function() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function(choiceResult) {
+      console.log("User response to the install prompt:", choiceResult.outcome);
+      deferredPrompt = null;
+      installBtnEl.style.display = "none";
     });
-    debugToggleEl.addEventListener('click', () => {
-      debugPanelEl.style.display = (debugPanelEl.style.display === 'block' ? 'none' : 'block');
+  });
+
+  /************************************************************************
+   * FETCH AGILE DATA
+   ************************************************************************/
+  function fetchAgileData() {
+    var now = new Date();
+    var future = new Date(now);
+    future.setDate(now.getDate() + 2);
+
+    var fromISO = now.toISOString();
+    var toISO   = future.toISOString();
+
+    var url = "https://api.octopus.energy/v1/products/" + AGILE_PRODUCT_CODE 
+      + "/electricity-tariffs/E-1R-" + AGILE_PRODUCT_CODE + "-" + regionCode
+      + "/standard-unit-rates/?period_from=" + fromISO 
+      + "&period_to=" + toISO + "&page_size=100";
+
+    return fetch(url).then(function(resp) {
+      if(!resp.ok) {
+        throw new Error("Agile fetch error: " + resp.status);
+      }
+      return resp.json();
     });
+  }
 
-    /************************************************************************
-     * FETCH AGILE DATA
-     ************************************************************************/
-    async function fetchAgileData() {
-      const now = new Date();
-      const future = new Date(now);
-      future.setDate(now.getDate() + 2);
+  function splitTodayAndTomorrow(results) {
+    todayData = [];
+    tomorrowData = [];
 
-      const fromISO = now.toISOString();
-      const toISO   = future.toISOString();
+    var now = new Date();
+    var todayStr = formatDateYYYYMMDD(now);
 
-      const url = `https://api.octopus.energy/v1/products/${AGILE_PRODUCT_CODE}/electricity-tariffs/E-1R-${AGILE_PRODUCT_CODE}-${regionCode}/standard-unit-rates/?period_from=${fromISO}&period_to=${toISO}&page_size=100`;
+    var tDay = new Date(now);
+    tDay.setDate(now.getDate() + 1);
+    var tomorrowStr = formatDateYYYYMMDD(tDay);
 
-      const resp = await fetch(url);
+    results.sort(function(a, b) {
+      return new Date(a.valid_from) - new Date(b.valid_from);
+    });
+    results.forEach(function(item) {
+      var d = new Date(item.valid_from);
+      var dStr = formatDateYYYYMMDD(d);
+      if(dStr === todayStr) {
+        todayData.push(item);
+      } else if(dStr === tomorrowStr) {
+        tomorrowData.push(item);
+      }
+    });
+  }
+
+  function formatDateYYYYMMDD(d) {
+    var y = d.getFullYear();
+    var m = String(d.getMonth() + 1).padStart(2, "0");
+    var day = String(d.getDate()).padStart(2, "0");
+    return y + "-" + m + "-" + day;
+  }
+
+  /************************************************************************
+   * RENDER CURRENT PRICE
+   ************************************************************************/
+  function renderCurrentPrice() {
+    var now = new Date();
+    var current = todayData.find(function(item) {
+      var start = new Date(item.valid_from);
+      var end   = new Date(item.valid_to);
+      return (start <= now && end > now);
+    });
+    if(!current) {
+      priceEl.innerText = "No current price data.";
+      timestampEl.innerText = "";
+      return;
+    }
+    var p = current.value_inc_vat.toFixed(2);
+    priceEl.innerText = "Current Price: " + p + " p/kWh";
+
+    var fromStr = new Date(current.valid_from).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+    var toStr   = new Date(current.valid_to).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+    timestampEl.innerText = "Valid: " + fromStr + " - " + toStr;
+  }
+
+  /************************************************************************
+   * RENDER TODAY
+   ************************************************************************/
+  function renderTodayMetrics() {
+    if(!todayData.length) {
+      todayMinEl.innerText = "-";
+      todayMaxEl.innerText = "-";
+      todayAvgEl.innerText = "-";
+      return;
+    }
+    var minP = Infinity, maxP = -Infinity, sum = 0;
+    todayData.forEach(function(d) {
+      var p = d.value_inc_vat;
+      if(p < minP) minP = p;
+      if(p > maxP) maxP = p;
+      sum += p;
+    });
+    var avgP = sum / todayData.length;
+    todayMinEl.innerText = minP.toFixed(2) + " p";
+    todayMaxEl.innerText = maxP.toFixed(2) + " p";
+    todayAvgEl.innerText = avgP.toFixed(2) + " p";
+  }
+
+  function renderTodayTable() {
+    todayTableBodyEl.innerHTML = "";
+    if(!todayData.length) {
+      var row = document.createElement("tr");
+      var cell = document.createElement("td");
+      cell.colSpan = 3;
+      cell.innerText = "No data for today.";
+      row.appendChild(cell);
+      todayTableBodyEl.appendChild(row);
+      return;
+    }
+    todayData.forEach(function(item) {
+      var row = document.createElement("tr");
+      var p = item.value_inc_vat;
+
+      row.style.backgroundColor = getDynamicColor(p);
+
+      var fromStr = new Date(item.valid_from).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+      var toStr   = new Date(item.valid_to).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+
+      var fromTd = document.createElement("td");
+      fromTd.innerText = fromStr;
+      var toTd = document.createElement("td");
+      toTd.innerText = toStr;
+      var priceTd = document.createElement("td");
+      priceTd.innerText = p.toFixed(2) + getPriceEmoji(p);
+
+      row.appendChild(fromTd);
+      row.appendChild(toTd);
+      row.appendChild(priceTd);
+      todayTableBodyEl.appendChild(row);
+    });
+  }
+
+  /************************************************************************
+   * RENDER TOMORROW
+   ************************************************************************/
+  function renderTomorrowMetrics() {
+    if(!tomorrowData.length) {
+      tomorrowSectionEl.style.display = "none";
+      tomorrowChartSectionEl.style.display = "none";
+      tomorrowTableSectionEl.style.display = "none";
+      tomorrowNotAvailableEl.style.display = "block";
+      return;
+    }
+    tomorrowSectionEl.style.display = "block";
+    tomorrowChartSectionEl.style.display = "block";
+    tomorrowTableSectionEl.style.display = "block";
+    tomorrowNotAvailableEl.style.display = "none";
+
+    var minP = Infinity, maxP = -Infinity, sum = 0;
+    tomorrowData.forEach(function(d) {
+      var p = d.value_inc_vat;
+      if(p < minP) minP = p;
+      if(p > maxP) maxP = p;
+      sum += p;
+    });
+    var avgP = sum / tomorrowData.length;
+    tomorrowMinEl.innerText = minP.toFixed(2) + " p";
+    tomorrowMaxEl.innerText = maxP.toFixed(2) + " p";
+    tomorrowAvgEl.innerText = avgP.toFixed(2) + " p";
+  }
+
+  function renderTomorrowTable() {
+    tomorrowTableBodyEl.innerHTML = "";
+    if(!tomorrowData.length) return;
+    tomorrowData.forEach(function(item) {
+      var row = document.createElement("tr");
+      var p = item.value_inc_vat;
+
+      row.style.backgroundColor = getDynamicColor(p);
+
+      var fromStr = new Date(item.valid_from).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+      var toStr   = new Date(item.valid_to).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+
+      var fromTd = document.createElement("td");
+      fromTd.innerText = fromStr;
+      var toTd = document.createElement("td");
+      toTd.innerText = toStr;
+      var priceTd = document.createElement("td");
+      priceTd.innerText = p.toFixed(2) + getPriceEmoji(p);
+
+      row.appendChild(fromTd);
+      row.appendChild(toTd);
+      row.appendChild(priceTd);
+      tomorrowTableBodyEl.appendChild(row);
+    });
+  }
+
+  /************************************************************************
+   * PRICE CLASS / EMOJIS
+   ************************************************************************/
+  function getPriceEmoji(p) {
+    // Using pure ASCII \u escapes to avoid special chars
+    if(p > 70) return " \\uD83D\\uDC80";     // Skull
+    if(p > 40) return " \\u274C";           // Cross Mark
+    if(p > 30) return " \\u26A0\\uFE0F";    // Warning
+    if(p < 7)  return " \\uD83E\\uDD11";    // Money mouth
+    if(p < 15) return " \\uD83D\\uDE0E";    // Sunglasses
+    return "";
+  }
+
+  function getDynamicColor(p) {
+    if (p < 22) {
+      var fraction = Math.min(Math.max(p, 0), 22) / 22;
+      var alpha = 0.7 - fraction * 0.5;
+      return "rgba(0,255,0," + alpha.toFixed(2) + ")";
+    } else if (p < 30) {
+      var fraction2 = (p - 22) / 8;
+      var alpha2 = 0.7 - fraction2 * 0.5;
+      return "rgba(255,165,0," + alpha2.toFixed(2) + ")";
+    } else {
+      var clamped = Math.min(p, 70);
+      var fraction3 = (clamped - 30) / 40;
+      var alpha3 = 0.7 - fraction3 * 0.5;
+      return "rgba(255,0,0," + alpha3.toFixed(2) + ")";
+    }
+  }
+
+  /************************************************************************
+   * BAR CHARTS (MARGINS)
+   ************************************************************************/
+  function renderTodayChart(){
+    renderBarChart(todayData, todayChartEl);
+  }
+  function renderTomorrowChart(){
+    renderBarChart(tomorrowData, tomorrowChartEl);
+  }
+
+  function renderBarChart(dataArray, containerEl){
+    containerEl.innerHTML = "";
+    if(!dataArray.length){
+      containerEl.innerText = "No data to chart.";
+      return;
+    }
+    var w = containerEl.clientWidth;
+    var h = containerEl.clientHeight;
+    var dpr = window.devicePixelRatio || 1;
+
+    var canvas = document.createElement("canvas");
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    containerEl.appendChild(canvas);
+
+    var ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
+
+    var marginLeft = 40;
+    var marginRight = 10;
+    var marginTop = 10;
+    var marginBottom = 30;
+    var chartW = w - marginLeft - marginRight;
+    var chartH = h - marginTop - marginBottom;
+
+    ctx.fillStyle = "#4A2E60";
+    ctx.fillRect(0, 0, w, h);
+
+    dataArray.sort(function(a, b) {
+      return new Date(a.valid_from) - new Date(b.valid_from);
+    });
+    var minTime = new Date(dataArray[0].valid_from).getTime();
+    var maxTime = new Date(dataArray[dataArray.length - 1].valid_to).getTime();
+
+    var minP = Infinity, maxP = -Infinity;
+    dataArray.forEach(function(d) {
+      if(d.value_inc_vat < minP) minP = d.value_inc_vat;
+      if(d.value_inc_vat > maxP) maxP = d.value_inc_vat;
+    });
+    var pad = (maxP - minP) * 0.1 || 1;
+    var chartMinP = minP - pad;
+    var chartMaxP = maxP + pad;
+
+    // Vertical grid lines (every 2 hours)
+    var twoHours = 2 * 3600000;
+    var tCur = minTime - (minTime % twoHours);
+    ctx.strokeStyle = "rgba(255,255,255,0.2)";
+    ctx.lineWidth = 1;
+    while (tCur <= maxTime) {
+      var xNorm = (tCur - minTime) / (maxTime - minTime || 1);
+      var x = marginLeft + xNorm * chartW;
+      ctx.beginPath();
+      ctx.moveTo(x, marginTop);
+      ctx.lineTo(x, marginTop + chartH);
+      ctx.stroke();
+      tCur += twoHours;
+    }
+
+    // Horizontal lines (price lines)
+    ctx.strokeStyle = "rgba(255,255,255,0.2)";
+    var step = 5;
+    var base = Math.floor(chartMinP / step) * step;
+    var limit = Math.ceil(chartMaxP / step) * step;
+    for(var val = base; val <= limit; val += step){
+      var yNorm = (val - chartMinP) / (chartMaxP - chartMinP || 1);
+      var y = marginTop + (chartH - yNorm * chartH);
+      ctx.beginPath();
+      ctx.moveTo(marginLeft, y);
+      ctx.lineTo(marginLeft + chartW, y);
+      ctx.stroke();
+    }
+
+    // X axis time labels (every 6 hours)
+    ctx.fillStyle = "#fff";
+    ctx.font = "12px sans-serif";
+    tCur = minTime - (minTime % twoHours);
+    while (tCur <= maxTime) {
+      var date = new Date(tCur);
+      var hours = date.getHours();
+      var mins = date.getMinutes();
+      if (hours % 6 === 0 && mins === 0) {
+        var xNorm2 = (tCur - minTime) / (maxTime - minTime || 1);
+        var x2 = marginLeft + xNorm2 * chartW;
+        var hour12 = (hours === 0 ? 12 : (hours > 12 ? hours - 12 : hours));
+        var ampm = (hours >= 12 ? "pm" : "am");
+        ctx.fillText(hour12 + ampm, x2 - 10, marginTop + chartH + 15);
+      }
+      tCur += twoHours;
+    }
+
+    // Y axis price labels
+    for(var valY = base; valY <= limit; valY += step){
+      var yNorm2 = (valY - chartMinP) / (chartMaxP - chartMinP || 1);
+      var y2 = marginTop + (chartH - yNorm2 * chartH);
+      ctx.fillText(valY + "p", marginLeft - 35, y2 + 4);
+    }
+
+    // Bars
+    var n = dataArray.length;
+    var barGap = 1;
+    var barWidth = chartW / n - barGap;
+
+    dataArray.forEach(function(item, i) {
+      var p = item.value_inc_vat;
+      var pNorm = (p - chartMinP) / (chartMaxP - chartMinP || 1);
+      var barH = pNorm * chartH;
+      var xB = marginLeft + i * (barWidth + barGap);
+      var yB = marginTop + (chartH - barH);
+      var color = getDynamicColor(p).replace(",0.", ",0.8");
+      ctx.fillStyle = color;
+      ctx.fillRect(xB, yB, barWidth, barH);
+    });
+  }
+
+  /************************************************************************
+   * ENERGY MIX
+   ************************************************************************/
+  function fetchEnergyMix() {
+    return fetch(ENERGY_MIX_API).then(function(resp) {
       if(!resp.ok) {
-        throw new Error(`Agile fetch error: ${resp.status}`);
+        throw new Error("Energy Mix error: " + resp.status);
       }
       return resp.json();
+    });
+  }
+  function renderEnergyMix(){
+    energyMixContainerEl.innerHTML = "";
+    if(!energyMixData || !energyMixData.data || !energyMixData.data.generationmix){
+      energyMixContainerEl.innerText = "No energy mix data.";
+      return;
+    }
+    var arr = energyMixData.data.generationmix.filter(function(item) {
+      return item.perc > 0;
+    });
+    arr.sort(function(a, b) {
+      return b.perc - a.perc;
+    });
+    if(!arr.length){
+      energyMixContainerEl.innerText = "No sources above 0% right now.";
+      return;
     }
 
-    function splitTodayAndTomorrow(results) {
-      todayData = [];
-      tomorrowData = [];
+    var container = document.createElement("div");
+    container.className = "energy-mix-grid";
 
-      const now = new Date();
-      const todayStr = formatDateYYYYMMDD(now);
+    arr.forEach(function(item) {
+      var wrap = document.createElement("div");
+      wrap.className = "energy-mix-item";
 
-      const tDay = new Date(now);
-      tDay.setDate(now.getDate() + 1);
-      const tomorrowStr = formatDateYYYYMMDD(tDay);
+      var title = document.createElement("h3");
+      title.innerText = item.fuel;
+      wrap.appendChild(title);
 
-      results.sort((a, b) => new Date(a.valid_from) - new Date(b.valid_from));
-      results.forEach(item => {
-        const d = new Date(item.valid_from);
-        const dStr = formatDateYYYYMMDD(d);
-        if(dStr === todayStr) {
-          todayData.push(item);
-        } else if(dStr === tomorrowStr) {
-          tomorrowData.push(item);
-        }
-      });
-    }
+      var barC = document.createElement("div");
+      barC.className = "energy-bar-container";
+      var bar = document.createElement("div");
+      bar.className = "energy-bar";
+      bar.style.width = item.perc + "%";
+      barC.appendChild(bar);
+      wrap.appendChild(barC);
 
-    function formatDateYYYYMMDD(d) {
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      return `${y}-${m}-${day}`;
-    }
+      var perc = document.createElement("div");
+      perc.className = "energy-perc";
+      perc.innerText = item.perc.toFixed(1) + "%";
+      wrap.appendChild(perc);
 
-    /************************************************************************
-     * RENDER CURRENT PRICE
-     ************************************************************************/
-    function renderCurrentPrice() {
-      const now = new Date();
-      const current = todayData.find(item => {
-        const start = new Date(item.valid_from);
-        const end   = new Date(item.valid_to);
-        return (start <= now && end > now);
-      });
-      if(!current) {
-        priceEl.innerText = 'No current price data.';
-        timestampEl.innerText = '';
-        return;
-      }
-      const p = current.value_inc_vat.toFixed(2);
-      priceEl.innerText = `Current Price: ${p} p/kWh`;
+      container.appendChild(wrap);
+    });
+    energyMixContainerEl.appendChild(container);
+  }
 
-      const fromStr = new Date(current.valid_from).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-      const toStr   = new Date(current.valid_to).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-      timestampEl.innerText = `Valid: ${fromStr} - ${toStr}`;
-    }
-
-    /************************************************************************
-     * RENDER TODAY
-     ************************************************************************/
-    function renderTodayMetrics() {
-      if(!todayData.length) {
-        todayMinEl.innerText = '-';
-        todayMaxEl.innerText = '-';
-        todayAvgEl.innerText = '-';
-        return;
-      }
-      let minP = Infinity, maxP = -Infinity, sum = 0;
-      todayData.forEach(d => {
-        const p = d.value_inc_vat;
-        if(p < minP) minP = p;
-        if(p > maxP) maxP = p;
-        sum += p;
-      });
-      const avgP = sum / todayData.length;
-      todayMinEl.innerText = `${minP.toFixed(2)} p`;
-      todayMaxEl.innerText = `${maxP.toFixed(2)} p`;
-      todayAvgEl.innerText = `${avgP.toFixed(2)} p`;
-    }
-
-    function renderTodayTable() {
-      todayTableBodyEl.innerHTML = '';
-      if(!todayData.length) {
-        const row = document.createElement('tr');
-        const cell = document.createElement('td');
-        cell.colSpan = 3;
-        cell.innerText = 'No data for today.';
-        row.appendChild(cell);
-        todayTableBodyEl.appendChild(row);
-        return;
-      }
-      todayData.forEach(item => {
-        const row = document.createElement('tr');
-        const p = item.value_inc_vat;
-
-        row.style.backgroundColor = getDynamicColor(p);
-
-        const fromStr = new Date(item.valid_from).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-        const toStr   = new Date(item.valid_to).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-
-        const fromTd = document.createElement('td');
-        fromTd.innerText = fromStr;
-        const toTd = document.createElement('td');
-        toTd.innerText = toStr;
-        const priceTd = document.createElement('td');
-        priceTd.innerText = p.toFixed(2) + getPriceEmoji(p);
-
-        row.appendChild(fromTd);
-        row.appendChild(toTd);
-        row.appendChild(priceTd);
-        todayTableBodyEl.appendChild(row);
-      });
-    }
-
-    /************************************************************************
-     * RENDER TOMORROW
-     ************************************************************************/
-    function renderTomorrowMetrics() {
-      if(!tomorrowData.length) {
-        tomorrowSectionEl.style.display = 'none';
-        tomorrowChartSectionEl.style.display = 'none';
-        tomorrowTableSectionEl.style.display = 'none';
-        tomorrowNotAvailableEl.style.display = 'block';
-        return;
-      }
-      tomorrowSectionEl.style.display = 'block';
-      tomorrowChartSectionEl.style.display = 'block';
-      tomorrowTableSectionEl.style.display = 'block';
-      tomorrowNotAvailableEl.style.display = 'none';
-
-      let minP = Infinity, maxP = -Infinity, sum = 0;
-      tomorrowData.forEach(d => {
-        const p = d.value_inc_vat;
-        if(p < minP) minP = p;
-        if(p > maxP) maxP = p;
-        sum += p;
-      });
-      const avgP = sum / tomorrowData.length;
-      tomorrowMinEl.innerText = `${minP.toFixed(2)} p`;
-      tomorrowMaxEl.innerText = `${maxP.toFixed(2)} p`;
-      tomorrowAvgEl.innerText = `${avgP.toFixed(2)} p`;
-    }
-
-    function renderTomorrowTable() {
-      tomorrowTableBodyEl.innerHTML = '';
-      if(!tomorrowData.length) return;
-      tomorrowData.forEach(item => {
-        const row = document.createElement('tr');
-        const p = item.value_inc_vat;
-
-        row.style.backgroundColor = getDynamicColor(p);
-
-        const fromStr = new Date(item.valid_from).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-        const toStr   = new Date(item.valid_to).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-        
-        const fromTd = document.createElement('td');
-        fromTd.innerText = fromStr;
-        const toTd = document.createElement('td');
-        toTd.innerText = toStr;
-        const priceTd = document.createElement('td');
-        priceTd.innerText = p.toFixed(2) + getPriceEmoji(p);
-
-        row.appendChild(fromTd);
-        row.appendChild(toTd);
-        row.appendChild(priceTd);
-        tomorrowTableBodyEl.appendChild(row);
-      });
-    }
-
-    /************************************************************************
-     * PRICE CLASS / EMOJIS
-     ************************************************************************/
-    function getPriceEmoji(p) {
-      if(p > 70) return ' 💀';
-      if(p > 40) return ' ❌';
-      if(p > 30) return ' ⚠️';
-      if(p < 7)  return ' 🤑';
-      if(p < 15) return ' 😎';
-      return '';
-    }
-
-    function getDynamicColor(p) {
-      if (p < 22) {
-        const fraction = Math.min(Math.max(p, 0), 22) / 22; 
-        const alpha = 0.7 - fraction * 0.5;
-        return `rgba(0, 255, 0, ${alpha.toFixed(2)})`;
-      } else if (p < 30) {
-        const fraction = (p - 22) / 8;
-        const alpha = 0.7 - fraction * 0.5;
-        return `rgba(255, 165, 0, ${alpha.toFixed(2)})`;
-      } else {
-        const clamped = Math.min(p, 70);
-        const fraction = (clamped - 30) / 40;
-        const alpha = 0.7 - fraction * 0.5;
-        return `rgba(255, 0, 0, ${alpha.toFixed(2)})`;
-      }
-    }
-
-    /************************************************************************
-     * BAR CHARTS (MARGINS)
-     ************************************************************************/
-    function renderTodayChart(){
-      renderBarChart(todayData, todayChartEl);
-    }
-    function renderTomorrowChart(){
-      renderBarChart(tomorrowData, tomorrowChartEl);
-    }
-
-    function renderBarChart(dataArray, containerEl){
-      containerEl.innerHTML = '';
-      if(!dataArray.length){
-        containerEl.innerText = 'No data to chart.';
-        return;
-      }
-      const w = containerEl.clientWidth;
-      const h = containerEl.clientHeight;
-      const dpr = window.devicePixelRatio || 1;
-
-      const canvas = document.createElement('canvas');
-      canvas.style.width = w + 'px';
-      canvas.style.height = h + 'px';
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      containerEl.appendChild(canvas);
-
-      const ctx = canvas.getContext('2d');
-      ctx.scale(dpr, dpr);
-
-      const marginLeft = 40;
-      const marginRight = 10;
-      const marginTop = 10;
-      const marginBottom = 30;
-      const chartW = w - marginLeft - marginRight;
-      const chartH = h - marginTop - marginBottom;
-
-      ctx.fillStyle = '#4A2E60';
-      ctx.fillRect(0, 0, w, h);
-
-      dataArray.sort((a, b) => new Date(a.valid_from) - new Date(b.valid_from));
-      const minTime = new Date(dataArray[0].valid_from).getTime();
-      const maxTime = new Date(dataArray[dataArray.length - 1].valid_to).getTime();
-
-      let minP = Infinity, maxP = -Infinity;
-      dataArray.forEach(d => {
-        if(d.value_inc_vat < minP) minP = d.value_inc_vat;
-        if(d.value_inc_vat > maxP) maxP = d.value_inc_vat;
-      });
-      const pad = (maxP - minP) * 0.1 || 1;
-      const chartMinP = minP - pad;
-      const chartMaxP = maxP + pad;
-
-      // Vertical grid lines (every 2 hours)
-      const twoHours = 2 * 3600000;
-      let tCur = minTime - (minTime % twoHours);
-      ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-      ctx.lineWidth = 1;
-      while (tCur <= maxTime) {
-        const xNorm = (tCur - minTime) / (maxTime - minTime || 1);
-        const x = marginLeft + xNorm * chartW;
-        ctx.beginPath();
-        ctx.moveTo(x, marginTop);
-        ctx.lineTo(x, marginTop + chartH);
-        ctx.stroke();
-        tCur += twoHours;
-      }
-
-      // Horizontal lines (price lines)
-      ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-      const step = 5;
-      const base = Math.floor(chartMinP / step) * step;
-      const limit = Math.ceil(chartMaxP / step) * step;
-      for(let val = base; val <= limit; val += step){
-        const yNorm = (val - chartMinP) / (chartMaxP - chartMinP || 1);
-        const y = marginTop + (chartH - yNorm * chartH);
-        ctx.beginPath();
-        ctx.moveTo(marginLeft, y);
-        ctx.lineTo(marginLeft + chartW, y);
-        ctx.stroke();
-      }
-
-      // X axis time labels (every 6 hours)
-      ctx.fillStyle = '#fff';
-      ctx.font = '12px Roboto';
-      tCur = minTime - (minTime % twoHours);
-      while (tCur <= maxTime) {
-        const date = new Date(tCur);
-        const hours = date.getHours();
-        const mins = date.getMinutes();
-        if (hours % 6 === 0 && mins === 0) {
-          const xNorm = (tCur - minTime) / (maxTime - minTime || 1);
-          const x = marginLeft + xNorm * chartW;
-          const hour12 = (hours === 0 ? 12 : (hours > 12 ? hours - 12 : hours));
-          const ampm = (hours >= 12 ? 'pm' : 'am');
-          ctx.fillText(`${hour12}${ampm}`, x - 10, marginTop + chartH + 15);
-        }
-        tCur += twoHours;
-      }
-
-      // Y axis price labels
-      for(let val = base; val <= limit; val += step){
-        const yNorm = (val - chartMinP) / (chartMaxP - chartMinP || 1);
-        const y = marginTop + (chartH - yNorm * chartH);
-        ctx.fillText(`${val}p`, marginLeft - 35, y + 4);
-      }
-
-      // Bars
-      const n = dataArray.length;
-      const barGap = 1;
-      const barWidth = chartW / n - barGap;
-
-      dataArray.forEach((item, i) => {
-        const p = item.value_inc_vat;
-        const pNorm = (p - chartMinP) / (chartMaxP - chartMinP || 1);
-        const barH = pNorm * chartH;
-        const x = marginLeft + i * (barWidth + barGap);
-        const y = marginTop + (chartH - barH);
-        const color = getDynamicColor(p).replace(', 0.', ', 0.8');
-        ctx.fillStyle = color;
-        ctx.fillRect(x, y, barWidth, barH);
-      });
-    }
-
-    /************************************************************************
-     * ENERGY MIX
-     ************************************************************************/
-    async function fetchEnergyMix() {
-      const resp = await fetch(ENERGY_MIX_API);
+  /************************************************************************
+   * OPEN-METEO FORECAST (NEXT FEW DAYS)
+   ************************************************************************/
+  function fetchOpenMeteoForecast() {
+    return fetch(FORECAST_API).then(function(resp) {
       if(!resp.ok) {
-        throw new Error(`Energy Mix error: ${resp.status}`);
+        throw new Error("Forecast fetch error: " + resp.status);
       }
       return resp.json();
+    });
+  }
+
+  function renderForecastTable(forecastJson) {
+    var daily = forecastJson.daily;
+    forecastTableBodyEl.innerHTML = "";
+
+    // Show next 3 days beyond today (indexes 1 to 3)
+    for (var i = 1; i < daily.time.length; i++) {
+      if (i > 3) break;
+      var tr = document.createElement("tr");
+
+      // Date
+      var dateTd = document.createElement("td");
+      dateTd.style.padding = "8px";
+      dateTd.style.fontSize = "0.8rem";
+      dateTd.innerText = daily.time[i];
+      tr.appendChild(dateTd);
+
+      // Max wind speed
+      var windTd = document.createElement("td");
+      windTd.style.padding = "8px";
+      windTd.style.fontSize = "0.8rem";
+      windTd.innerText = daily.windspeed_10m_max[i]
+        ? daily.windspeed_10m_max[i].toFixed(1)
+        : "-";
+      tr.appendChild(windTd);
+
+      // Solar radiation sum
+      var solarTd = document.createElement("td");
+      solarTd.style.padding = "8px";
+      solarTd.style.fontSize = "0.8rem";
+      solarTd.innerText = daily.shortwave_radiation_sum[i]
+        ? daily.shortwave_radiation_sum[i].toFixed(1)
+        : "-";
+      tr.appendChild(solarTd);
+
+      forecastTableBodyEl.appendChild(tr);
     }
-    function renderEnergyMix(){
-      energyMixContainerEl.innerHTML = '';
-      if(!energyMixData || !energyMixData.data || !energyMixData.data.generationmix){
-        energyMixContainerEl.innerText = 'No energy mix data.';
-        return;
-      }
-      const arr = energyMixData.data.generationmix.filter(item => item.perc > 0);
-      arr.sort((a, b) => b.perc - a.perc);
-      if(!arr.length){
-        energyMixContainerEl.innerText = 'No sources above 0% right now.';
-        return;
-      }
+  }
 
-      const container = document.createElement('div');
-      container.className = 'energy-mix-grid';
+  /************************************************************************
+   * DEBUG
+   ************************************************************************/
+  function renderDebugInfo(){
+    var debugObj = {
+      rawAgileData: rawAgileData,
+      todayData: todayData,
+      tomorrowData: tomorrowData,
+      energyMixData: energyMixData,
+      openMeteoForecastData: openMeteoForecastData
+    };
+    debugPanelEl.textContent = JSON.stringify(debugObj, null, 2);
+  }
 
-      arr.forEach(item => {
-        const wrap = document.createElement('div');
-        wrap.className = 'energy-mix-item';
-        const title = document.createElement('h3');
-        title.innerText = item.fuel;
-        wrap.appendChild(title);
-
-        const barC = document.createElement('div');
-        barC.className = 'energy-bar-container';
-        const bar = document.createElement('div');
-        bar.className = 'energy-bar';
-        bar.style.width = `${item.perc}%`;
-        barC.appendChild(bar);
-        wrap.appendChild(barC);
-
-        const perc = document.createElement('div');
-        perc.className = 'energy-perc';
-        perc.innerText = `${item.perc.toFixed(1)}%`;
-        wrap.appendChild(perc);
-
-        container.appendChild(wrap);
-      });
-      energyMixContainerEl.appendChild(container);
-    }
-
-    /************************************************************************
-     * OPEN-METEO FORECAST (NEXT FEW DAYS)
-     ************************************************************************/
-    async function fetchOpenMeteoForecast() {
-      const resp = await fetch(FORECAST_API);
-      if(!resp.ok) {
-        throw new Error(`Forecast fetch error: ${resp.status}`);
-      }
-      return resp.json();
-    }
-
-    function renderForecastTable(forecastJson) {
-      // Display the next 3 days beyond today (indexes 1 to 3)
-      const daily = forecastJson.daily;
-      forecastTableBodyEl.innerHTML = '';
-
-      for (let i = 1; i < daily.time.length; i++) {
-        if (i > 3) break;
-
-        const tr = document.createElement('tr');
-
-        // Date
-        const dateTd = document.createElement('td');
-        dateTd.style.padding = '8px';
-        dateTd.style.fontSize = '0.8rem';
-        dateTd.innerText = daily.time[i];
-        tr.appendChild(dateTd);
-
-        // Max wind speed
-        const windTd = document.createElement('td');
-        windTd.style.padding = '8px';
-        windTd.style.fontSize = '0.8rem';
-        windTd.innerText = daily.windspeed_10m_max[i] ? daily.windspeed_10m_max[i].toFixed(1) : '-';
-        tr.appendChild(windTd);
-
-        // Solar radiation sum
-        const solarTd = document.createElement('td');
-        solarTd.style.padding = '8px';
-        solarTd.style.fontSize = '0.8rem';
-        solarTd.innerText = daily.shortwave_radiation_sum[i] ? daily.shortwave_radiation_sum[i].toFixed(1) : '-';
-        tr.appendChild(solarTd);
-
-        forecastTableBodyEl.appendChild(tr);
-      }
-    }
-
-    /************************************************************************
-     * DEBUG
-     ************************************************************************/
-    function renderDebugInfo(){
-      const debugObj = {
-        rawAgileData,
-        todayData,
-        tomorrowData,
-        energyMixData,
-        openMeteoForecastData
-      };
-      debugPanelEl.textContent = JSON.stringify(debugObj, null, 2);
-    }
-
-    /************************************************************************
-     * MAIN
-     ************************************************************************/
-    async function fetchAndRenderAll(){
-      try {
-        // 1. Agile Data
-        const agileJson = await fetchAgileData();
+  /************************************************************************
+   * MAIN
+   ************************************************************************/
+  function fetchAndRenderAll(){
+    fetchAgileData()
+      .then(function(agileJson){
         rawAgileData = agileJson;
-        if(!agileJson.results) throw new Error('No Agile results found.');
+        if(!agileJson.results) {
+          throw new Error("No Agile results found.");
+        }
         splitTodayAndTomorrow(agileJson.results);
-
-        // 2. Energy Mix
-        try {
-          energyMixData = await fetchEnergyMix();
-        } catch(eMix) {
-          console.error('Energy mix error:', eMix);
+      })
+      .then(function(){
+        // fetch Energy Mix
+        return fetchEnergyMix().then(function(data){
+          energyMixData = data;
+        }).catch(function(eMix){
+          console.error("Energy mix error:", eMix);
           energyMixData = null;
-        }
-
-        // 3. Weather Forecast (Open-Meteo)
-        try {
-          openMeteoForecastData = await fetchOpenMeteoForecast();
-        } catch(eForecast) {
-          console.error('Open-Meteo error:', eForecast);
+        });
+      })
+      .then(function(){
+        // fetch Weather
+        return fetchOpenMeteoForecast().then(function(data){
+          openMeteoForecastData = data;
+        }).catch(function(eForecast){
+          console.error("Open-Meteo error:", eForecast);
           openMeteoForecastData = null;
-        }
-
-        // 4. Render everything
+        });
+      })
+      .then(function(){
+        // Render everything
         renderCurrentPrice();
 
         renderTodayMetrics();
@@ -975,25 +1070,24 @@
         if(openMeteoForecastData) {
           renderForecastTable(openMeteoForecastData);
         } else {
-          forecastTableBodyEl.innerHTML = '<tr><td colspan="3">No forecast data.</td></tr>';
+          forecastTableBodyEl.innerHTML = "<tr><td colspan='3'>No forecast data.</td></tr>";
         }
 
-        // 5. Render debug
         renderDebugInfo();
-      } catch(err) {
-        debugPanelEl.style.display = 'block';
+      })
+      .catch(function(err){
+        debugPanelEl.style.display = "block";
         debugPanelEl.textContent = String(err);
         console.error(err);
-        priceEl.innerText = 'Error loading data.';
-      }
-    }
+        priceEl.innerText = "Error loading data.";
+      });
+  }
 
-    // Initial load
-    regionSelectEl.value = 'A';
-    fetchAndRenderAll();
+  // Initial load
+  fetchAndRenderAll();
 
-    // Refresh data every 30 min
-    setInterval(fetchAndRenderAll, 30 * 60 * 1000);
+  // Refresh data every 30 min
+  setInterval(fetchAndRenderAll, 30 * 60 * 1000);
   </script>
 </body>
 </html>
