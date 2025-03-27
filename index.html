@@ -5,11 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Octopus Agile – Margins & Tomorrow Data</title>
 
-  <!-- Optional PWA Manifest -->
-  <link rel="manifest" href="manifest.json" />
-
-  <!-- Theme color (used by mobile browsers) -->
-  <meta name="theme-color" content="#210035" />
+  <!-- PWA: Manifest and Theme Color -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#360040">
 
   <!-- Optional Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -206,9 +204,7 @@
     }
     .energy-bar {
       position: absolute;
-      left: 0; 
-      top: 0; 
-      bottom: 0;
+      left: 0; top: 0; bottom: 0;
       background-color: #FF00E5;
     }
     .energy-perc {
@@ -434,55 +430,87 @@
      * GLOBAL CONSTANTS & DOM REFS
      ************************************************************************/
     const AGILE_PRODUCT_CODE = 'AGILE-24-10-01';
-    const ENERGY_MIX_API = 'https://api.carbonintensity.org.uk/generation';
-    const FORECAST_API = 'https://api.open-meteo.com/v1/forecast?latitude=54.3&longitude=-0.1&daily=windspeed_10m_max,shortwave_radiation_sum&forecast_days=4&timezone=Europe%2FLondon';
+    const ENERGY_MIX_API     = 'https://api.carbonintensity.org.uk/generation';
+
+    // Using coordinates for a renewable hotspot in Yorkshire and the Humber (Flamborough Head)
+    const FORECAST_API = 'https://api.open-meteo.com/v1/forecast?'
+      + 'latitude=54.3&longitude=-0.1'
+      + '&daily=windspeed_10m_max,shortwave_radiation_sum'
+      + '&forecast_days=4'
+      + '&timezone=Europe%2FLondon';
 
     let regionCode = 'A';
     let rawAgileData = null;
     let todayData = [];
     let tomorrowData = [];
     let energyMixData = null;
+
+    // We'll store the entire forecast JSON here
     let openMeteoForecastData = null;
 
-    // Element references
     const regionSelectEl = document.getElementById('regionSelect');
-    const priceEl = document.getElementById('priceDisplay');
-    const timestampEl = document.getElementById('timestampDisplay');
-    const todayMinEl = document.getElementById('todayMin');
-    const todayMaxEl = document.getElementById('todayMax');
-    const todayAvgEl = document.getElementById('todayAvg');
-    const todayTableBodyEl = document.getElementById('todayTableBody');
-    const todayChartEl = document.getElementById('todayChart');
-    const tomorrowSectionEl = document.getElementById('tomorrowSection');
-    const tomorrowNotAvailableEl = document.getElementById('tomorrowNotAvailable');
+    const priceEl        = document.getElementById('priceDisplay');
+    const timestampEl    = document.getElementById('timestampDisplay');
+    // Today
+    const todayMinEl      = document.getElementById('todayMin');
+    const todayMaxEl      = document.getElementById('todayMax');
+    const todayAvgEl      = document.getElementById('todayAvg');
+    const todayTableBodyEl= document.getElementById('todayTableBody');
+    const todayChartEl    = document.getElementById('todayChart');
+    // Tomorrow
+    const tomorrowSectionEl     = document.getElementById('tomorrowSection');
+    const tomorrowNotAvailableEl= document.getElementById('tomorrowNotAvailable');
     const tomorrowMetricsGridEl = document.getElementById('tomorrowMetricsGrid');
-    const tomorrowMinEl = document.getElementById('tomorrowMin');
-    const tomorrowMaxEl = document.getElementById('tomorrowMax');
-    const tomorrowAvgEl = document.getElementById('tomorrowAvg');
-    const tomorrowChartEl = document.getElementById('tomorrowChart');
+    const tomorrowMinEl       = document.getElementById('tomorrowMin');
+    const tomorrowMaxEl       = document.getElementById('tomorrowMax');
+    const tomorrowAvgEl       = document.getElementById('tomorrowAvg');
+    const tomorrowChartEl     = document.getElementById('tomorrowChart');
     const tomorrowTableBodyEl = document.getElementById('tomorrowTableBody');
-    const tomorrowChartSectionEl = document.getElementById('tomorrowChartSection');
-    const tomorrowTableSectionEl = document.getElementById('tomorrowTableSection');
-    const energyMixContainerEl = document.getElementById('energyMixContainer');
+    const tomorrowChartSectionEl= document.getElementById('tomorrowChartSection');
+    const tomorrowTableSectionEl= document.getElementById('tomorrowTableSection');
+    // Energy Mix
+    const energyMixContainerEl= document.getElementById('energyMixContainer');
+    // Forecast table
     const forecastTableBodyEl = document.getElementById('forecastTableBody');
-    const debugToggleEl = document.getElementById('debugToggle');
-    const debugPanelEl = document.getElementById('debugPanel');
+    // Debug
+    const debugToggleEl   = document.getElementById('debugToggle');
+    const debugPanelEl    = document.getElementById('debugPanel');
+
+    /************************************************************************
+     * PWA: Register Service Worker
+     ************************************************************************/
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(function(registration) {
+            console.log('Service Worker registered with scope:', registration.scope);
+          }).catch(function(error) {
+            console.log('Service Worker registration failed:', error);
+          });
+      });
+    }
+
+    /************************************************************************
+     * REMEMBER SELECTED REGION
+     ************************************************************************/
+    // On load, check localStorage for selected region
+    const savedRegion = localStorage.getItem('selectedRegion');
+    if (savedRegion) {
+      regionSelectEl.value = savedRegion;
+      regionCode = savedRegion;
+    }
 
     /************************************************************************
      * EVENT LISTENERS
      ************************************************************************/
-    regionSelectEl.addEventListener('change', function() {
+    regionSelectEl.addEventListener('change', () => {
       regionCode = regionSelectEl.value;
+      // Save selected region to localStorage
       localStorage.setItem('selectedRegion', regionCode);
       fetchAndRenderAll();
     });
-
-    debugToggleEl.addEventListener('click', function() {
-      if (debugPanelEl.style.display === 'block') {
-        debugPanelEl.style.display = 'none';
-      } else {
-        debugPanelEl.style.display = 'block';
-      }
+    debugToggleEl.addEventListener('click', () => {
+      debugPanelEl.style.display = (debugPanelEl.style.display === 'block' ? 'none' : 'block');
     });
 
     /************************************************************************
@@ -494,16 +522,13 @@
       future.setDate(now.getDate() + 2);
 
       const fromISO = now.toISOString();
-      const toISO = future.toISOString();
+      const toISO   = future.toISOString();
 
-      const url = 'https://api.octopus.energy/v1/products/' + AGILE_PRODUCT_CODE +
-                  '/electricity-tariffs/E-1R-' + AGILE_PRODUCT_CODE + '-' +
-                  regionCode + '/standard-unit-rates/?period_from=' + fromISO +
-                  '&period_to=' + toISO + '&page_size=100';
+      const url = `https://api.octopus.energy/v1/products/${AGILE_PRODUCT_CODE}/electricity-tariffs/E-1R-${AGILE_PRODUCT_CODE}-${regionCode}/standard-unit-rates/?period_from=${fromISO}&period_to=${toISO}&page_size=100`;
 
       const resp = await fetch(url);
-      if (!resp.ok) {
-        throw new Error('Agile fetch error: ' + resp.status);
+      if(!resp.ok) {
+        throw new Error(`Agile fetch error: ${resp.status}`);
       }
       return resp.json();
     }
@@ -514,20 +539,18 @@
 
       const now = new Date();
       const todayStr = formatDateYYYYMMDD(now);
+
       const tDay = new Date(now);
       tDay.setDate(now.getDate() + 1);
       const tomorrowStr = formatDateYYYYMMDD(tDay);
 
-      results.sort(function(a, b) {
-        return new Date(a.valid_from) - new Date(b.valid_from);
-      });
-
-      results.forEach(function(item) {
+      results.sort((a, b) => new Date(a.valid_from) - new Date(b.valid_from));
+      results.forEach(item => {
         const d = new Date(item.valid_from);
         const dStr = formatDateYYYYMMDD(d);
-        if (dStr === todayStr) {
+        if(dStr === todayStr) {
           todayData.push(item);
-        } else if (dStr === tomorrowStr) {
+        } else if(dStr === tomorrowStr) {
           tomorrowData.push(item);
         }
       });
@@ -537,7 +560,7 @@
       const y = d.getFullYear();
       const m = String(d.getMonth() + 1).padStart(2, '0');
       const day = String(d.getDate()).padStart(2, '0');
-      return y + '-' + m + '-' + day;
+      return `${y}-${m}-${day}`;
     }
 
     /************************************************************************
@@ -545,54 +568,50 @@
      ************************************************************************/
     function renderCurrentPrice() {
       const now = new Date();
-      const current = todayData.find(function(item) {
+      const current = todayData.find(item => {
         const start = new Date(item.valid_from);
-        const end = new Date(item.valid_to);
+        const end   = new Date(item.valid_to);
         return (start <= now && end > now);
       });
-
-      if (!current) {
+      if(!current) {
         priceEl.innerText = 'No current price data.';
         timestampEl.innerText = '';
         return;
       }
-
       const p = current.value_inc_vat.toFixed(2);
-      priceEl.innerText = 'Current Price: ' + p + ' p/kWh';
+      priceEl.innerText = `Current Price: ${p} p/kWh`;
 
       const fromStr = new Date(current.valid_from).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-      const toStr = new Date(current.valid_to).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-      timestampEl.innerText = 'Valid: ' + fromStr + ' - ' + toStr;
+      const toStr   = new Date(current.valid_to).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      timestampEl.innerText = `Valid: ${fromStr} - ${toStr}`;
     }
 
     /************************************************************************
      * RENDER TODAY
      ************************************************************************/
     function renderTodayMetrics() {
-      if (!todayData.length) {
+      if(!todayData.length) {
         todayMinEl.innerText = '-';
         todayMaxEl.innerText = '-';
         todayAvgEl.innerText = '-';
         return;
       }
-      let minP = Infinity;
-      let maxP = -Infinity;
-      let sum = 0;
-      todayData.forEach(function(d) {
+      let minP = Infinity, maxP = -Infinity, sum = 0;
+      todayData.forEach(d => {
         const p = d.value_inc_vat;
-        if (p < minP) { minP = p; }
-        if (p > maxP) { maxP = p; }
+        if(p < minP) minP = p;
+        if(p > maxP) maxP = p;
         sum += p;
       });
       const avgP = sum / todayData.length;
-      todayMinEl.innerText = minP.toFixed(2) + ' p';
-      todayMaxEl.innerText = maxP.toFixed(2) + ' p';
-      todayAvgEl.innerText = avgP.toFixed(2) + ' p';
+      todayMinEl.innerText = `${minP.toFixed(2)} p`;
+      todayMaxEl.innerText = `${maxP.toFixed(2)} p`;
+      todayAvgEl.innerText = `${avgP.toFixed(2)} p`;
     }
 
     function renderTodayTable() {
       todayTableBodyEl.innerHTML = '';
-      if (!todayData.length) {
+      if(!todayData.length) {
         const row = document.createElement('tr');
         const cell = document.createElement('td');
         cell.colSpan = 3;
@@ -601,14 +620,14 @@
         todayTableBodyEl.appendChild(row);
         return;
       }
-      todayData.forEach(function(item) {
+      todayData.forEach(item => {
         const row = document.createElement('tr');
         const p = item.value_inc_vat;
 
         row.style.backgroundColor = getDynamicColor(p);
 
         const fromStr = new Date(item.valid_from).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-        const toStr = new Date(item.valid_to).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        const toStr   = new Date(item.valid_to).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
 
         const fromTd = document.createElement('td');
         fromTd.innerText = fromStr;
@@ -628,7 +647,7 @@
      * RENDER TOMORROW
      ************************************************************************/
     function renderTomorrowMetrics() {
-      if (!tomorrowData.length) {
+      if(!tomorrowData.length) {
         tomorrowSectionEl.style.display = 'none';
         tomorrowChartSectionEl.style.display = 'none';
         tomorrowTableSectionEl.style.display = 'none';
@@ -640,33 +659,31 @@
       tomorrowTableSectionEl.style.display = 'block';
       tomorrowNotAvailableEl.style.display = 'none';
 
-      let minP = Infinity;
-      let maxP = -Infinity;
-      let sum = 0;
-      tomorrowData.forEach(function(d) {
+      let minP = Infinity, maxP = -Infinity, sum = 0;
+      tomorrowData.forEach(d => {
         const p = d.value_inc_vat;
-        if (p < minP) { minP = p; }
-        if (p > maxP) { maxP = p; }
+        if(p < minP) minP = p;
+        if(p > maxP) maxP = p;
         sum += p;
       });
       const avgP = sum / tomorrowData.length;
-      tomorrowMinEl.innerText = minP.toFixed(2) + ' p';
-      tomorrowMaxEl.innerText = maxP.toFixed(2) + ' p';
-      tomorrowAvgEl.innerText = avgP.toFixed(2) + ' p';
+      tomorrowMinEl.innerText = `${minP.toFixed(2)} p`;
+      tomorrowMaxEl.innerText = `${maxP.toFixed(2)} p`;
+      tomorrowAvgEl.innerText = `${avgP.toFixed(2)} p`;
     }
 
     function renderTomorrowTable() {
       tomorrowTableBodyEl.innerHTML = '';
-      if (!tomorrowData.length) { return; }
-      tomorrowData.forEach(function(item) {
+      if(!tomorrowData.length) return;
+      tomorrowData.forEach(item => {
         const row = document.createElement('tr');
         const p = item.value_inc_vat;
 
         row.style.backgroundColor = getDynamicColor(p);
 
         const fromStr = new Date(item.valid_from).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-        const toStr = new Date(item.valid_to).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-
+        const toStr   = new Date(item.valid_to).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        
         const fromTd = document.createElement('td');
         fromTd.innerText = fromStr;
         const toTd = document.createElement('td');
@@ -682,51 +699,47 @@
     }
 
     /************************************************************************
-     * PRICE EMOJIS
+     * PRICE CLASS / EMOJIS
      ************************************************************************/
     function getPriceEmoji(p) {
-      if (p > 70) { return ' 💀'; }
-      if (p > 40) { return ' ❌'; }
-      if (p > 30) { return ' ⚠️'; }
-      if (p < 7) { return ' 🤑'; }
-      if (p < 15) { return ' 😎'; }
+      if(p > 70) return ' 💀';
+      if(p > 40) return ' ❌';
+      if(p > 30) return ' ⚠️';
+      if(p < 7)  return ' 🤑';
+      if(p < 15) return ' 😎';
       return '';
     }
 
-    /************************************************************************
-     * COLOR CODING
-     ************************************************************************/
     function getDynamicColor(p) {
       if (p < 22) {
-        const fraction = Math.min(Math.max(p, 0), 22) / 22;
+        const fraction = Math.min(Math.max(p, 0), 22) / 22; 
         const alpha = 0.7 - fraction * 0.5;
-        return 'rgba(0, 255, 0, ' + alpha.toFixed(2) + ')';
+        return `rgba(0, 255, 0, ${alpha.toFixed(2)})`;
       } else if (p < 30) {
         const fraction = (p - 22) / 8;
         const alpha = 0.7 - fraction * 0.5;
-        return 'rgba(255, 165, 0, ' + alpha.toFixed(2) + ')';
+        return `rgba(255, 165, 0, ${alpha.toFixed(2)})`;
       } else {
         const clamped = Math.min(p, 70);
         const fraction = (clamped - 30) / 40;
         const alpha = 0.7 - fraction * 0.5;
-        return 'rgba(255, 0, 0, ' + alpha.toFixed(2) + ')';
+        return `rgba(255, 0, 0, ${alpha.toFixed(2)})`;
       }
     }
 
     /************************************************************************
-     * BAR CHARTS
+     * BAR CHARTS (MARGINS)
      ************************************************************************/
-    function renderTodayChart() {
+    function renderTodayChart(){
       renderBarChart(todayData, todayChartEl);
     }
-
-    function renderTomorrowChart() {
+    function renderTomorrowChart(){
       renderBarChart(tomorrowData, tomorrowChartEl);
     }
 
-    function renderBarChart(dataArray, containerEl) {
+    function renderBarChart(dataArray, containerEl){
       containerEl.innerHTML = '';
-      if (!dataArray.length) {
+      if(!dataArray.length){
         containerEl.innerText = 'No data to chart.';
         return;
       }
@@ -754,17 +767,14 @@
       ctx.fillStyle = '#4A2E60';
       ctx.fillRect(0, 0, w, h);
 
-      dataArray.sort(function(a, b) {
-        return new Date(a.valid_from) - new Date(b.valid_from);
-      });
+      dataArray.sort((a, b) => new Date(a.valid_from) - new Date(b.valid_from));
       const minTime = new Date(dataArray[0].valid_from).getTime();
       const maxTime = new Date(dataArray[dataArray.length - 1].valid_to).getTime();
 
-      let minP = Infinity;
-      let maxP = -Infinity;
-      dataArray.forEach(function(d) {
-        if (d.value_inc_vat < minP) { minP = d.value_inc_vat; }
-        if (d.value_inc_vat > maxP) { maxP = d.value_inc_vat; }
+      let minP = Infinity, maxP = -Infinity;
+      dataArray.forEach(d => {
+        if(d.value_inc_vat < minP) minP = d.value_inc_vat;
+        if(d.value_inc_vat > maxP) maxP = d.value_inc_vat;
       });
       const pad = (maxP - minP) * 0.1 || 1;
       const chartMinP = minP - pad;
@@ -786,11 +796,11 @@
       }
 
       // Horizontal lines (price lines)
+      ctx.strokeStyle = 'rgba(255,255,255,0.2)';
       const step = 5;
       const base = Math.floor(chartMinP / step) * step;
       const limit = Math.ceil(chartMaxP / step) * step;
-      ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-      for (let val = base; val <= limit; val += step) {
+      for(let val = base; val <= limit; val += step){
         const yNorm = (val - chartMinP) / (chartMaxP - chartMinP || 1);
         const y = marginTop + (chartH - yNorm * chartH);
         ctx.beginPath();
@@ -810,20 +820,18 @@
         if (hours % 6 === 0 && mins === 0) {
           const xNorm = (tCur - minTime) / (maxTime - minTime || 1);
           const x = marginLeft + xNorm * chartW;
-          let hour12 = hours;
-          if (hours === 0) { hour12 = 12; }
-          else if (hours > 12) { hour12 = hours - 12; }
-          const ampm = (hours >= 12) ? 'pm' : 'am';
-          ctx.fillText(hour12 + ampm, x - 10, marginTop + chartH + 15);
+          const hour12 = (hours === 0 ? 12 : (hours > 12 ? hours - 12 : hours));
+          const ampm = (hours >= 12 ? 'pm' : 'am');
+          ctx.fillText(`${hour12}${ampm}`, x - 10, marginTop + chartH + 15);
         }
         tCur += twoHours;
       }
 
       // Y axis price labels
-      for (let val = base; val <= limit; val += step) {
+      for(let val = base; val <= limit; val += step){
         const yNorm = (val - chartMinP) / (chartMaxP - chartMinP || 1);
         const y = marginTop + (chartH - yNorm * chartH);
-        ctx.fillText(val + 'p', marginLeft - 35, y + 4);
+        ctx.fillText(`${val}p`, marginLeft - 35, y + 4);
       }
 
       // Bars
@@ -831,7 +839,7 @@
       const barGap = 1;
       const barWidth = chartW / n - barGap;
 
-      dataArray.forEach(function(item, i) {
+      dataArray.forEach((item, i) => {
         const p = item.value_inc_vat;
         const pNorm = (p - chartMinP) / (chartMaxP - chartMinP || 1);
         const barH = pNorm * chartH;
@@ -848,25 +856,20 @@
      ************************************************************************/
     async function fetchEnergyMix() {
       const resp = await fetch(ENERGY_MIX_API);
-      if (!resp.ok) {
-        throw new Error('Energy Mix error: ' + resp.status);
+      if(!resp.ok) {
+        throw new Error(`Energy Mix error: ${resp.status}`);
       }
       return resp.json();
     }
-
-    function renderEnergyMix() {
+    function renderEnergyMix(){
       energyMixContainerEl.innerHTML = '';
-      if (!energyMixData || !energyMixData.data || !energyMixData.data.generationmix) {
+      if(!energyMixData || !energyMixData.data || !energyMixData.data.generationmix){
         energyMixContainerEl.innerText = 'No energy mix data.';
         return;
       }
-      const arr = energyMixData.data.generationmix.filter(function(item) {
-        return item.perc > 0;
-      });
-      arr.sort(function(a, b) {
-        return b.perc - a.perc;
-      });
-      if (!arr.length) {
+      const arr = energyMixData.data.generationmix.filter(item => item.perc > 0);
+      arr.sort((a, b) => b.perc - a.perc);
+      if(!arr.length){
         energyMixContainerEl.innerText = 'No sources above 0% right now.';
         return;
       }
@@ -874,10 +877,9 @@
       const container = document.createElement('div');
       container.className = 'energy-mix-grid';
 
-      arr.forEach(function(item) {
+      arr.forEach(item => {
         const wrap = document.createElement('div');
         wrap.className = 'energy-mix-item';
-
         const title = document.createElement('h3');
         title.innerText = item.fuel;
         wrap.appendChild(title);
@@ -886,13 +888,13 @@
         barC.className = 'energy-bar-container';
         const bar = document.createElement('div');
         bar.className = 'energy-bar';
-        bar.style.width = item.perc + '%';
+        bar.style.width = `${item.perc}%`;
         barC.appendChild(bar);
         wrap.appendChild(barC);
 
         const perc = document.createElement('div');
         perc.className = 'energy-perc';
-        perc.innerText = item.perc.toFixed(1) + '%';
+        perc.innerText = `${item.perc.toFixed(1)}%`;
         wrap.appendChild(perc);
 
         container.appendChild(wrap);
@@ -905,45 +907,41 @@
      ************************************************************************/
     async function fetchOpenMeteoForecast() {
       const resp = await fetch(FORECAST_API);
-      if (!resp.ok) {
-        throw new Error('Forecast fetch error: ' + resp.status);
+      if(!resp.ok) {
+        throw new Error(`Forecast fetch error: ${resp.status}`);
       }
       return resp.json();
     }
 
     function renderForecastTable(forecastJson) {
+      // Display the next 3 days beyond today (indexes 1 to 3)
       const daily = forecastJson.daily;
       forecastTableBodyEl.innerHTML = '';
-      // Show next 3 days beyond today => indexes 1,2,3
+
       for (let i = 1; i < daily.time.length; i++) {
-        if (i > 3) { break; }
+        if (i > 3) break;
 
         const tr = document.createElement('tr');
 
+        // Date
         const dateTd = document.createElement('td');
         dateTd.style.padding = '8px';
         dateTd.style.fontSize = '0.8rem';
         dateTd.innerText = daily.time[i];
         tr.appendChild(dateTd);
 
+        // Max wind speed
         const windTd = document.createElement('td');
         windTd.style.padding = '8px';
         windTd.style.fontSize = '0.8rem';
-        if (daily.windspeed_10m_max[i]) {
-          windTd.innerText = daily.windspeed_10m_max[i].toFixed(1);
-        } else {
-          windTd.innerText = '-';
-        }
+        windTd.innerText = daily.windspeed_10m_max[i] ? daily.windspeed_10m_max[i].toFixed(1) : '-';
         tr.appendChild(windTd);
 
+        // Solar radiation sum
         const solarTd = document.createElement('td');
         solarTd.style.padding = '8px';
         solarTd.style.fontSize = '0.8rem';
-        if (daily.shortwave_radiation_sum[i]) {
-          solarTd.innerText = daily.shortwave_radiation_sum[i].toFixed(1);
-        } else {
-          solarTd.innerText = '-';
-        }
+        solarTd.innerText = daily.shortwave_radiation_sum[i] ? daily.shortwave_radiation_sum[i].toFixed(1) : '-';
         tr.appendChild(solarTd);
 
         forecastTableBodyEl.appendChild(tr);
@@ -953,29 +951,29 @@
     /************************************************************************
      * DEBUG
      ************************************************************************/
-    function renderDebugInfo() {
+    function renderDebugInfo(){
       const debugObj = {
-        rawAgileData: rawAgileData,
-        todayData: todayData,
-        tomorrowData: tomorrowData,
-        energyMixData: energyMixData,
-        openMeteoForecastData: openMeteoForecastData
+        rawAgileData,
+        todayData,
+        tomorrowData,
+        energyMixData,
+        openMeteoForecastData
       };
       debugPanelEl.textContent = JSON.stringify(debugObj, null, 2);
     }
 
     /************************************************************************
-     * MAIN FETCH & RENDER
+     * MAIN
      ************************************************************************/
-    async function fetchAndRenderAll() {
+    async function fetchAndRenderAll(){
       try {
+        // 1. Agile Data
         const agileJson = await fetchAgileData();
         rawAgileData = agileJson;
-        if (!agileJson.results) {
-          throw new Error('No Agile results found.');
-        }
+        if(!agileJson.results) throw new Error('No Agile results found.');
         splitTodayAndTomorrow(agileJson.results);
 
+        // 2. Energy Mix
         try {
           energyMixData = await fetchEnergyMix();
         } catch(eMix) {
@@ -983,6 +981,7 @@
           energyMixData = null;
         }
 
+        // 3. Weather Forecast (Open-Meteo)
         try {
           openMeteoForecastData = await fetchOpenMeteoForecast();
         } catch(eForecast) {
@@ -990,21 +989,26 @@
           openMeteoForecastData = null;
         }
 
+        // 4. Render everything
         renderCurrentPrice();
+
         renderTodayMetrics();
         renderTodayChart();
         renderTodayTable();
+
         renderTomorrowMetrics();
         renderTomorrowChart();
         renderTomorrowTable();
+
         renderEnergyMix();
 
-        if (openMeteoForecastData) {
+        if(openMeteoForecastData) {
           renderForecastTable(openMeteoForecastData);
         } else {
           forecastTableBodyEl.innerHTML = '<tr><td colspan="3">No forecast data.</td></tr>';
         }
 
+        // 5. Render debug
         renderDebugInfo();
       } catch(err) {
         debugPanelEl.style.display = 'block';
@@ -1014,62 +1018,11 @@
       }
     }
 
-    /************************************************************************
-     * INITIAL LOAD
-     ************************************************************************/
-    const storedRegion = localStorage.getItem('selectedRegion');
-    if (storedRegion) {
-      regionCode = storedRegion;
-      regionSelectEl.value = storedRegion;
-    } else {
-      regionSelectEl.value = 'A';
-    }
-
+    // Initial load
     fetchAndRenderAll();
+
+    // Refresh data every 30 min
     setInterval(fetchAndRenderAll, 30 * 60 * 1000);
-
-    /************************************************************************
-     * PWA: Minimal Add-to-Home-Screen Prompt
-     ************************************************************************/
-    let deferredPrompt = null;
-    window.addEventListener('beforeinstallprompt', function(e) {
-      e.preventDefault();
-      deferredPrompt = e;
-
-      const installBtn = document.createElement('button');
-      installBtn.style.display = 'block';
-      installBtn.style.margin = '10px auto';
-      installBtn.style.padding = '8px 16px';
-      installBtn.style.backgroundColor = '#FF00E5';
-      installBtn.style.color = '#FFFFFF';
-      installBtn.style.border = 'none';
-      installBtn.style.borderRadius = '4px';
-      installBtn.style.cursor = 'pointer';
-      installBtn.innerText = 'Install App';
-
-      installBtn.addEventListener('click', function() {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(function(choiceResult) {
-          if (choiceResult.outcome === 'accepted') {
-            console.log('User accepted A2HS prompt');
-          } else {
-            console.log('User dismissed A2HS prompt');
-          }
-          deferredPrompt = null;
-          installBtn.remove();
-        });
-      });
-
-      document.body.appendChild(installBtn);
-    });
-
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js').then(function() {
-        console.log('Service worker registered');
-      }).catch(function(err) {
-        console.error('SW registration failed:', err);
-      });
-    }
   </script>
 </body>
 </html>
