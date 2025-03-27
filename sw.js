@@ -1,30 +1,40 @@
-// A simple service worker that caches key files for offline use
-
-const CACHE_NAME = 'octopus-agile-pwa-v1';
-const ASSETS_TO_CACHE = [
-  './',              // might resolve to index.html in many servers
-  './index.html',
-  './manifest.json',
-  // Add CSS files, icons, etc. if you have them:
-  // './icons/icon-192.png',
-  // './icons/icon-512.png',
+const CACHE_NAME = 'octopus-agile-cache-v1';
+const urlsToCache = [
+  '/',
+  '/index.html',
+  '/manifest.json'
+  // Add other assets (CSS, JS, images) as needed
 ];
 
-// During install, cache the specified assets
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        return cache.addAll(urlsToCache);
+      })
   );
 });
 
-// Fetch handler: tries the cache first, then goes to network
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request).then(response => {
-      // If found in cache, return it; otherwise fetch from network
-      return response || fetch(event.request);
+    caches.match(event.request)
+      .then(response => {
+        return response || fetch(event.request);
+      })
+  );
+});
+
+self.addEventListener('activate', event => {
+  const cacheWhitelist = [CACHE_NAME];
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
     })
   );
 });
