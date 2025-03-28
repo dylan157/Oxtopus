@@ -1,7 +1,8 @@
 {
   "name": "Octopus Agile – Margins & Tomorrow Data",
   "short_name": "Octopus Agile",
-  "start_url": "/",
+  "start_url": "/Oxtopus/",
+  "scope": "/Oxtopus/",
   "display": "standalone",
   "background_color": "#210035",
   "theme_color": "#360040",
